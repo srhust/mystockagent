@@ -59,6 +59,8 @@ for i in range(1, n):
     if crash_start is not None and not in_pos and pend is None and i - crash_start <= 15:  # 审查十五轮: 急跌有效期15日(10日实测0交易, 5/10/15为待检参数)
         if c.iloc[i] > ma10.iloc[i] and i - crash_start >= 2 and fund_ok[i]:
             pend = ("buy", i + 1)
+    elif crash_start is not None and not in_pos and i - crash_start > 15:
+        crash_start = None  # 审查十五轮: 过期作废(原实现cs只随SELL重置→陈旧信号跨7年/或永久卡死), 等待新急跌
     if in_pos and pend is None:
         ret = px / entry_px - 1
         holding_days = i - entry_idx  # 审查十五轮P0修复
@@ -69,4 +71,6 @@ eq = equity.dropna()
 print(f"快V修复版: 终值={float(eq.iloc[-1]):.2f} MDD={float((eq/eq.cummax()-1).min()):.1%}")
 for t in trades:
     print("   " + " ".join(str(x) for x in t))
+
+
 
