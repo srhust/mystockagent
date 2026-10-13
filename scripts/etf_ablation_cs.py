@@ -95,11 +95,27 @@ for base, sid, sym6 in pairs:
 cal = pd.DatetimeIndex(sorted(set().union(*[set(s.index) for s in etf_series.values()])))
 PX = pd.DataFrame({n: etf_series[n].reindex(cal) for n in names})
 catmap = {n: n for n in names}
-print(f"\n{'配置':<22}{'CAGR':>8}{'Sharpe':>8}{'MDD':>8}{'恢复日':>7}")
-for tag, key in [("Baseline 温度+回撤", "base"), ("CycleStart 三路径", "cs"), ("CycleStart+ranker", "csr")]:
-    SIG = pd.DataFrame({n: sig_frames[key][n].reindex(cal).fillna(0) for n in names})
-    EXT = pd.DataFrame({n: ((idx_series[n].pipe(lambda s: 100 * (0.60 * ((s - s.rolling(1250, min_periods=500).min()) / (s.rolling(1250, min_periods=500).max() - s.rolling(1250, min_periods=500).min())) + 0.25 * s.pct_change(120).rolling(1250, min_periods=500).rank(pct=True) + 0.15 * s.pct_change(60).rolling(1250, min_periods=500).rank(pct=True))) > 85) | (s / s.cummax() - 1 >= -0.25)).astype(float).reindex(cal).fillna(0) for n, s in idx_series.items()})
-    STRE = pd.DataFrame({n: -(idx_series[n] / idx_series[n].cummax() - 1).rolling(20).mean().reindex(cal).fillna(-9) for n in names})
-    res = run_ledger(PX, SIG, EXT, STRE, catmap, cal, max_pos=6, per_cat=2, cost=ETF_COST)
+
+
+def ext_of(n):
+    s = idx_series[n]
+    t = temperature(s)
+    dd = s / s.cummax() - 1.0
+    return ((t > 85) | (dd >= -0.25)).astype(float).reindex(cal).fillna(0)
+
+
+print(f"\n{'配置':<26}{'CAGR':>8}{'Sharpe':>8}{'MDD':>8}{'恢复日':>7}")
+for tag, key, sw in [("Baseline 温度+回撤", "base", None),
+                     ("CycleStart 三路径", "cs", None),
+                     ("CycleStart+ranker", "csr", None),
+                     ("覆盖层:基线+C浅调半仓", "overlay", True)]:
+    if key == "overlay":
+        SIG = pd.DataFrame({n: ((sig_frames["base"][n] > 0) | (sig_frames["csr"][n] > 0)).astype(float).reindex(cal).fillna(0) for n in names})
+        W = pd.DataFrame({n: np.where(sig_frames["base"][n].reindex(cal).fillna(0) > 0, 1.0,
+                                      np.where(sig_frames["csr"][n].reindex(cal).fillna(0) > 0, 0.5, 0.0)) for n in names})
+        res = run_ledger(PX, SIG, pd.DataFrame({n: ext_of(n) for n in names}), pd.DataFrame({n: -(idx_series[n] / idx_series[n].cummax() - 1).rolling(20).mean().reindex(cal).fillna(-9) for n in names}), catmap, cal, max_pos=6, per_cat=2, cost=ETF_COST, sig_weight=W)
+    else:
+        SIG = pd.DataFrame({n: sig_frames[key][n].reindex(cal).fillna(0) for n in names})
+        res = run_ledger(PX, SIG, pd.DataFrame({n: ext_of(n) for n in names}), pd.DataFrame({n: -(idx_series[n] / idx_series[n].cummax() - 1).rolling(20).mean().reindex(cal).fillna(-9) for n in names}), catmap, cal, max_pos=6, per_cat=2, cost=ETF_COST)
     m = metrics(res["equity"].dropna())
-    print(f"{tag:<22}{m['CAGR']*100:>7.2f}%{m['Sharpe']:>8.2f}{m['MDD']*100:>7.1f}%{m['recovery_days']:>7}")
+    print(f"{tag:<26}{m['CAGR']*100:>7.2f}%{m['Sharpe']:>8.2f}{m['MDD']*100:>7.1f}%{m['recovery_days']:>7}")

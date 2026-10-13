@@ -9,7 +9,7 @@ import pandas as pd
 
 def run_ledger(px, sig, ext, stre, catmap, cal, *, max_pos=6, per_cat=2, cost=0.0015,
                cap=100.0, greedy=False, risk=False, tranches=False, stale_limit=20,
-               exposure_cap=0.70, breaker_dd=0.12, sort_key="dd"):
+               exposure_cap=0.70, breaker_dd=0.12, sort_key="dd", sig_weight=None):
     """单引擎回测。
     px: DataFrame[cal×names] 收盘价; sig/ext: 0/1 入场/出场信号(T日生成,T+1执行);
     stre: 排序强度(可选); catmap: name->类别; 返回 dict(equity, fills, eqmax_dd)。
@@ -79,6 +79,11 @@ def run_ledger(px, sig, ext, stre, catmap, cal, *, max_pos=6, per_cat=2, cost=0.
         for n in buys:
             p = float(px.at[d, n])
             w = eq.iloc[i] / max_pos if not greedy else eq.iloc[i] / (len(pos) + len(buys))
+            if sig_weight is not None and n in getattr(sig_weight, "columns", []):
+                try:
+                    w *= float(sig_weight.at[sd, n])
+                except (KeyError, ValueError):
+                    pass
             spend = min(cash * 0.999, w * (0.30 if tranches else 1.0))
             if risk:
                 spend = min(spend, eq.iloc[i] * 0.08)

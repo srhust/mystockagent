@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-"""指令⑤: 模拟盘候选版 v1(冻结)。每日运行: 产出信号+可执行动作+可用时间, 记录人工决策与后续表现。
+"""指令⑤: 模拟盘候选版 v1(冻结, 2026-10-13 定版)。每日运行: 产出信号+可执行动作+可用时间, 记录人工决策与后续表现。
 永不自动交易; 阈值冻结: temp_v4<12 ∨ dd<=-max(0.30,0.70×1250日最深); 出场 temp>85 ∨ dd>=-0.25。
-载体: 仅carriers.py高保真9只。日志: paper/log.csv (追加), 信号快照: paper/signals_日期.md。"""
+载体: 仅carriers.py高保真9只。
+冻结依据(全链路ETF消融, scripts/etf_ablation_cs.py): Baseline 5.96%/Sharpe0.50 为最优核心;
+CycleStart+ranker 5.00%/-19.3%MDD/恢复20日 为风险优化备选(研究轨); 覆盖层5.71%无增量, 不采用。"""
 import os
 import sys
 from datetime import datetime
