@@ -1,0 +1,26 @@
+python : E:\mystockagent\cycle_system\backtest.py:62: FutureWarning: The default fill_method='pad' in DataFrame.pct_cha
+nge is deprecated and will be removed in a future version. Either fill in any non-leading NA values prior to calling pc
+t_change or specify 'fill_method=None' to not fill NA values.
+At line:1 char:160
++ ... NG='utf-8'; python E:\mystockagent\scripts\test_infra.py 1>E:\mystock ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (E:\mystockagent...fill NA values.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  rets = closes.pct_change().fillna(0.0)
+E:\mystockagent\cycle_system\backtest.py:62: FutureWarning: The default fill_method='pad' in DataFrame.pct_change is de
+precated and will be removed in a future version. Either fill in any non-leading NA values prior to calling pct_change 
+or specify 'fill_method=None' to not fill NA values.
+  rets = closes.pct_change().fillna(0.0)
+E:\mystockagent\scripts\test_infra.py:33: FutureWarning: The default fill_method='pad' in DataFrame.pct_change is depre
+cated and will be removed in a future version. Either fill in any non-leading NA values prior to calling pct_change or 
+specify 'fill_method=None' to not fill NA values.
+  rets = closes.pct_change().fillna(0.0)
+[1] 参数透传: 默认12/75 CAGR 0.111 笔数 169
+    覆盖10/70 CAGR 0.099 笔数 148
+[2] ETF数据: 煤炭ETF 1602行 2020-03-02~2026-10-09 列['date', 'open', 'high', 'low', 'close', 'volume', 'amount']
+[3] 基线: CAGR 0.111 MDD -0.399 Sharpe 0.60
+    覆盖: CAGR 0.084 MDD -0.281 Sharpe 0.62
+    覆盖+voltarget: CAGR 0.071 MDD -0.282
+
+全部通过

@@ -1,0 +1,68 @@
+python : E:\mystockagent\cycle_system\backtest.py:62: FutureWarning: The default fill_method='pad' in DataFrame.pct_cha
+nge is deprecated and will be removed in a future version. Either fill in any non-leading NA values prior to calling pc
+t_change or specify 'fill_method=None' to not fill NA values.
+At line:1 char:160
++ ... NG='utf-8'; python E:\mystockagent\scripts\ref_checks.py 1>E:\mystock ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (E:\mystockagent...fill NA values.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  rets = closes.pct_change().fillna(0.0)
+E:\mystockagent\cycle_system\backtest.py:62: FutureWarning: The default fill_method='pad' in DataFrame.pct_change is de
+precated and will be removed in a future version. Either fill in any non-leading NA values prior to calling pct_change 
+or specify 'fill_method=None' to not fill NA values.
+  rets = closes.pct_change().fillna(0.0)
+E:\mystockagent\cycle_system\backtest.py:62: FutureWarning: The default fill_method='pad' in DataFrame.pct_change is de
+precated and will be removed in a future version. Either fill in any non-leading NA values prior to calling pct_change 
+or specify 'fill_method=None' to not fill NA values.
+  rets = closes.pct_change().fillna(0.0)
+E:\mystockagent\cycle_system\backtest.py:62: FutureWarning: The default fill_method='pad' in DataFrame.pct_change is de
+precated and will be removed in a future version. Either fill in any non-leading NA values prior to calling pct_change 
+or specify 'fill_method=None' to not fill NA values.
+  rets = closes.pct_change().fillna(0.0)
+E:\mystockagent\cycle_system\backtest.py:62: FutureWarning: The default fill_method='pad' in DataFrame.pct_change is de
+precated and will be removed in a future version. Either fill in any non-leading NA values prior to calling pct_change 
+or specify 'fill_method=None' to not fill NA values.
+  rets = closes.pct_change().fillna(0.0)
+E:\mystockagent\cycle_system\backtest.py:62: FutureWarning: The default fill_method='pad' in DataFrame.pct_change is de
+precated and will be removed in a future version. Either fill in any non-leading NA values prior to calling pct_change 
+or specify 'fill_method=None' to not fill NA values.
+  rets = closes.pct_change().fillna(0.0)
+E:\mystockagent\cycle_system\backtest.py:62: FutureWarning: The default fill_method='pad' in DataFrame.pct_change is de
+precated and will be removed in a future version. Either fill in any non-leading NA values prior to calling pct_change 
+or specify 'fill_method=None' to not fill NA values.
+  rets = closes.pct_change().fillna(0.0)
+E:\mystockagent\cycle_system\backtest.py:62: FutureWarning: The default fill_method='pad' in DataFrame.pct_change is de
+precated and will be removed in a future version. Either fill in any non-leading NA values prior to calling pct_change 
+or specify 'fill_method=None' to not fill NA values.
+  rets = closes.pct_change().fillna(0.0)
+E:\mystockagent\cycle_system\backtest.py:62: FutureWarning: The default fill_method='pad' in DataFrame.pct_change is de
+precated and will be removed in a future version. Either fill in any non-leading NA values prior to calling pct_change 
+or specify 'fill_method=None' to not fill NA values.
+  rets = closes.pct_change().fillna(0.0)
+E:\mystockagent\scripts\ref_checks.py:29: FutureWarning: The default fill_method='pad' in DataFrame.pct_change is depre
+cated and will be removed in a future version. Either fill in any non-leading NA values prior to calling pct_change or 
+specify 'fill_method=None' to not fill NA values.
+  rets = closes.pct_change().iloc[-250:]
+=== 参照1: 3x3 参数子网格 (全样本 cold, Sharpe / CAGR) ===
+  eb10/xa70: S0.597 C0.099 D-0.36 N148 | eb10/xa75: S0.621 C0.108 D-0.39 N147 | eb10/xa80: S0.530 C0.092 D-0.48 N143
+  eb12/xa70: S0.599 C0.106 D-0.40 N171 | eb12/xa75: S0.605 C0.111 D-0.40 N169 | eb12/xa80: S0.507 C0.090 D-0.49 N165
+  eb15/xa70: S0.459 C0.077 D-0.51 N184 | eb15/xa75: S0.399 C0.064 D-0.51 N180 | eb15/xa80: S0.382 C0.062 D-0.52 N163
+
+=== 参照2: 板块相关性快照 (>0.65 对数, 250日) ===
+  高相关对数量: 78 / 435
+    面板 ~ 消费电子: 0.903
+    农化制品 ~ 化学原料: 0.901
+    养殖 ~ 饲料加工: 0.901
+    水泥建材 ~ 基建建筑: 0.9
+    元件 ~ 消费电子: 0.863
+    工业金属 ~ 小金属: 0.847
+    饲料加工 ~ 种植种业: 0.836
+    房地产 ~ 基建建筑: 0.826
+    元件 ~ 面板: 0.824
+    化纤 ~ 化学原料: 0.819
+    造纸 ~ 基建建筑: 0.818
+    化纤 ~ 水泥建材: 0.814
+    半导体 ~ 元件: 0.81
+    半导体 ~ 面板: 0.8
+    水泥建材 ~ 房地产: 0.797

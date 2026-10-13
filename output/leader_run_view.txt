@@ -1,0 +1,3 @@
+[data] 个股面板: 247/251 只有效
+[events] 信号事件: 1017 个 (板块×日期)
+[done] output/leader_study.md + leader_events.csv | 6s

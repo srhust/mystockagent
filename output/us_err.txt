@@ -1,0 +1,10 @@
+python : Traceback (most recent call last):
+At line:1 char:160
++ ... NG='utf-8'; python E:\mystockagent\scripts\us_cycle_test.py 1>E:\myst ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Traceback (most recent call last)::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  File "E:\mystockagent\scripts\us_cycle_test.py", line 6, in <module>
+    import akshare as ak
+ModuleNotFoundError: No module named 'akshare'

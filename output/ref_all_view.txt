@@ -1,0 +1,26 @@
+nge is deprecated and will be removed in a future version. Either fill in any non-leading NA values prior to calling pc
+t_change or specify 'fill_method=None' to not fill NA values.
+ 
+or specify 'fill_method=None' to not fill NA values.
+or specify 'fill_method=None' to not fill NA values.
+or specify 'fill_method=None' to not fill NA values.
+or specify 'fill_method=None' to not fill NA values.
+or specify 'fill_method=None' to not fill NA values.
+or specify 'fill_method=None' to not fill NA values.
+or specify 'fill_method=None' to not fill NA values.
+or specify 'fill_method=None' to not fill NA values.
+or specify 'fill_method=None' to not fill NA values.
+or specify 'fill_method=None' to not fill NA values.
+or specify 'fill_method=None' to not fill NA values.
+=== 默认 12/75 各测试窗口分段 ===
+  2017~2018: CAGR -0.156 Sharpe -0.84 MDD -0.376 N19 段末净值0.715
+  2019~2020: CAGR +0.233 Sharpe +0.96 MDD -0.201 N19 段末净值1.520
+  2021~2022: CAGR +0.222 Sharpe +1.27 MDD -0.166 N14 段末净值1.490
+  2023~2024: CAGR +0.155 Sharpe +0.77 MDD -0.213 N22 段末净值1.333
+  2025~2026: CAGR +0.157 Sharpe +1.93 MDD -0.045 N6 段末净值1.294
+  链接乘积(2017-01~2026-10): 总收益 +1.793, 年化 +0.110
+
+=== 参数网格补齐 (Sharpe) ===
+  eb8: xa65:0.41/C0.054 xa70:0.42/C0.057 xa75:0.51/C0.076 xa80:0.54/C0.085 xa85:0.46/C0.074
+  eb10: xa65:0.61/C0.099 xa85:0.43/C0.072
+  eb12: xa65:0.58/C0.101 xa85:0.43/C0.075

@@ -1,0 +1,8 @@
+    + CategoryInfo          : NotSpecified: (Traceback (most recent call last)::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  File "E:\mystockagent\scripts\specialist.py", line 85, in <module>
+    tr = simulate_account(df, **kw)
+  File "E:\mystockagent\scripts\specialist.py", line 51, in simulate_account
+    if ki not in used and close[j] <= e0 * (1 + dlv):
+TypeError: unsupported operand type(s) for +: 'int' and 'tuple'

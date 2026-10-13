@@ -1,0 +1,7 @@
+sh517400 黄金股: OK 588行 2024-05-08~2026-10-09 列:['date', 'open', 'high', 'low', 'close', 'volume', 'amount', 'postVol', 'postAmt']
+sz159562 黄金股华夏: OK 654行 2024-01-22~2026-10-09 列:['date', 'open', 'high', 'low', 'close', 'volume', 'amount', 'postVol', 'postAmt']
+sh561360 油气产业: OK 712行 2023-10-31~2026-10-09 列:['date', 'open', 'high', 'low', 'close', 'volume', 'amount', 'postVol', 'postAmt']
+sh561570 油气华泰: OK 479行 2024-10-17~2026-10-09 列:['date', 'open', 'high', 'low', 'close', 'volume', 'amount', 'postVol', 'postAmt']
+sh516950 基建华夏: OK 1310行 2021-05-14~2026-10-09 列:['date', 'open', 'high', 'low', 'close', 'volume', 'amount', 'postVol', 'postAmt']
+sh512140 电力华安: OK 103行 2026-05-11~2026-10-09 列:['date', 'open', 'high', 'low', 'close', 'volume', 'amount', 'postVol', 'postAmt']
+sh516650 细分有色: OK 1285行 2021-06-21~2026-10-09 列:['date', 'open', 'high', 'low', 'close', 'volume', 'amount', 'postVol', 'postAmt']

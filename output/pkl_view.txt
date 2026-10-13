@@ -1,0 +1,19 @@
+keys: ['dfs', 'meta', 'ts'] | ts: 2026-10-12 09:32:04.723621
+煤炭 列: ['open', 'high', 'low', 'close', 'volume', 'amount', 'ma20', 'ma60', 'ma200', 'mom20', 'mom60', 'mom120', 'rs20', 'rs60', 'rs120', 'price_pos', 'dd_from_high', 'runup_from_low', 'vol_surge', 'breadth', 'new_high', 'pb', 'pb_pct', 'temp', 'stage']
+最后2行:
+               close       temp      stage
+date                                      
+2026-10-08  3079.227  69.601890  expansion
+2026-10-09  3121.296  71.511513  expansion
+index 类型: DatetimeIndex | 最后日期: 2026-10-09 00:00:00
+[data] 请求失败(已重试) THS:煤炭: KeyError '煤炭'
+python : Traceback (most recent call last):
+At line:1 char:160
++ ... NG='utf-8'; python E:\mystockagent\scripts\inspect_pkl.py 1>E:\mystoc ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Traceback (most recent call last)::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  File "E:\mystockagent\scripts\inspect_pkl.py", line 21, in <module>
+    print("\n煤炭日K列:", list(idx.columns))
+AttributeError: 'NoneType' object has no attribute 'columns'

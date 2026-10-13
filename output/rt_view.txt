@@ -1,0 +1,202 @@
+akshare 1.19.1
+
+--- 同花顺(ths)相关接口 ---
+   bond_zh_cov_info_ths
+   fund_etf_category_ths
+   fund_etf_spot_ths
+   fund_info_ths
+   fund_new_found_ths
+   stock_board_concept_index_ths
+   stock_board_concept_info_ths
+   stock_board_concept_name_ths
+   stock_board_concept_summary_ths
+   stock_board_industry_index_ths
+   stock_board_industry_info_ths
+   stock_board_industry_name_ths
+   stock_board_industry_summary_ths
+   stock_fhps_detail_ths
+   stock_financial_abstract_new_ths
+   stock_financial_abstract_ths
+   stock_financial_benefit_new_ths
+   stock_financial_benefit_ths
+   stock_financial_cash_new_ths
+   stock_financial_cash_ths
+   stock_financial_debt_new_ths
+   stock_financial_debt_ths
+   stock_hk_fhpx_detail_ths
+   stock_info_global_ths
+   stock_ipo_benefit_ths
+   stock_ipo_hk_ths
+   stock_ipo_ths
+   stock_management_change_ths
+   stock_profit_forecast_ths
+   stock_rank_cxd_ths
+   stock_rank_cxfl_ths
+   stock_rank_cxg_ths
+   stock_rank_cxsl_ths
+   stock_rank_ljqd_ths
+   stock_rank_ljqs_ths
+   stock_rank_lxsz_ths
+   stock_rank_lxxd_ths
+   stock_rank_xstp_ths
+   stock_rank_xxtp_ths
+   stock_rank_xzjp_ths
+   stock_shareholder_change_ths
+   stock_xgsr_ths
+   stock_zyjs_ths
+
+--- 实时/盘中关键词接口 ---
+   bond_spot_deal
+   bond_spot_quote
+   bond_zh_hs_cov_spot
+   bond_zh_hs_spot
+   crypto_js_spot
+   forex_spot_em
+   fund_etf_hist_min_em
+   fund_etf_spot_em
+   fund_etf_spot_ths
+   fund_lof_hist_min_em
+   fund_lof_spot_em
+   futures_foreign_commodity_realtime
+   futures_global_spot_em
+   futures_spot_price
+   futures_spot_price_daily
+   futures_spot_price_previous
+   futures_spot_stock
+   futures_spot_sys
+   futures_to_spot_czce
+   futures_to_spot_dce
+   futures_to_spot_shfe
+   futures_zh_minute_sina
+   futures_zh_realtime
+   futures_zh_spot
+   fx_spot_quote
+   index_global_spot_em
+   index_hog_spot_price
+   index_min_sw
+   index_option_1000index_min_qvix
+   index_option_100etf_min_qvix
+   index_option_300etf_min_qvix
+   index_option_300index_min_qvix
+   index_option_500etf_min_qvix
+   index_option_50etf_min_qvix
+   index_option_50index_min_qvix
+   index_option_cyb_min_qvix
+   index_option_kcb_min_qvix
+   index_realtime_fund_sw
+   index_realtime_sw
+   index_zh_a_hist_min_em
+   movie_boxoffice_realtime
+   option_cffex_hs300_spot_sina
+   option_cffex_sz50_spot_sina
+   option_cffex_zz1000_spot_sina
+   option_finance_minute_sina
+   option_minute_em
+   option_sse_minute_sina
+   option_sse_spot_price_sina
+   option_sse_underlying_spot_price_sina
+   reits_hist_min_em
+   reits_realtime_em
+   rv_from_futures_zh_minute_sina
+   rv_from_stock_zh_a_hist_min_em
+   spot
+   spot_corn_price_soozhu
+   spot_golden_benchmark_sge
+   spot_goods
+   spot_hist_sge
+   spot_hog_crossbred_soozhu
+   spot_hog_lean_price_soozhu
+
+--- 实测: THS 行业指数接口当日数据 ---
+python : 
+At line:1 char:160
++ ... NG='utf-8'; python E:\mystockagent\scripts\test_realtime.py 1>E:\myst ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  0%|          | 0/1 [00:00<?, ?it/s]
+100%|██████████| 1/1 [00:00<00:00,  2.07it/s]
+OK 返回 1 行
+           日期       开盘价        最高价        最低价        收盘价         成交量           成交额
+0  2026-10-09  15188.62  15251.867  14376.597  15096.384  3183742700  2.300700e+11
+
+--- 实测: 新浪全A实时快照 stock_zh_a_spot ---
+                                             
+
+Please wait for a moment:   0%|          | 0/70 [00:00<?, ?it/s]
+Please wait for a moment:   1%|▏         | 1/70 [00:00<00:14,  4.68it/s]
+Please wait for a moment:   3%|▎         | 2/70 [00:00<00:18,  3.59it/s]
+Please wait for a moment:   4%|▍         | 3/70 [00:00<00:15,  4.23it/s]
+Please wait for a moment:   6%|▌         | 4/70 [00:00<00:16,  4.06it/s]
+Please wait for a moment:   7%|▋         | 5/70 [00:01<00:24,  2.63it/s]
+Please wait for a moment:   9%|▊         | 6/70 [00:01<00:22,  2.79it/s]
+Please wait for a moment:  10%|█         | 7/70 [00:02<00:22,  2.83it/s]
+Please wait for a moment:  11%|█▏        | 8/70 [00:02<00:20,  3.01it/s]
+Please wait for a moment:  13%|█▎        | 9/70 [00:02<00:19,  3.16it/s]
+Please wait for a moment:  14%|█▍        | 10/70 [00:03<00:19,  3.11it/s]
+Please wait for a moment:  16%|█▌        | 11/70 [00:03<00:17,  3.44it/s]
+Please wait for a moment:  17%|█▋        | 12/70 [00:03<00:16,  3.46it/s]
+Please wait for a moment:  19%|█▊        | 13/70 [00:03<00:16,  3.44it/s]
+Please wait for a moment:  20%|██        | 14/70 [00:04<00:15,  3.63it/s]
+Please wait for a moment:  21%|██▏       | 15/70 [00:04<00:15,  3.52it/s]
+Please wait for a moment:  23%|██▎       | 16/70 [00:04<00:16,  3.31it/s]
+Please wait for a moment:  24%|██▍       | 17/70 [00:05<00:16,  3.30it/s]
+Please wait for a moment:  26%|██▌       | 18/70 [00:05<00:16,  3.23it/s]
+Please wait for a moment:  27%|██▋       | 19/70 [00:05<00:16,  3.10it/s]
+Please wait for a moment:  29%|██▊       | 20/70 [00:06<00:15,  3.18it/s]
+Please wait for a moment:  30%|███       | 21/70 [00:06<00:15,  3.09it/s]
+Please wait for a moment:  31%|███▏      | 22/70 [00:06<00:15,  3.06it/s]
+Please wait for a moment:  33%|███▎      | 23/70 [00:07<00:15,  2.98it/s]
+Please wait for a moment:  34%|███▍      | 24/70 [00:07<00:20,  2.19it/s]
+Please wait for a moment:  36%|███▌      | 25/70 [00:08<00:24,  1.83it/s]
+Please wait for a moment:  37%|███▋      | 26/70 [00:08<00:20,  2.12it/s]
+Please wait for a moment:  39%|███▊      | 27/70 [00:09<00:17,  2.42it/s]
+Please wait for a moment:  40%|████      | 28/70 [00:09<00:16,  2.56it/s]
+Please wait for a moment:  41%|████▏     | 29/70 [00:09<00:14,  2.81it/s]
+Please wait for a moment:  43%|████▎     | 30/70 [00:10<00:13,  2.87it/s]
+Please wait for a moment:  44%|████▍     | 31/70 [00:10<00:12,  3.03it/s]
+Please wait for a moment:  46%|████▌     | 32/70 [00:10<00:12,  2.95it/s]
+Please wait for a moment:  47%|████▋     | 33/70 [00:11<00:12,  3.04it/s]
+Please wait for a moment:  49%|████▊     | 34/70 [00:11<00:12,  2.92it/s]
+Please wait for a moment:  50%|█████     | 35/70 [00:11<00:11,  3.05it/s]
+Please wait for a moment:  51%|█████▏    | 36/70 [00:12<00:12,  2.75it/s]
+Please wait for a moment:  53%|█████▎    | 37/70 [00:12<00:12,  2.74it/s]
+Please wait for a moment:  54%|█████▍    | 38/70 [00:12<00:11,  2.82it/s]
+Please wait for a moment:  56%|█████▌    | 39/70 [00:13<00:10,  2.85it/s]
+Please wait for a moment:  57%|█████▋    | 40/70 [00:13<00:09,  3.06it/s]
+Please wait for a moment:  59%|█████▊    | 41/70 [00:13<00:08,  3.23it/s]
+Please wait for a moment:  60%|██████    | 42/70 [00:14<00:11,  2.45it/s]
+Please wait for a moment:  61%|██████▏   | 43/70 [00:14<00:09,  2.72it/s]
+Please wait for a moment:  63%|██████▎   | 44/70 [00:15<00:09,  2.76it/s]
+Please wait for a moment:  64%|██████▍   | 45/70 [00:15<00:08,  3.05it/s]
+Please wait for a moment:  66%|██████▌   | 46/70 [00:15<00:07,  3.31it/s]
+Please wait for a moment:  67%|██████▋   | 47/70 [00:15<00:06,  3.73it/s]
+Please wait for a moment:  69%|██████▊   | 48/70 [00:16<00:06,  3.37it/s]
+Please wait for a moment:  70%|███████   | 49/70 [00:16<00:06,  3.37it/s]
+Please wait for a moment:  71%|███████▏  | 50/70 [00:19<00:21,  1.06s/it]
+Please wait for a moment:  73%|███████▎  | 51/70 [00:19<00:15,  1.20it/s]
+Please wait for a moment:  74%|███████▍  | 52/70 [00:19<00:12,  1.48it/s]
+Please wait for a moment:  76%|███████▌  | 53/70 [00:20<00:09,  1.72it/s]
+Please wait for a moment:  77%|███████▋  | 54/70 [00:20<00:07,  2.06it/s]
+Please wait for a moment:  79%|███████▊  | 55/70 [00:20<00:06,  2.35it/s]
+Please wait for a moment:  80%|████████  | 56/70 [00:21<00:05,  2.62it/s]
+Please wait for a moment:  81%|████████▏ | 57/70 [00:21<00:04,  2.90it/s]
+Please wait for a moment:  83%|████████▎ | 58/70 [00:21<00:03,  3.18it/s]
+Please wait for a moment:  84%|████████▍ | 59/70 [00:21<00:03,  3.35it/s]
+Please wait for a moment:  86%|████████▌ | 60/70 [00:22<00:02,  3.47it/s]
+Please wait for a moment:  87%|████████▋ | 61/70 [00:22<00:02,  3.55it/s]
+Please wait for a moment:  89%|████████▊ | 62/70 [00:22<00:02,  3.51it/s]
+Please wait for a moment:  90%|█████████ | 63/70 [00:22<00:02,  3.42it/s]
+Please wait for a moment:  91%|█████████▏| 64/70 [00:23<00:01,  3.28it/s]
+Please wait for a moment:  93%|█████████▎| 65/70 [00:23<00:01,  3.38it/s]
+Please wait for a moment:  94%|█████████▍| 66/70 [00:23<00:01,  3.49it/s]
+Please wait for a moment:  96%|█████████▌| 67/70 [00:24<00:00,  3.89it/s]
+Please wait for a moment:  97%|█████████▋| 68/70 [00:24<00:00,  3.52it/s]
+Please wait for a moment:  99%|█████████▊| 69/70 [00:24<00:00,  3.57it/s]
+Please wait for a moment: 100%|██████████| 70/70 [00:25<00:00,  2.66it/s]
+OK 返回 5492 行, 列: ['代码', '名称', '最新价', '涨跌额', '涨跌幅', '买入', '卖出', '昨收']
+         代码    名称    最新价   涨跌额    涨跌幅     买入     卖出     昨收     今开     最高     最低       成交量        成交额       时间戳
+0  bj920000  安徽凤凰  14.19  0.00  0.000  14.03  14.19  14.19  14.10  14.43  14.10  117850.0  1680568.0  10:02:42
+1  bj920001  纬达光电  11.03 -0.17 -1.518  11.02  11.04  11.20  11.31  11.31  11.03  255345.0  2853789.0  10:02:42
+                                                                         

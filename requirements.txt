@@ -1,0 +1,15 @@
+# 周期股量化交易系统依赖
+#
+# 环境说明:
+# - 本项目在 Anaconda (Python 3.9) 基础环境中开发, pandas/numpy/matplotlib/scipy 直接使用 base 环境
+# - akshare 及其 base 环境没有的依赖已离线安装到 .libs/ (通过 _path.py 自动加入 sys.path)
+# - 若在全新环境安装: pip install -r requirements.txt
+# - 若无外网/代理失效: 依赖已在 .libs/, 无需安装 (NO_PROXY 绕行逻辑见 cycle_system/data.py)
+
+akshare>=1.14          # 数据源统一接口 (1.19.1 已验证)
+curl_cffi>=0.5          # akshare 依赖 (同花顺接口需要)
+py-mini-racer>=0.6      # akshare 依赖 (JS 计算)
+pandas>=1.5             # base 环境已有 (2.3.3)
+numpy>=1.23             # base 环境已有 (1.26.0)
+matplotlib>=3.6         # base 环境已有 (3.9.4)
+scipy>=1.9              # 可选: 因子 IC 的 spearman 相关 (缺失时自动跳过该分析)

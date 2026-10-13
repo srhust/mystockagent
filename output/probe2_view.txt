@@ -1,0 +1,5 @@
+meta keys sample: ['煤炭', '钢铁', '工业金属']
+meta entry keys: ['ths', 'cat', 'note', 'cycle_len', 'fut', 'stocks']
+meta entry sample: {'ths': '煤炭开采加工', 'cat': '资源周期', 'note': '供需+能源政策', 'cycle_len': '4', 'fut': 'JM0', 'stocks': "[('601088', '中国神华'), ('601225', '陕西煤业'), ('600188', '兖矿能源')]..."}
+csv total: 569 | stock-like: 509 | examples: ['fut_AU0.csv', 'fut_CU0.csv', 'fut_FG0.csv', 'fut_JM0.csv', 'fut_LC0.csv']
+factors functions: ['add_ma', 'add_momentum', 'add_pb_percentile', 'add_price_position', 'add_relative_strength', 'add_volume_surge', 'compute_breadth', 'cycle_segments', 'ma_alignment_score', 'np', 'pd', 'rolling_pct_rank', 'zigzag']

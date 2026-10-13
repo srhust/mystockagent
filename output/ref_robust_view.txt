@@ -1,0 +1,18 @@
+t_change or specify 'fill_method=None' to not fill NA values.
+or specify 'fill_method=None' to not fill NA values.
+or specify 'fill_method=None' to not fill NA values.
+or specify 'fill_method=None' to not fill NA values.
+or specify 'fill_method=None' to not fill NA values.
+or specify 'fill_method=None' to not fill NA values.
+or specify 'fill_method=None' to not fill NA values.
+or specify 'fill_method=None' to not fill NA values.
+or specify 'fill_method=None' to not fill NA values.
+=== 各折两种选参对比 ===
+  折1: 朴素 10/85(训练S 0.58)  vs  稳健 10/80(邻域均值 0.54)
+  折2: 朴素 10/75(训练S 0.35)  vs  稳健 10/80(邻域均值 0.28)
+  折3: 朴素 8/85(训练S 0.48)  vs  稳健 10/80(邻域均值 0.41)
+  折4: 朴素 10/70(训练S 0.55)  vs  稳健 10/70(邻域均值 0.48)
+  折5: 朴素 10/65(训练S 0.63)  vs  稳健 10/70(邻域均值 0.54)
+朴素网格最优: 链式总收益 +33.4%, 年化 +3.0%  [10/85 10/75 8/85 10/70 10/65]
+邻域平滑稳健: 链式总收益 +78.5%, 年化 +6.1%  [10/80 10/80 10/80 10/70 10/70]
+固定12/75: 链式总收益 +179.3%, 年化 +11.0%  [12/75 12/75 12/75 12/75 12/75]

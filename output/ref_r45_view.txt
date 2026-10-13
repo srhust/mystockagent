@@ -1,0 +1,9 @@
+nge is deprecated and will be removed in a future version. Either fill in any non-leading NA values prior to calling pc
+t_change or specify 'fill_method=None' to not fill NA values.
+specify 'fill_method=None' to not fill NA values.
+specify 'fill_method=None' to not fill NA values.
+or specify 'fill_method=None' to not fill NA values.
+specify 'fill_method=None' to not fill NA values.
+簇数 3, 簇大小分布 [28, 1, 1]
+方案4: CAGR +0.057 波动 0.114 Sharpe 0.56 MDD -0.242 笔数 91
+方案5: CAGR +0.038 波动 0.092 Sharpe 0.46 MDD -0.197

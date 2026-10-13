@@ -1,0 +1,6 @@
+6位代码个股csv: 0 | 期货csv: 12 | 其余: 557
+期货csv列: ['date', 'open', 'high', 'low', 'close', 'volume']
+期货示例: fut_AU0.csv 2010-01-04 ~ 2026-10-09 4075 行
+fut文件: ['fut_AU0.csv', 'fut_CU0.csv', 'fut_FG0.csv', 'fut_JM0.csv', 'fut_LC0.csv', 'fut_LH0.csv', 'fut_M0.csv', 'fut_RB0.csv', 'fut_SA0.csv', 'fut_SC0.csv', 'fut_SP0.csv', 'fut_TA0.csv']
+zigzag sig: (close: pandas.core.series.Series, pct=0.25)
+cycle_segments sig: (close: pandas.core.series.Series, pct=0.25, min_days=60)

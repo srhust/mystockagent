@@ -1,0 +1,7 @@
+columns: ['open', 'high', 'low', 'close', 'volume', 'amount', 'ma20', 'ma60', 'ma200', 'mom20', 'mom60', 'mom120', 'rs20', 'rs60', 'rs120', 'price_pos', 'dd_from_high', 'runup_from_low', 'vol_surge', 'breadth', 'new_high', 'pb', 'pb_pct', 'temp', 'stage']
+stage values: ['bottom', 'decline', 'expansion', 'recovery', 'topping', 'warmup']
+temp range: 0.0 ~ 99.0
+position_target sig: (df: pandas.core.frame.DataFrame, mode='right', enter_below: float = None, exit_above: float = None) -> pandas.core.series.Series
+signal_strength sig: (df: pandas.core.frame.DataFrame) -> pandas.core.series.Series
+position_target sample: [0, 0, 0, 0, 0] | unique: [0, 1]
+signal_strength sample: [0.29, 0.37, 0.5]

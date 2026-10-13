@@ -1,0 +1,263 @@
+# 个股(EM)核对 + 期货全历史比对 2026-10-12 19:21
+
+## 个股(EM, 247只): OK 1 / MISMATCH 0 / 失败 246
+- 000002: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000012: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 000050: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 000059: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 000060: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000069: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000100: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000157: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000301: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000401: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000408: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000420: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000422: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000425: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000488: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000520: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000528: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000625: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000630: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000636: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000672: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000680: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000683: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000703: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000708: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000725: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000733: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000776: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000789: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000792: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000807: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000825: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 000831: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 000876: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 000877: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 000878: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000898: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000902: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000932: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000933: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000949: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000951: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000959: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000960: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000961: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 000970: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 000983: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 000998: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 001309: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 001979: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 002041: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 002064: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 002078: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 002080: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 002092: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 002110: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 002124: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 002138: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 002155: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 002157: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 002207: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 002233: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 002234: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 002241: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 002244: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 002254: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 002299: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 002311: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 002318: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 002353: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 002378: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 002384: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 002385: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 002387: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 002408: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 002409: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 002458: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 002460: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 002463: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 002466: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 002475: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 002493: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 002532: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 002539: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 002548: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 002567: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 002594: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 002600: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 002648: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 002714: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 002738: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 002756: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 002859: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 002895: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 002916: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 300059: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 300164: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 300191: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 300196: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 300223: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 300224: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 300303: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 300408: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 300433: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 300475: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 300498: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 300618: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 300666: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 300761: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 300866: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 301308: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600004: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600009: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600010: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600011: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600019: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600023: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600026: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600027: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600028: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600029: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600030: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600031: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600039: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600048: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600066: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600075: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600096: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 600104: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 600111: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 600115: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 600141: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 600170: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 600176: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 600183: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 600188: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 600308: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600309: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600325: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600346: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600348: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600356: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600366: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600383: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600409: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600418: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 600426: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 600428: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 600438: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 600449: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600470: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600486: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600489: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600529: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600540: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 600546: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 600547: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 600549: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600567: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600583: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600584: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600585: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600598: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600618: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600660: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600688: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600703: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600707: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 600711: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 600745: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 600761: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 600782: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 600795: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 600801: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 600808: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 600876: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 600958: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 600966: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600975: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600985: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600988: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600989: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 600999: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601021: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601088: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601100: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601111: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601118: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 601127: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 601138: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 601155: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601186: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601211: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601225: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601233: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601238: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601318: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601319: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601336: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601377: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601390: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601600: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 601601: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 601628: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 601633: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601636: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601666: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601668: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601669: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601688: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601699: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601788: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601800: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601808: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601857: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601868: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601872: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601898: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601899: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601901: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601919: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601952: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601958: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601975: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 601991: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 603225: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 603298: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 603338: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 603363: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 603477: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 603565: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 603603: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 603668: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 603678: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 603733: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 603799: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 603885: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 603986: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 603993: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 605007: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 688008: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 688012: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 688036: 重取失败 SSLError HTTPSConnectionPool(host='push2his.eastm
+- 688051: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 688525: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- 688981: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+
+## 期货全历史比对(缓存 vs 新浪重取)
+- JM0: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- CU0: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- LC0: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- AU0: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- SC0: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- RB0: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- FG0: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- LH0: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- M0: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- SA0: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- SP0: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
+- TA0: 重取失败 ConnectionError ('Connection aborted.', ConnectionResetE
