@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """唯一可执行回测引擎 (V4.1账本, 指令①): 统一信号输入 + T+1收盘成交 + 现金份额账本 + 风控。
 所有研究脚本/每日顾问/模拟盘共用本引擎, 不再各自维护 run()。
 约定: ①所有决策输入必须 available_at <= T-1收盘; ②缺价用最近有效价估值(>stale_limit禁止交易);
@@ -139,8 +139,6 @@ def run_specialist(px, sig, ext, cal, *, budget, cost=0.0015, tranches=(0.30, 0.
         can_trade = np.isfinite(raw)                       # 审查五轮: 只有当日真实行情才可成交
         vp = raw if can_trade else last_px                 # 估值价
         val = vp if (vp is not None and np.isfinite(vp)) else 0.0
-        eq.iloc[i] = cash + shares * val
-        inv[i] = shares * val
         sd = cal[i - 1] if i > 0 else None
         prev_px = float(px.get(sd, np.nan)) if sd is not None else np.nan  # T-1收盘(加仓确认用)
         if shares > 0 and can_trade:
@@ -167,11 +165,11 @@ def run_specialist(px, sig, ext, cal, *, budget, cost=0.0015, tranches=(0.30, 0.
                     shares += delta
                     stage += 1
                     adds_used += 1
-                    fills.append((d.date().isoformat(), "ADD", round(delta, 2), raw))
+                    fills.append((d.date().isoformat(), "ADD", delta, raw))  # 审查九轮: 全精度, 展示层再舍入
             if do_exit:
                 proceeds = shares * raw * (1 - cost)
                 cash += proceeds
-                fills.append((d.date().isoformat(), "SELL", round(shares, 2), raw))
+                fills.append((d.date().isoformat(), "SELL", shares, raw))
                 trades.append((d.date().isoformat(), None))
                 shares, entry_px, stage, adds_used = 0.0, None, 0, 0
         elif shares == 0 and can_trade and sd is not None and sig.get(sd, 0.0) >= 1 and cash > raw * 0.001:
@@ -179,7 +177,10 @@ def run_specialist(px, sig, ext, cal, *, budget, cost=0.0015, tranches=(0.30, 0.
             cash -= spend
             shares = spend * (1 - cost) / raw
             entry_px = raw
-            fills.append((d.date().isoformat(), "BUY", round(shares, 2), raw))
+            fills.append((d.date().isoformat(), "BUY", shares, raw))
+        # 审查九轮P0: 净值为成交后口径(当日收盘, 已含费用与持仓变化); inv为持仓市值
+        eq.iloc[i] = cash + shares * val
+        inv[i] = shares * val
     eq.attrs["avg_exposure"] = float(np.mean(inv) / np.mean(eq)) if np.mean(eq) > 0 else 0.0
     return eq, fills, trades
 
@@ -187,6 +188,7 @@ def run_specialist(px, sig, ext, cal, *, budget, cost=0.0015, tranches=(0.30, 0.
 def fmt(m):
     return (f"CAGR {m['CAGR']*100:+.2f}% Sharpe {m['Sharpe']:.2f} Calmar {m['Calmar']:.2f} "
             f"MDD {m['MDD']*100:.1f}% 谷底{m['trough'].date()} 恢复{m['recovery_days']}日")
+
 
 
 

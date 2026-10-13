@@ -69,9 +69,10 @@ def per_cycle(fills):
         exit_px = t.get("exit_px") or float(c.iloc[-1])
         ref = float(c.iloc[i1] / c.iloc[i0] - 1)
         pxp = c.iloc[i_e:i_x + 1].dropna().values
+        ret_acct = (t["shares"] * exit_px * 0.999 - t["spend"]) / BUDGET  # 审查九轮: 周期账户贡献(预算100基准, 含闲置现金)
         out[best.cycle_id] = dict(entry=t["first"].date(), exit=pd.Timestamp(end).date(),
                                   hold=int(i_x - i_e), n_add=t["n_add"], spend=round(t["spend"], 1),
-                                  ret=round(exit_px / (avg * 1.001) - 1, 3),
+                                  ret=round(exit_px / (avg * 1.001) - 1, 3), ret_acct=round(float(ret_acct), 3),
                                   mfe=round(float(pxp.max() / avg - 1), 2) if len(pxp) else np.nan,
                                   mae=round(float(pxp.min() / avg - 1), 2) if len(pxp) else np.nan,
                                   capture=round((exit_px / avg - 1) / ref, 2) if ref > 0 else np.nan,
@@ -93,5 +94,6 @@ for tag, esig, asig, ext, tr in [("A 逆势分批", v4, None, ext85, (0.30, 0.35
     print(f"\n=== {tag} ===")
     for cid, r in rep.items():
         print(f"{cid}: 入{r['entry']} 出{r['exit']} 持{r['hold']}日 加仓{r['n_add']}次 "
-              f"投入{r['spend']} 收益{r['ret']*100:+.0f}% MFE{r['mfe']*100:+.0f}% MAE{r['mae']*100:+.0f}% "
+              f"投入{r['spend']} 持仓收益{r['ret']*100:+.0f}% 账户贡献{r['ret_acct']*100:+.0f}% "
+              f"MFE{r['mfe']*100:+.0f}% MAE{r['mae']*100:+.0f}% "
               f"捕获{r['capture']*100:.0f}% 回吐{r['giveback']*100:.0f}%" + ("" if r["closed"] else " [未平仓]"))
