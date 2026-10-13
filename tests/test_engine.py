@@ -96,3 +96,18 @@ if __name__ == "__main__":
         f()
         print(f"PASS {f.__name__}")
     print(f"\n{len(fns)}/{len(fns)} 引擎测试全部通过")
+
+
+def test_add_sig_trend_add_fires():
+    """审查七轮: add_sig模式不受tiers长度限制 — 单元素tiers下顺势加仓必须可达且记增量。"""
+    cal = pd.date_range("2024-01-01", periods=6, freq="D")
+    px = pd.Series([10.0, 10.0, 12.0, 12.4, 12.4, 12.4], index=cal)  # 突破后顺势
+    sig = pd.Series([1.0, 0, 0, 0, 0, 0], index=cal)
+    ext = pd.Series([0.0, 0, 0, 0, 0, 0], index=cal)
+    add_sig = pd.Series([0.0, 0, 1.0, 0, 0, 0], index=cal)
+    eq, fills, trades = engine.run_specialist(px, sig, ext, cal, budget=100.0, cost=0.0,
+                                              tranches=(0.30,), add_sig=add_sig, max_adds=2)
+    adds = [f for f in fills if f[1] == "ADD"]
+    assert len(adds) == 1, f"顺势加仓必须成交1次, 实际{len(adds)} (加仓门bug回归)"
+    assert adds[0][2] < 4.0, "ADD日志必须是增量份额而非累计份额"
+    assert eq.iloc[-1] > eq.iloc[2], "加仓后净值应延续"

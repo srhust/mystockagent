@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """Phase5/资金分配对照实验: 9只高保真ETF, V4入场+30/35/35+t85dd出场。
 S1 静态六槽等权(Baseline参照, 已有5.96%) vs S2 动态机会分配(score加权, cap 35%, watch预留20%)。
 S2账本: 共享现金池, 入场时按allocate()定预算, 30%首仓/35%×2加仓, 出场释放。T+1, 0.1%/边。"""
@@ -59,7 +59,7 @@ cal = pd.DatetimeIndex(sorted(set().union(*[set(d["px"].index) for d in data.val
 names = list(data)
 
 
-def run_dynamic(cap=0.35):
+def run_dynamic(cap=0.35, alloc_mode="dynamic"):
     """动态分配账本: 逐日T+1执行。持仓: {sid: {budget, cash_left, shares, stage}}。"""
     cash, pos, eq = CAP, {}, pd.Series(np.nan, index=cal)
     for i, d in enumerate(cal):
@@ -88,7 +88,11 @@ def run_dynamic(cap=0.35):
                                    float(data[sid]["thr"].get(sd, 0.3)))
             cands[sid] = sc
         n_watch = sum(1 for sid in names if float(data[sid]["temp"].get(sd, 50)) < 25)
-        budgets = CA.allocate(cands, n_watch, equity, cash, cap_conc=cap)  # 审查六轮: 正式参数穿透
+        # 审查七轮: 同引擎同信号仅分配不同 — static=等权1/6槽位, dynamic=评分加权
+        if alloc_mode == "static":
+            budgets = {s: min(equity / 6.0, cash) for s in cands}
+        else:
+            budgets = CA.allocate(cands, n_watch, equity, cash, cap_conc=cap)
         for sid, bud in budgets.items():
             px = float(data[sid]["px"].get(d))
             spend = min(bud * 0.30, cash)
@@ -119,5 +123,8 @@ for cap in (0.35, 0.60, 0.80, 1.00):
     eq1 = run_dynamic(cap)
     m = metrics(eq1)
     print(f"S2 动态分配 cap={cap:.0%}: CAGR {m['CAGR']*100:+.2f}% Sharpe {m['Sharpe']:.2f} MDD {m['MDD']*100:.1f}% 恢复{m['recovery_days']}日")
-print("S1 静态六槽等权 (Baseline参照): CAGR +5.96% Sharpe 0.50 MDD -21.4% 恢复627日")
+eq_s1 = run_dynamic(alloc_mode="static")
+m1 = metrics(eq_s1)
+print(f"S1 静态六槽(同引擎): CAGR {m1['CAGR']*100:+.2f}% Sharpe {m1['Sharpe']:.2f} MDD {m1['MDD']*100:.1f}% 恢复{m1['recovery_days']}日")
+
 
