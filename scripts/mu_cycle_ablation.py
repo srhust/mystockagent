@@ -14,6 +14,7 @@ import pandas as pd
 import config
 from engine import run_specialist
 from breakout_detector import detect_breakout
+from cycle_state_machine import unified
 
 BUDGET = 100.0
 mu = pd.read_csv(os.path.join(config.DATA_DIR, "mu", "MU.csv"), parse_dates=["date"]).sort_values("date").set_index("date")
@@ -41,12 +42,6 @@ ext_tb = pd.Series(0.0, index=cal)
 ext_tb[(tbreak > 0) & (ma50.shift(1) < c.shift(1))] = 1.0  # 上穿后首次跌破, 防重复
 ext_tb = ((ext_tb > 0) | (temp > 85)).astype(float)
 
-CONFIGS = [
-    ("A: V4入场 30/35/35 t85", v4, ((temp > 85)).astype(float), (0.30, 0.35, 0.35)),
-    ("B: V4+突破55 无加仓 t85", ((v4 > 0) | (brk55 > 0)).astype(float), (temp > 85).astype(float), None),
-    ("C: V4+突破55 无加仓 趋势破坏", ((v4 > 0) | (brk55 > 0)).astype(float), ext_tb, None),
-    ("D: V4+突破55 30/35/35 趋势破坏", ((v4 > 0) | (brk55 > 0)).astype(float), ext_tb, (0.30, 0.35, 0.35)),
-]
 
 
 def round_trips(fills):
@@ -110,4 +105,5 @@ for tag, sig, ext, tr in CONFIGS:
 print("\n逐轮捕获(配置B):", results["B: V4+突破55 无加仓 t85"][4])
 print("逐轮捕获(配置C):", results["C: V4+突破55 无加仓 趋势破坏"][4])
 print("逐轮捕获(配置D):", results["D: V4+突破55 30/35/35 趋势破坏"][4])
+
 

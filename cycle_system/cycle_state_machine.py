@@ -9,6 +9,33 @@ import pandas as pd
 EXIT_TOP, EXIT_DD = 85.0, -0.25
 
 
+def unified(v4, brk, ext, close, *, max_adds=2):
+    """状态机v2 (CycleTrend-v1): FLAT→POSITION→EXIT; 一轮一cycle_id。
+    入场: V4(左)∨brk(右), 仅FLAT时; 加仓: 持仓中brk再确认∨MA20回踩后重上, 每轮≤max_adds; 出场: ext。
+    返回 (entry, add, n_cycles)。防重: 出场后5日内不再入场。"""
+    idx = close.index
+    entry = pd.Series(0.0, index=idx)
+    add = pd.Series(0.0, index=idx)
+    pos, adds, cooldown, cyc = 0, 0, 0, 0
+    ma20 = close.rolling(20).mean()
+    pull = (close < ma20 * 1.03) & (close.shift(1) < close.rolling(5).mean()) & (close > ma20 * 0.98)
+    v4v, bv, ev = v4.values, brk.values, ext.values
+    for i in range(1, len(idx)):
+        sd = idx[i - 1]
+        if pos and ev[i - 1] >= 1:
+            pos, adds, cooldown = 0, 0, 5
+        elif cooldown > 0:
+            cooldown -= 1
+        elif not pos and cooldown == 0 and (v4v[i - 1] >= 1 or bv[i - 1] >= 1):
+            pos, adds = 1, 0
+            cyc += 1
+            entry.iloc[i] = 1.0
+        elif pos and adds < max_adds and (bv[i - 1] >= 1 or pull.iloc[i - 1]):
+            add.iloc[i] = 1.0
+            adds += 1
+    return entry, add, cyc
+
+
 def run_machine(close, det, temp, dd, breadth=None, volume=None):
     """输入: close, reversal_detector输出det, 温度序列, 回撤序列。
     返回状态帧: state∈{FLAT,WATCH,EARLY,START,HOLD,EXIT}, fail_reason。"""

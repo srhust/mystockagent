@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """唯一可执行回测引擎 (V4.1账本, 指令①): 统一信号输入 + T+1收盘成交 + 现金份额账本 + 风控。
 所有研究脚本/每日顾问/模拟盘共用本引擎, 不再各自维护 run()。
 约定: ①所有决策输入必须 available_at <= T-1收盘; ②缺价用最近有效价估值(>stale_limit禁止交易);
@@ -119,13 +119,14 @@ def metrics(eq, cost_free_days=244):
 
 
 def run_specialist(px, sig, ext, cal, *, budget, cost=0.0015, tranches=(0.30, 0.35, 0.35),
-                   tier_dd=(-0.15, -0.30), stale_limit=20):
+                   tier_dd=(-0.15, -0.30), stale_limit=20, add_sig=None, add_frac=0.35, max_adds=2):
     """V4专户账本 v2 (审查五轮修复):
     ①raw_price与valuation_price分离: 当日无行情(raw非有限)->禁止BUY/ADD/SELL, 仅按last_px估值;
       陈旧>stale_limit->连估值都冻结(不再允许陈旧价成交)。
     ②加仓时间顺序: 用T-1收盘确认 tier 条件(entry_px×(1+dd)), T日执行(与T+1框架一致)。
     tranches=None=一次性全仓; 否则首仓=budget×tranches[0], 加仓=budget×tranches[k+1]。"""
     cash, shares, entry_px, stage = float(budget), 0.0, None, 0
+    adds_used = 0
     last_px, stale, eq, fills, trades = None, 0, pd.Series(np.nan, index=cal), [], []
     tiers = [1.0] if tranches is None else list(tranches)
     inv = np.zeros(len(cal))
@@ -144,21 +145,26 @@ def run_specialist(px, sig, ext, cal, *, budget, cost=0.0015, tranches=(0.30, 0.
         prev_px = float(px.get(sd, np.nan)) if sd is not None else np.nan  # T-1收盘(加仓确认用)
         if shares > 0 and can_trade:
             do_exit = bool(ext.get(sd, 0.0)) if sd is not None else False
-            if (not do_exit and entry_px is not None and stage < len(tiers) - 1
-                    and np.isfinite(prev_px)  # T-1确认
-                    and prev_px <= entry_px * (1 + tier_dd[min(stage, len(tier_dd) - 1)])):
-                spend = budget * tiers[stage + 1]
+            do_add = False
+            if not do_exit and stage < len(tiers) - 1:
+                if add_sig is not None:
+                    do_add = bool(add_sig.get(sd, 0.0)) and adds_used < max_adds  # 顺势加仓: 信号T-1确认
+                elif entry_px is not None and np.isfinite(prev_px):
+                    do_add = prev_px <= entry_px * (1 + tier_dd[min(stage, len(tier_dd) - 1)])  # 逆势: T-1确认
+            if not do_exit and do_add:
+                spend = budget * (add_frac if add_sig is not None else tiers[stage + 1])
                 if spend <= cash:
                     cash -= spend
                     shares += spend * (1 - cost) / raw
                     stage += 1
+                    adds_used += 1
                     fills.append((d.date().isoformat(), "ADD", round(shares, 2), raw))
             if do_exit:
                 proceeds = shares * raw * (1 - cost)
                 cash += proceeds
                 fills.append((d.date().isoformat(), "SELL", round(shares, 2), raw))
                 trades.append((d.date().isoformat(), None))
-                shares, entry_px, stage = 0.0, None, 0
+                shares, entry_px, stage, adds_used = 0.0, None, 0, 0
         elif shares == 0 and can_trade and sd is not None and sig.get(sd, 0.0) >= 1 and cash > raw * 0.001:
             spend = min(cash, budget * tiers[0])
             cash -= spend
@@ -172,3 +178,4 @@ def run_specialist(px, sig, ext, cal, *, budget, cost=0.0015, tranches=(0.30, 0.
 def fmt(m):
     return (f"CAGR {m['CAGR']*100:+.2f}% Sharpe {m['Sharpe']:.2f} Calmar {m['Calmar']:.2f} "
             f"MDD {m['MDD']*100:.1f}% 谷底{m['trough'].date()} 恢复{m['recovery_days']}日")
+
