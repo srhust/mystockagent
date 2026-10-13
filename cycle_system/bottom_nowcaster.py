@@ -73,8 +73,9 @@ def build_features(close, prev_trough_idx, sox=None):
     cur = np.nan
     for i in range(len(c)):
         while j < len(pti) and pti[j] <= i:
-            cur = i - pti[j]
             j += 1
+        if j > 0:
+            cur = float(i - pti[j - 1])  # 审查十四轮修复: 逐日重算(原实现j先advance后不再更新, dist恒为0)
         dist[i] = cur
     f["days_since_prev_trough"] = dist
     if sox is not None:
@@ -113,4 +114,43 @@ def fit_expanding(feats, labels, *, start=750, targets=("P_bottom_20d", "P_rever
             preds[t].iloc[i:] = lr.predict_proba(Xz)[:, 1]
             coefs[t] = dict(zip(feats.columns, np.round(lr.coef_[0], 2)))
     return preds, coefs
+
+
+def trough_confirm_idx(close, troughs, rebound=0.30):
+    """审查十四轮: zigzag谷底的"可得时点"= 反弹rebound确认日(交易者在当日才知道谷底成立)。
+    返回与troughs等长的确认日索引数组(未确认者记NaN)。"""
+    c = close.values
+    out = []
+    for t in troughs:
+        conf = np.nan
+        for i in range(t + 1, len(c)):
+            if c[i] >= c[t] * (1 + rebound):
+                conf = i
+                break
+        out.append(conf)
+    return np.array(out, dtype=float)
+
+
+def build_industry_features(fund_csv, daily_index):
+    """审查十四轮: 季度序列先算同比/加速度(修v3的日频shift(4)错位), 再按真实提交日as-of对齐到日频。
+    fund_csv列: end(季度末), val(营收), filed(提交日), 可选gp/inv。"""
+    q = pd.read_csv(fund_csv, parse_dates=["end", "filed"]).dropna(subset=["filed"])
+    q = q.sort_values("end").drop_duplicates("end", keep="last").reset_index(drop=True)
+    q["rev_yoy"] = q["val"] / q["val"].shift(4) - 1  # 季度序列上的真同比
+    q["rev_accel"] = q["rev_yoy"] - q["rev_yoy"].shift(1)
+    if "gp" in q.columns:
+        q["gm"] = q["gp"] / q["val"]
+    if "inv" in q.columns:
+        q["inv_rev"] = q["inv"] / q["val"]
+    cols = [c for c in ("rev_yoy", "rev_accel", "gm", "inv_rev") if c in q.columns]
+    # as-of: 每日取filed<=当日且end最近的最近一次提交
+    q2 = q.sort_values("filed").set_index("filed")[cols]
+    ind = q2.reindex(daily_index, method="ffill")
+    return ind
+
+
+def rule_state(close, dd_th=-0.35, pos_th=0.35):
+    """审查十二轮规则版(生产候选): 深跌+低位状态序列(风险过滤用, 非底部预测)。"""
+    f = build_features(close, [])
+    return (f["dd252"] <= dd_th) & (f["pos1250"] <= pos_th)
 
