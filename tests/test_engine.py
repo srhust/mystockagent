@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """审查五轮P0③: 直接测试生产引擎 run_ledger / run_specialist。
 覆盖: 缺价禁成交 / 现金+市值=净值 / 专户预算不串用 / 费用当日入账 / 加仓T-1确认T执行 / T+1成交。"""
 import os
@@ -90,14 +90,6 @@ def test_ledger_cash_mv_identity():
     assert np.isfinite(res["equity"]).all() and (res["equity"] > 0).all()
 
 
-if __name__ == "__main__":
-    fns = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
-    for f in fns:
-        f()
-        print(f"PASS {f.__name__}")
-    print(f"\n{len(fns)}/{len(fns)} 引擎测试全部通过")
-
-
 def test_add_sig_trend_add_fires():
     """审查七轮: add_sig模式不受tiers长度限制 — 单元素tiers下顺势加仓必须可达且记增量。"""
     cal = pd.date_range("2024-01-01", periods=6, freq="D")
@@ -105,9 +97,18 @@ def test_add_sig_trend_add_fires():
     sig = pd.Series([1.0, 0, 0, 0, 0, 0], index=cal)
     ext = pd.Series([0.0, 0, 0, 0, 0, 0], index=cal)
     add_sig = pd.Series([0.0, 0, 1.0, 0, 0, 0], index=cal)
-    eq, fills, trades = engine.run_specialist(px, sig, ext, cal, budget=100.0, cost=0.0,
+    eq, fills, trades = E.run_specialist(px, sig, ext, cal, budget=100.0, cost=0.0,
                                               tranches=(0.30,), add_sig=add_sig, max_adds=2)
     adds = [f for f in fills if f[1] == "ADD"]
     assert len(adds) == 1, f"顺势加仓必须成交1次, 实际{len(adds)} (加仓门bug回归)"
     assert adds[0][2] < 4.0, "ADD日志必须是增量份额而非累计份额"
     assert eq.iloc[-1] > eq.iloc[2], "加仓后净值应延续"
+
+
+
+if __name__ == "__main__":
+    fns = [v for k, v in sorted(globals().items()) if k.startswith("test_")]
+    for f in fns:
+        f()
+        print(f"PASS {f.__name__}")
+    print(f"\n{len(fns)}/{len(fns)} 引擎测试全部通过")

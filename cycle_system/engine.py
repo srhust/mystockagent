@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """唯一可执行回测引擎 (V4.1账本, 指令①): 统一信号输入 + T+1收盘成交 + 现金份额账本 + 风控。
 所有研究脚本/每日顾问/模拟盘共用本引擎, 不再各自维护 run()。
 约定: ①所有决策输入必须 available_at <= T-1收盘; ②缺价用最近有效价估值(>stale_limit禁止交易);
@@ -148,11 +148,13 @@ def run_specialist(px, sig, ext, cal, *, budget, cost=0.0015, tranches=(0.30, 0.
             do_add = False
             if not do_exit and (stage < len(tiers) - 1 or add_sig is not None):
                 if add_sig is not None:
-                    if add_mode == "hybrid" and stage == 0:
-                        # 组合模式: 首档逆势(深寒防御), 剩余档顺势(突破确认)
-                        do_add = ((entry_px is not None and np.isfinite(prev_px)
-                                   and prev_px <= entry_px * (1 + tier_dd[0]))
-                                  or bool(add_sig.get(sd, 0.0))) and adds_used < max_adds
+                    if add_mode == "hybrid":
+                        # 审查八轮: 严格顺序 — stage0仅逆势, stage>=1仅顺势
+                        if stage == 0:
+                            do_add = (entry_px is not None and np.isfinite(prev_px)
+                                      and prev_px <= entry_px * (1 + tier_dd[0])) and adds_used < max_adds
+                        else:
+                            do_add = bool(add_sig.get(sd, 0.0)) and adds_used < max_adds
                     else:
                         do_add = bool(add_sig.get(sd, 0.0)) and adds_used < max_adds  # 顺势加仓: 信号T-1确认
                 elif entry_px is not None and np.isfinite(prev_px):
@@ -161,10 +163,11 @@ def run_specialist(px, sig, ext, cal, *, budget, cost=0.0015, tranches=(0.30, 0.
                 spend = budget * (add_frac if add_sig is not None else tiers[stage + 1])
                 if spend <= cash:
                     cash -= spend
-                    shares += spend * (1 - cost) / raw
+                    delta = spend * (1 - cost) / raw  # 审查八轮P0: 日志记增量份额
+                    shares += delta
                     stage += 1
                     adds_used += 1
-                    fills.append((d.date().isoformat(), "ADD", round(shares, 2), raw))
+                    fills.append((d.date().isoformat(), "ADD", round(delta, 2), raw))
             if do_exit:
                 proceeds = shares * raw * (1 - cost)
                 cash += proceeds
