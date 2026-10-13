@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """审查十五轮P3前提: 跨标的机会质量 — MU/STX/WDC同一套冻结规则: S1阶段1状态持有(dd≤-35%&pos1250≤0.35),
 S2双路径A∪B事件持120日。T+1, 费0.15%。无MU特化参数, 公平比较机会质量。"""
 import os
@@ -34,3 +34,7 @@ for name, fn in {"MU": "MU.csv", "STX": "stx.csv", "WDC": "wdc.csv"}.items():
         mdd = float((eq / eq.cummax() - 1).min())
         out.append(f"{label}: 终值{float(eq.iloc[-1]):.1f} MDD{mdd:.0%} 比值{float(eq.iloc[-1])/abs(mdd):.0f}")
     print(f"{name}: " + " | ".join(out))
+
+# === 审查十五轮补充判定(同轮): 近似法在"同一执行模型内"可用于跨标的对比(其错误是与引擎分批模型混用), STX因毒数据单独作废 ===
+# 同规则同模型(全仓T+1): MU S1 278.2/-45%(比值6.2) S2 18733.7/-81%(比值231) vs WDC S1 200.3/-42%(4.8) S2 1131.1/-74%(15)
+# 分配器第一输入: 同一冻结规则下MU机会质量显著优于WDC, MU作为核心标的成立
