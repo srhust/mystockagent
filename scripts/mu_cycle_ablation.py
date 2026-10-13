@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
-"""Phase1/MU消融: V4入场 × 仓位方案(一次性/30-35-35) × 出场(t85/t85dd/t75dd) 逐轮回放。
-输出每周期: 收益/年化/MFE/MAE/捕获率/回吐/资金占用/持有天数。同MU全序列专户, fills按日期归属周期。"""
+﻿# -*- coding: utf-8 -*-
+"""Phase2/MU实验B/C: V4 vs V4+突破(B) vs 突破+趋势破坏出场(C)。逐轮捕获率对比。
+突破信号独立于V4(不要求temp<12)。信号T日确认 -> T+1执行(engine已保证)。"""
 import os
 import sys
 
@@ -13,7 +13,7 @@ import pandas as pd
 
 import config
 from engine import run_specialist
-from cycle_metrics import cycle_report
+from breakout_detector import detect_breakout
 
 BUDGET = 100.0
 mu = pd.read_csv(os.path.join(config.DATA_DIR, "mu", "MU.csv"), parse_dates=["date"]).sort_values("date").set_index("date")
@@ -29,26 +29,33 @@ temp = 100 * (0.60 * pp + 0.25 * r120 + 0.15 * r60)
 dd = c / c.cummax() - 1.0
 dep = (-dd).rolling(1250, min_periods=250).max()
 thr = np.maximum(0.30, 0.70 * dep)
-sig = (((temp < 12) | (dd <= -thr)) & (temp > 0)).astype(float)
-exts = {"t85": (temp > 85).astype(float),
-        "t85dd": ((temp > 85) | (dd >= -0.25)).astype(float),
-        "t75dd": ((temp > 75) | (dd >= -0.25)).astype(float)}
+v4 = (((temp < 12) | (dd <= -thr)) & (temp > 0)).astype(float)
 
-CONFIGS = [("一次性-t85", None, "t85"), ("一次性-t85dd", None, "t85dd"), ("一次性-t75dd", None, "t75dd"),
-           ("30/35/35-t85", (0.30, 0.35, 0.35), "t85"), ("30/35/35-t85dd", (0.30, 0.35, 0.35), "t85dd"),
-           ("30/35/35-t75dd", (0.30, 0.35, 0.35), "t75dd")]
-dates_list = list(cal)
+det = detect_breakout(c)
+brk55 = det["brk55_x"].astype(float)
+
+# 趋势破坏出场: 收盘跌破MA50×0.97 (仅对突破仓语义, 这里统一出场对照)
+ma50 = c.rolling(50).mean()
+tbreak = (c < ma50 * 0.97).astype(float)
+ext_tb = pd.Series(0.0, index=cal)
+ext_tb[(tbreak > 0) & (ma50.shift(1) < c.shift(1))] = 1.0  # 上穿后首次跌破, 防重复
+ext_tb = ((ext_tb > 0) | (temp > 85)).astype(float)
+
+CONFIGS = [
+    ("A: V4入场 30/35/35 t85", v4, ((temp > 85)).astype(float), (0.30, 0.35, 0.35)),
+    ("B: V4+突破55 无加仓 t85", ((v4 > 0) | (brk55 > 0)).astype(float), (temp > 85).astype(float), None),
+    ("C: V4+突破55 无加仓 趋势破坏", ((v4 > 0) | (brk55 > 0)).astype(float), ext_tb, None),
+    ("D: V4+突破55 30/35/35 趋势破坏", ((v4 > 0) | (brk55 > 0)).astype(float), ext_tb, (0.30, 0.35, 0.35)),
+]
 
 
-def round_trips(fills, c):
-    """专户fills -> 往返链: [(first_buy, last_buy, exit或None, spend, shares)]。"""
+def round_trips(fills):
     trips, cur = [], None
     for f in fills:
         d, side, sh, px = pd.Timestamp(f[0]), f[1], f[2], f[3]
         if side in ("BUY", "ADD"):
             if cur is None:
-                cur = dict(first=d, last=d, spend=0.0, shares=0.0)
-            cur["last"] = d
+                cur = dict(first=d, spend=0.0, shares=0.0)
             cur["spend"] += sh * px
             cur["shares"] += sh
         elif side == "SELL" and cur is not None:
@@ -61,46 +68,46 @@ def round_trips(fills, c):
     return trips
 
 
-def attr_cycle(trip, cycles, cal):
-    """往返链归属: 与[start-180d, end+250d]重叠最多的周期; 未平仓归最后覆盖期。"""
+def attr(trip, cycles, cal):
     end = trip.get("exit") or cal[-1]
-    best, best_ov = None, -1
+    best, bov = None, -1
     for _, r in cycles.iterrows():
         a = pd.Timestamp(r.start) - pd.Timedelta(days=180)
         b = pd.Timestamp(r.end) + pd.Timedelta(days=250)
         ov = (min(pd.Timestamp(end), b) - max(trip["first"], a)).days
-        if ov > best_ov:
-            best, best_ov = r.cycle_id, ov
-    return best if best_ov > 0 else None
+        if ov > bov:
+            best, bov = r.cycle_id, ov
+    return best if bov > 0 else None
 
 
-for tag, tr, ex in CONFIGS:
-    eq, fills, _ = run_specialist(c, sig.reindex(cal).fillna(0), exts[ex].reindex(cal).fillna(0),
+print(f"{'配置':<38}{'捕获中位':>8}{'捕获和':>8}{'往返':>6}{'MAE最深':>8}")
+results = {}
+for tag, sig, ext, tr in CONFIGS:
+    eq, fills, _ = run_specialist(c, sig.reindex(cal).fillna(0), ext.reindex(cal).fillna(0),
                                   cal, budget=BUDGET, cost=0.001, tranches=tr)
-    trips = round_trips(fills, c)
-    print(f"\n=== {tag} ===  (往返{len(trips)}次)")
+    trips = round_trips(fills)
+    caps, maes = [], []
+    detail = {}
     for _, row in cycles.iterrows():
-        mine = [t for t in trips if attr_cycle(t, cycles, cal) == row.cycle_id]
+        mine = [t for t in trips if attr(t, cycles, cal) == row.cycle_id]
         if not mine:
-            print(f"{row.cycle_id} {row.type}: 无入场(漏检)")
             continue
         i0 = cal.get_indexer([pd.Timestamp(row.start)])[0]
         i1 = cal.get_indexer([pd.Timestamp(row.end)])[0]
         for t in mine:
             i_entry = cal.get_indexer([t["first"]])[0]
             i_end = cal.get_indexer([t.get("exit") or cal[-1]])[0]
-            avg_cost = t["spend"] / t["shares"]
-            px_path = c.iloc[i_entry:i_end + 1].dropna().values
+            avg = t["spend"] / t["shares"]
+            pxp = c.iloc[i_entry:i_end + 1].dropna().values
             exit_px = t.get("exit_px") or float(c.iloc[-1])
-            ret = exit_px / (avg_cost * 1.001) - 1
-            mfe = float(px_path.max() / avg_cost - 1) if len(px_path) else np.nan
-            mae = float(px_path.min() / avg_cost - 1) if len(px_path) else np.nan
             ref_up = float(c.iloc[i1] / c.iloc[i0] - 1)
-            capture = (exit_px / avg_cost - 1) / ref_up if ref_up > 0 else np.nan
-            peak_float = float(px_path.max()) if len(px_path) else exit_px
-            giveback = (peak_float - exit_px) / peak_float if peak_float > 0 else np.nan
-            days = (t.get("exit") or cal[-1]) - t["first"]
-            ann = (1 + ret) ** (365.25 / max(1, days.days)) - 1 if days.days > 5 else np.nan
-            print(f"{row.cycle_id} {row.type}: 收益{ret*100:+.0f}% 年化{ann*100:+.0f}% 持有{days.days}日 "
-                  f"MFE{mfe*100:+.0f}% MAE{mae*100:+.0f}% 捕获{capture*100:.0f}% 回吐{giveback*100:.0f}% "
-                  f"投入{t['spend']:.0f}({t['spend']/BUDGET*100:.0f}%)" + ("" if t.get("exit") else " [未平仓]"))
+            cap = (exit_px / avg - 1) / ref_up if ref_up > 0 else np.nan
+            caps.append(cap)
+            maes.append(float(pxp.min() / avg - 1) if len(pxp) else np.nan)
+            detail[row.cycle_id] = f"{cap*100:.0f}%"
+    results[tag] = (float(np.nanmedian(caps)), float(np.nansum(caps)), len(trips), float(np.nanmin(maes)), detail)
+    print(f"{tag:<38}{np.nanmedian(caps)*100:>7.0f}%{np.nansum(caps)*100:>7.0f}%{len(trips):>6}{np.nanmin(maes)*100:>7.0f}%")
+print("\n逐轮捕获(配置B):", results["B: V4+突破55 无加仓 t85"][4])
+print("逐轮捕获(配置C):", results["C: V4+突破55 无加仓 趋势破坏"][4])
+print("逐轮捕获(配置D):", results["D: V4+突破55 30/35/35 趋势破坏"][4])
+
