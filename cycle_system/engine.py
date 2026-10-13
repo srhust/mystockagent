@@ -119,7 +119,7 @@ def metrics(eq, cost_free_days=244):
 
 
 def run_specialist(px, sig, ext, cal, *, budget, cost=0.0015, tranches=(0.30, 0.35, 0.35),
-                   tier_dd=(-0.15, -0.30), stale_limit=20, add_sig=None, add_frac=0.35, max_adds=2):
+                   tier_dd=(-0.15, -0.30), stale_limit=20, add_sig=None, add_frac=0.35, max_adds=2, add_mode="signal"):
     """V4专户账本 v2 (审查五轮修复):
     ①raw_price与valuation_price分离: 当日无行情(raw非有限)->禁止BUY/ADD/SELL, 仅按last_px估值;
       陈旧>stale_limit->连估值都冻结(不再允许陈旧价成交)。
@@ -148,7 +148,13 @@ def run_specialist(px, sig, ext, cal, *, budget, cost=0.0015, tranches=(0.30, 0.
             do_add = False
             if not do_exit and (stage < len(tiers) - 1 or add_sig is not None):
                 if add_sig is not None:
-                    do_add = bool(add_sig.get(sd, 0.0)) and adds_used < max_adds  # 顺势加仓: 信号T-1确认
+                    if add_mode == "hybrid" and stage == 0:
+                        # 组合模式: 首档逆势(深寒防御), 剩余档顺势(突破确认)
+                        do_add = ((entry_px is not None and np.isfinite(prev_px)
+                                   and prev_px <= entry_px * (1 + tier_dd[0]))
+                                  or bool(add_sig.get(sd, 0.0))) and adds_used < max_adds
+                    else:
+                        do_add = bool(add_sig.get(sd, 0.0)) and adds_used < max_adds  # 顺势加仓: 信号T-1确认
                 elif entry_px is not None and np.isfinite(prev_px):
                     do_add = prev_px <= entry_px * (1 + tier_dd[min(stage, len(tier_dd) - 1)])  # 逆势: T-1确认
             if not do_exit and do_add:
@@ -178,6 +184,7 @@ def run_specialist(px, sig, ext, cal, *, budget, cost=0.0015, tranches=(0.30, 0.
 def fmt(m):
     return (f"CAGR {m['CAGR']*100:+.2f}% Sharpe {m['Sharpe']:.2f} Calmar {m['Calmar']:.2f} "
             f"MDD {m['MDD']*100:.1f}% 谷底{m['trough'].date()} 恢复{m['recovery_days']}日")
+
 
 
 
