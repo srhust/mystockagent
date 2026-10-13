@@ -144,7 +144,7 @@ def build_industry_features(fund_csv, daily_index):
         q["inv_rev"] = q["inv"] / q["val"]
     cols = [c for c in ("rev_yoy", "rev_accel", "gm", "inv_rev") if c in q.columns]
     # as-of: 每日取filed<=当日且end最近的最近一次提交
-    q2 = q.sort_values("filed").set_index("filed")[cols]
+    q2 = q.sort_values("filed").drop_duplicates("filed", keep="last").set_index("filed")[cols]
     ind = q2.reindex(daily_index, method="ffill")
     return ind
 
