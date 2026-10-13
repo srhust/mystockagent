@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """cycle_labels.py (P0, CycleStart-v1第一步): 双标签 + 漏检诊断。
 标签1 历史谷底(冻结): dd谷底<=-30%, 修复段分隔, 两谷底间需dd>=-15%。
 标签2 有效启动(路径依赖): 信号日t后120日内 先涨+15% 先于 先跌-10% = 成功; 先跌-10%先=失败; 均未触发=超时。
@@ -19,28 +19,9 @@ HORIZON, G, R = 120, 0.15, 0.10
 
 
 def effective_start_labels(close, vol_win=250):
-    """逐日有效启动标签: 1=成功(先涨后跌), 0=失败, np.nan=超时/数据不足。路径依赖近似:
-    成功=fmax>=g×s 且 fmin>-r×s; 失败=fmin<=-r×s 且 fmax<g×s; 其余超时。"""
-    c = close.values
-    n = len(c)
-    vol = close.pct_change().rolling(vol_win).std().values
-    s = np.clip(0.20 / np.where(vol > 0, vol, np.nan), 0.5, 2.0)
-    lab = np.full(n, np.nan)
-    with np.errstate(invalid="ignore"):
-        for t in range(n - HORIZON):
-            if not np.isfinite(s[t]):
-                continue
-            w = c[t + 1:t + 1 + HORIZON]
-            fmax = w.max() / c[t] - 1
-            fmin = w.min() / c[t] - 1
-            g, r = G * s[t], R * s[t]
-            if fmax >= g and fmin > -r:
-                lab[t] = 1
-            elif fmin <= -r and fmax < g:
-                lab[t] = 0
-            else:
-                lab[t] = np.nan
-    return pd.Series(lab, index=close.index)
+    """v2: 委托 reversal_detector.effective_start (真first-touch triple-barrier, 年化波动障碍)。"""
+    from reversal_detector import effective_start
+    return effective_start(close, vol_win=vol_win)
 
 
 def troughs(close, *, depth=0.30, recover=0.15):

@@ -45,22 +45,34 @@ def detect(close, ref, breadth=None, volume=None):
                          "pathC": (start & watch_C).astype(int), "rs20": rs20, "bd": bd})
 
 
-def effective_start(close, *, g=0.15, r=0.10, horizon=HORIZON, vol_win=250):
-    """有效启动标签(信号日用): t后horizon日内先涨g×s先于先跌-r×s => 1; 反之0; 未触发nan。
-    s=clip(0.20/vol250, 0.5, 2.0)。"""
-    c = close.values
+def effective_start(close, *, horizon=HORIZON, vol_win=250):
+    """有效启动标签 v2 (审查三轮修复): 真first-touch triple-barrier。
+    逐日找第一个触发障碍的日子: 先触上涨目标=1, 先触止损=0, 都未触=nan。
+    波动缩放修复: 用年化波动 vol_a=vol250×sqrt(244), 障碍=clip(0.6×vol_a,10%,40%)上行 /
+    clip(0.4×vol_a,6%,30%)下行 (旧版0.20/日vol对低波动标的恒截断在2, 缩放失效)。"""
+    import numpy as _np
+    from numpy.lib.stride_tricks import sliding_window_view as _swv
+    c = _np.asarray(close, dtype=float)
     n = len(c)
-    vol = close.pct_change().rolling(vol_win).std().values
-    s = np.clip(0.20 / np.where(vol > 0, vol, np.nan), 0.5, 2.0)
-    lab = np.full(n, np.nan)
+    if n <= horizon:
+        return pd.Series(_np.nan, index=close.index if hasattr(close, "index") else None)
+    rets = pd.Series(c).pct_change()
+    vol_a = rets.rolling(vol_win).std().values * _np.sqrt(244)
+    lab = _np.full(n, _np.nan)
+    win = _swv(c[1:], horizon)  # win[t] = c[t+1..t+horizon]
     for t in range(n - horizon):
-        if not np.isfinite(s[t]):
+        va = vol_a[t]
+        if not _np.isfinite(va) or va <= 0:
             continue
-        w = c[t + 1:t + 1 + horizon]
-        fmax, fmin = w.max() / c[t] - 1, w.min() / c[t] - 1
-        gg, rr = g * s[t], r * s[t]
-        if fmax >= gg and fmin > -rr:
+        up = float(_np.clip(0.6 * va, 0.10, 0.40))
+        dn = float(_np.clip(0.4 * va, 0.06, 0.30))
+        e = c[t]
+        hu = _np.nonzero(win[t] >= e * (1 + up))[0]
+        hd = _np.nonzero(win[t] <= e * (1 - dn))[0]
+        fu = int(hu[0]) if len(hu) else horizon + 1
+        fd = int(hd[0]) if len(hd) else horizon + 1
+        if fu < fd:
             lab[t] = 1
-        elif fmin <= -rr and fmax < gg:
+        elif fd < fu:
             lab[t] = 0
-    return pd.Series(lab, index=close.index)
+    return pd.Series(lab, index=close.index if hasattr(close, "index") else None)

@@ -79,11 +79,13 @@ def run_ledger(px, sig, ext, stre, catmap, cal, *, max_pos=6, per_cat=2, cost=0.
         for n in buys:
             p = float(px.at[d, n])
             w = eq.iloc[i] / max_pos if not greedy else eq.iloc[i] / (len(pos) + len(buys))
-            if sig_weight is not None and n in getattr(sig_weight, "columns", []):
-                try:
-                    w *= float(sig_weight.at[sd, n])
-                except (KeyError, ValueError):
-                    pass
+            if sig_weight is not None:
+                if n not in sig_weight.columns or sd not in sig_weight.index:
+                    raise ValueError(f"sig_weight缺少权重: {n}@{sd} (审查三轮: 禁止静默回退默认仓位)")
+                wm = float(sig_weight.at[sd, n])
+                if not np.isfinite(wm) or wm <= 0:
+                    raise ValueError(f"sig_weight非法: {n}@{sd}={wm}")
+                w *= wm
             spend = min(cash * 0.999, w * (0.30 if tranches else 1.0))
             if risk:
                 spend = min(spend, eq.iloc[i] * 0.08)
