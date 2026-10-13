@@ -118,6 +118,54 @@ def metrics(eq, cost_free_days=244):
             "trough": trough, "recovery_days": rec_days}
 
 
+def run_specialist(px, sig, ext, cal, *, budget, cost=0.0015, tranches=(0.30, 0.35, 0.35),
+                   tier_dd=(-0.15, -0.30), stale_limit=20):
+    """V4专户账本(审查四轮迁移): 单行业独立预算, 闲置资金计入净值。
+    tranches=None=一次性全仓; 否则首仓=budget×tranches[0], 于 entry×(1+tier_dd[k]) 加仓 budget×tranches[k+1]。
+    预算回测前固定; 返回 (equity Series, fills, closed_trades列表[(出场日, pnl)])。"""
+    cash, shares, entry_px, stage = float(budget), 0.0, None, 0
+    last_px, stale, eq, fills, trades = None, 0, pd.Series(np.nan, index=cal), [], []
+    tiers = [1.0] if tranches is None else list(tranches)
+    for i, d in enumerate(cal):
+        p = float(px.get(d, np.nan))
+        if np.isfinite(p):
+            last_px, stale = p, 0
+        else:
+            p, stale = last_px, stale + 1
+        val = p if p is not None and np.isfinite(p) else 0.0
+        eq.iloc[i] = cash + shares * val
+        px_ok = p is not None and np.isfinite(p) and stale <= stale_limit
+        sd = cal[i - 1] if i > 0 else None
+        if shares > 0 and px_ok:
+            do_exit = bool(ext.get(sd, 0.0)) if sd is not None else False
+            # 加仓(先于出场判定: 信号日与出场同日时以出场优先)
+            if not do_exit and entry_px is not None and stage < len(tiers) - 1 and p <= entry_px * (1 + tier_dd[min(stage, len(tier_dd) - 1)]):
+                spend = budget * tiers[stage + 1]
+                if spend <= cash:
+                    cash -= spend
+                    shares += spend * (1 - cost) / p
+                    stage += 1
+                    fills.append((d.date().isoformat(), "ADD", round(shares, 2), p))
+            if do_exit:
+                proceeds = shares * p * (1 - cost)
+                trades.append((d.date().isoformat(), proceeds / (budget - cash + proceeds) if False else None))
+                cash += proceeds
+                fills.append((d.date().isoformat(), "SELL", round(shares, 2), p))
+                shares, entry_px, stage = 0.0, None, 0
+                trades[-1] = (d.date().isoformat(), None)
+        elif shares == 0 and px_ok and sd is not None and sig.get(sd, 0.0) >= 1 and cash > p * 0.001:
+            spend = min(cash, budget * tiers[0])
+            cash -= spend
+            shares = spend * (1 - cost) / p
+            entry_px = p
+            fills.append((d.date().isoformat(), "BUY", round(shares, 2), p))
+    return eq, fills, trades
+
+
+def specialist_metrics(eq):
+    return metrics(eq)
+
+
 def fmt(m):
     return (f"CAGR {m['CAGR']*100:+.2f}% Sharpe {m['Sharpe']:.2f} Calmar {m['Calmar']:.2f} "
             f"MDD {m['MDD']*100:.1f}% 谷底{m['trough'].date()} 恢复{m['recovery_days']}日")
