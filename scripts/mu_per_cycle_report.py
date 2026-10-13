@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """审查七轮: MU九轮周期终报告 — A(逆势分批)与E(突破顺势加仓)两冠军配置的逐轮明细。
 真实增量份额/费用/现金流口径(引擎已修正), 每轮: 入场/出场/持有/投入/加仓次数/收益/捕获/回吐。"""
 import os
@@ -70,6 +70,7 @@ def per_cycle(fills):
         ref = float(c.iloc[i1] / c.iloc[i0] - 1)
         pxp = c.iloc[i_e:i_x + 1].dropna().values
         cash_out = t["spend"] / 0.999  # 审查十轮: spend是费后证券额, 现金支出=费前全额
+        ret_acct = (t["shares"] * exit_px * 0.999 - cash_out) / BUDGET  # 周期账户贡献(含买入费用, 预算100基准)
         out[best.cycle_id] = dict(entry=t["first"].date(), exit=pd.Timestamp(end).date(),
                                   hold=int(i_x - i_e), n_add=t["n_add"], spend=round(t["spend"], 1),
                                   ret=round(exit_px / (avg * 1.001) - 1, 3), ret_acct=round(float(ret_acct), 3),
