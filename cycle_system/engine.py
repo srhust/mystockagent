@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """唯一可执行回测引擎 (V4.1账本, 指令①): 统一信号输入 + T+1收盘成交 + 现金份额账本 + 风控。
 所有研究脚本/每日顾问/模拟盘共用本引擎, 不再各自维护 run()。
 约定: ①所有决策输入必须 available_at <= T-1收盘; ②缺价用最近有效价估值(>stale_limit禁止交易);
@@ -31,8 +31,8 @@ def run_ledger(px, sig, ext, stre, catmap, cal, *, max_pos=6, per_cat=2, cost=0.
                 stale[n] = stale.get(n, 0) + 1
             if p is not None and np.isfinite(p):
                 mv += sh * p
-        eq.iloc[i] = cash + mv
-        eqmax = max(eqmax, eq.iloc[i])
+        eq_now = cash + mv  # 审查十轮: 交易前权益仅用于仓位/熔断估算; 净值在成交后记录
+        eqmax = max(eqmax, eq_now)
         sd = cal[i - 1] if i > 0 else None
         # 出场: T-1信号, T日执行(需有效价)
         for n in [n for n in list(pos) if sd is not None and ext.at[sd, n] == 1]:
@@ -51,8 +51,9 @@ def run_ledger(px, sig, ext, stre, catmap, cal, *, max_pos=6, per_cat=2, cost=0.
                 if not np.isfinite(p) or stale.get(n, 0) > stale_limit:
                     continue
                 tier = -0.15 if st[1] == 0 else -0.30
-                if p <= st[0] * (1 + tier):
-                    spend = min(cash * 0.999, eq.iloc[i] / max_pos * 0.35)
+                prev = float(px.at[sd, n]) if (sd is not None and n in px.columns) else np.nan  # 审查十轮: T-1确认
+                if np.isfinite(prev) and prev <= st[0] * (1 + tier):  # T-1收盘确认, T日执行
+                    spend = min(cash * 0.999, eq_now / max_pos * 0.35)
                     if spend > p * 0.001:
                         cash -= spend
                         pos[n] += spend * (1 - cost) / p
@@ -60,7 +61,7 @@ def run_ledger(px, sig, ext, stre, catmap, cal, *, max_pos=6, per_cat=2, cost=0.
                         fills.append((d.date().isoformat(), "ADD", n, spend * (1 - cost) / p, float(p)))
         # 入场
         slots = (10**9 if greedy else max_pos) - len(pos)
-        breaker = risk and eq.iloc[i] < eqmax * (1 - breaker_dd)
+        breaker = risk and eq_now < eqmax * (1 - breaker_dd)
         buys = []
         if i > 0 and not breaker:
             cand = [n for n in names if n not in pos and sig.at[sd, n] == 1
@@ -78,7 +79,7 @@ def run_ledger(px, sig, ext, stre, catmap, cal, *, max_pos=6, per_cat=2, cost=0.
                 cats[catmap[n]] = cats.get(catmap[n], 0) + 1
         for n in buys:
             p = float(px.at[d, n])
-            w = eq.iloc[i] / max_pos if not greedy else eq.iloc[i] / (len(pos) + len(buys))
+            w = eq_now / max_pos if not greedy else eq_now / (len(pos) + len(buys))
             if sig_weight is not None:
                 if n not in sig_weight.columns or sd not in sig_weight.index:
                     raise ValueError(f"sig_weight缺少权重: {n}@{sd} (审查三轮: 禁止静默回退默认仓位)")
@@ -88,8 +89,8 @@ def run_ledger(px, sig, ext, stre, catmap, cal, *, max_pos=6, per_cat=2, cost=0.
                 w *= wm
             spend = min(cash * 0.999, w * (0.30 if tranches else 1.0))
             if risk:
-                spend = min(spend, eq.iloc[i] * 0.08)
-                spend = min(spend, max(0.0, exposure_cap * eq.iloc[i] - (eq.iloc[i] - cash)))
+                spend = min(spend, eq_now * 0.08)
+                spend = min(spend, max(0.0, exposure_cap * eq_now - (eq_now - cash)))
             if spend > p * 0.001:
                 cash -= spend
                 sh = spend * (1 - cost) / p
@@ -97,6 +98,16 @@ def run_ledger(px, sig, ext, stre, catmap, cal, *, max_pos=6, per_cat=2, cost=0.
                 entry[n] = d
                 stage[n] = [p, 0]
                 fills.append((d.date().isoformat(), "BUY", n, sh, p))
+        # 审查十轮: 共享池净值统一为成交后口径(含当日费用与持仓变化)
+        mv2 = 0.0
+        for n, sh in pos.items():
+            p2 = px.at[d, n] if n in px.columns else np.nan
+            if not np.isfinite(p2):
+                p2 = last_px.get(n)
+            if p2 is not None and np.isfinite(p2):
+                mv2 += sh * p2
+        eq.iloc[i] = cash + mv2
+        eqmax = max(eqmax, eq.iloc[i])
     return {"equity": eq, "fills": fills, "positions": pos}
 
 
@@ -188,6 +199,7 @@ def run_specialist(px, sig, ext, cal, *, budget, cost=0.0015, tranches=(0.30, 0.
 def fmt(m):
     return (f"CAGR {m['CAGR']*100:+.2f}% Sharpe {m['Sharpe']:.2f} Calmar {m['Calmar']:.2f} "
             f"MDD {m['MDD']*100:.1f}% 谷底{m['trough'].date()} 恢复{m['recovery_days']}日")
+
 
 
 

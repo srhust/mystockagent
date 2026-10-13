@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """审查七轮: MU九轮周期终报告 — A(逆势分批)与E(突破顺势加仓)两冠军配置的逐轮明细。
 真实增量份额/费用/现金流口径(引擎已修正), 每轮: 入场/出场/持有/投入/加仓次数/收益/捕获/回吐。"""
 import os
@@ -69,7 +69,7 @@ def per_cycle(fills):
         exit_px = t.get("exit_px") or float(c.iloc[-1])
         ref = float(c.iloc[i1] / c.iloc[i0] - 1)
         pxp = c.iloc[i_e:i_x + 1].dropna().values
-        ret_acct = (t["shares"] * exit_px * 0.999 - t["spend"]) / BUDGET  # 审查九轮: 周期账户贡献(预算100基准, 含闲置现金)
+        cash_out = t["spend"] / 0.999  # 审查十轮: spend是费后证券额, 现金支出=费前全额
         out[best.cycle_id] = dict(entry=t["first"].date(), exit=pd.Timestamp(end).date(),
                                   hold=int(i_x - i_e), n_add=t["n_add"], spend=round(t["spend"], 1),
                                   ret=round(exit_px / (avg * 1.001) - 1, 3), ret_acct=round(float(ret_acct), 3),
@@ -97,3 +97,5 @@ for tag, esig, asig, ext, tr in [("A 逆势分批", v4, None, ext85, (0.30, 0.35
               f"投入{r['spend']} 持仓收益{r['ret']*100:+.0f}% 账户贡献{r['ret_acct']*100:+.0f}% "
               f"MFE{r['mfe']*100:+.0f}% MAE{r['mae']*100:+.0f}% "
               f"捕获{r['capture']*100:.0f}% 回吐{r['giveback']*100:.0f}%" + ("" if r["closed"] else " [未平仓]"))
+
+
