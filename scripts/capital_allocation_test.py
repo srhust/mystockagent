@@ -15,7 +15,8 @@ import pandas as pd
 import config
 from carriers import CARRIERS
 from engine import metrics
-from capital_allocator import opportunity_score, allocate
+import capital_allocator as CA
+from capital_allocator import opportunity_score
 
 COST, CAP = 0.001, 100.0
 obj = pd.read_pickle(os.path.join(config.DATA_DIR, "enriched.pkl"))
@@ -59,8 +60,6 @@ names = list(data)
 
 
 def run_dynamic(cap=0.35):
-    import capital_allocator as CA
-    globals()['allocate'] = lambda cands, nw, eq, cash: CA.allocate(cands, nw, eq, cash, cap_conc=cap)
     """动态分配账本: 逐日T+1执行。持仓: {sid: {budget, cash_left, shares, stage}}。"""
     cash, pos, eq = CAP, {}, pd.Series(np.nan, index=cal)
     for i, d in enumerate(cal):
@@ -89,7 +88,7 @@ def run_dynamic(cap=0.35):
                                    float(data[sid]["thr"].get(sd, 0.3)))
             cands[sid] = sc
         n_watch = sum(1 for sid in names if float(data[sid]["temp"].get(sd, 50)) < 25)
-        budgets = allocate(cands, n_watch, equity, cash)
+        budgets = CA.allocate(cands, n_watch, equity, cash, cap_conc=cap)  # 审查六轮: 正式参数穿透
         for sid, bud in budgets.items():
             px = float(data[sid]["px"].get(d))
             spend = min(bud * 0.30, cash)
@@ -116,10 +115,9 @@ def run_dynamic(cap=0.35):
     return eq.dropna()
 
 
-import capital_allocator as CA
 for cap in (0.35, 0.60, 0.80, 1.00):
-    globals()['allocate'] = lambda cands, nw, eq, cash, _cap=cap: CA.allocate(cands, nw, eq, cash, cap_conc=_cap)
-    eq1 = run_dynamic()
+    eq1 = run_dynamic(cap)
     m = metrics(eq1)
     print(f"S2 动态分配 cap={cap:.0%}: CAGR {m['CAGR']*100:+.2f}% Sharpe {m['Sharpe']:.2f} MDD {m['MDD']*100:.1f}% 恢复{m['recovery_days']}日")
 print("S1 静态六槽等权 (Baseline参照): CAGR +5.96% Sharpe 0.50 MDD -21.4% 恢复627日")
+
