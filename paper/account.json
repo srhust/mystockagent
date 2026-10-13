@@ -1,18 +1,21 @@
 {
- "cash": 66.72668000000002,
- "positions": {
-  "broker": {
-   "shares": 0.011715861434892843,
-   "avg_px": 1418.308,
-   "sector": "证券",
-   "carrier": "512000.SH"
+ "cash": 100.0,
+ "positions": {},
+ "pending": [
+  {
+   "action": "BUY",
+   "sector": "broker",
+   "created_on": "2026-10-13",
+   "created_at": "2026-10-13T13:00:20",
+   "reason": "temp=45 dd=-54% thr=-47%"
   },
-  "realestate": {
-   "shares": 0.009333495043912496,
-   "avg_px": 1781.042,
-   "sector": "房地产",
-   "carrier": "512200.SH"
+  {
+   "action": "BUY",
+   "sector": "realestate",
+   "created_on": "2026-10-13",
+   "created_at": "2026-10-13T13:00:20",
+   "reason": "temp=62 dd=-56% thr=-51%"
   }
- },
- "created": "2026-10-13T12:46:11"
+ ],
+ "created": "2026-10-13T13:00:20"
 }

@@ -65,28 +65,19 @@ print(f"专户×{len(names)}, 每户预算{budget:.2f}, 成本{ETF_COST:.1%}/边
 
 
 def spec_run(which_ext, tranches):
-    eqs = []
+    eqs, exps = [], []
     for n in names:
         sig = sigs[n].reindex(cal).fillna(0)
         ext = exts[n][which_ext].reindex(cal).fillna(0)
         px = etf_s[n].reindex(cal)
         eq, fills, _ = run_specialist(px, sig, ext, cal, budget=budget, cost=ETF_COST, tranches=tranches)
         eqs.append(eq)
+        exps.append(eq.attrs.get("avg_exposure", float("nan")))
     tot = pd.concat(eqs, axis=1).sum(axis=1)
-    return tot.dropna()
+    return tot.dropna(), float(np.nanmean(exps))
 
 
-def trades_stats(which_ext, tranches):
-    wins, tot_n = 0, 0
-    for n in names:
-        sig = sigs[n].reindex(cal).fillna(0)
-        ext = exts[n][which_ext].reindex(cal).fillna(0)
-        px = etf_s[n].reindex(cal)
-        eq, fills, _ = run_specialist(px, sig, ext, cal, budget=budget, cost=ETF_COST, tranches=tranches)
-    return None
-
-
-print(f"{'配置':<34}{'CAGR':>8}{'Sharpe':>8}{'MDD':>8}{'恢复日':>7}")
+print(f"{'配置':<34}{'CAGR':>8}{'Sharpe':>8}{'MDD':>8}{'恢复日':>7}{'平均暴露':>8}")
 configs = [
     ("1 专户 一次性买入 (t85出场)", ("t85", None)),
     ("2 专户 30/35/35 (t85出场)", ("t85", (0.30, 0.35, 0.35))),
@@ -94,9 +85,9 @@ configs = [
     ("5 专户 30/35/35 (t75出场消融)", ("t75dd", (0.30, 0.35, 0.35))),
 ]
 for tag, (e, tr) in configs:
-    tot = spec_run(e, tr)
+    tot, exp = spec_run(e, tr)
     m = metrics(tot)
-    print(f"{tag:<34}{m['CAGR']*100:>7.2f}%{m['Sharpe']:>8.2f}{m['MDD']*100:>7.1f}%{m['recovery_days']:>7}")
+    print(f"{tag:<34}{m['CAGR']*100:>7.2f}%{m['Sharpe']:>8.2f}{m['MDD']*100:>7.1f}%{m['recovery_days']:>7}{exp*100:>7.1f}%")
 
 # 4 六槽共享池 30/35/35
 PX = pd.DataFrame({n: etf_s[n].reindex(cal) for n in names})

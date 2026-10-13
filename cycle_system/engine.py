@@ -120,50 +120,53 @@ def metrics(eq, cost_free_days=244):
 
 def run_specialist(px, sig, ext, cal, *, budget, cost=0.0015, tranches=(0.30, 0.35, 0.35),
                    tier_dd=(-0.15, -0.30), stale_limit=20):
-    """V4专户账本(审查四轮迁移): 单行业独立预算, 闲置资金计入净值。
-    tranches=None=一次性全仓; 否则首仓=budget×tranches[0], 于 entry×(1+tier_dd[k]) 加仓 budget×tranches[k+1]。
-    预算回测前固定; 返回 (equity Series, fills, closed_trades列表[(出场日, pnl)])。"""
+    """V4专户账本 v2 (审查五轮修复):
+    ①raw_price与valuation_price分离: 当日无行情(raw非有限)->禁止BUY/ADD/SELL, 仅按last_px估值;
+      陈旧>stale_limit->连估值都冻结(不再允许陈旧价成交)。
+    ②加仓时间顺序: 用T-1收盘确认 tier 条件(entry_px×(1+dd)), T日执行(与T+1框架一致)。
+    tranches=None=一次性全仓; 否则首仓=budget×tranches[0], 加仓=budget×tranches[k+1]。"""
     cash, shares, entry_px, stage = float(budget), 0.0, None, 0
     last_px, stale, eq, fills, trades = None, 0, pd.Series(np.nan, index=cal), [], []
     tiers = [1.0] if tranches is None else list(tranches)
+    inv = np.zeros(len(cal))
     for i, d in enumerate(cal):
-        p = float(px.get(d, np.nan))
-        if np.isfinite(p):
-            last_px, stale = p, 0
+        raw = float(px.get(d, np.nan))
+        if np.isfinite(raw):
+            last_px, stale = raw, 0
         else:
-            p, stale = last_px, stale + 1
-        val = p if p is not None and np.isfinite(p) else 0.0
+            stale += 1
+        can_trade = np.isfinite(raw)                       # 审查五轮: 只有当日真实行情才可成交
+        vp = raw if can_trade else last_px                 # 估值价
+        val = vp if (vp is not None and np.isfinite(vp)) else 0.0
         eq.iloc[i] = cash + shares * val
-        px_ok = p is not None and np.isfinite(p) and stale <= stale_limit
+        inv[i] = shares * val
         sd = cal[i - 1] if i > 0 else None
-        if shares > 0 and px_ok:
+        prev_px = float(px.get(sd, np.nan)) if sd is not None else np.nan  # T-1收盘(加仓确认用)
+        if shares > 0 and can_trade:
             do_exit = bool(ext.get(sd, 0.0)) if sd is not None else False
-            # 加仓(先于出场判定: 信号日与出场同日时以出场优先)
-            if not do_exit and entry_px is not None and stage < len(tiers) - 1 and p <= entry_px * (1 + tier_dd[min(stage, len(tier_dd) - 1)]):
+            if (not do_exit and entry_px is not None and stage < len(tiers) - 1
+                    and np.isfinite(prev_px)  # T-1确认
+                    and prev_px <= entry_px * (1 + tier_dd[min(stage, len(tier_dd) - 1)])):
                 spend = budget * tiers[stage + 1]
                 if spend <= cash:
                     cash -= spend
-                    shares += spend * (1 - cost) / p
+                    shares += spend * (1 - cost) / raw
                     stage += 1
-                    fills.append((d.date().isoformat(), "ADD", round(shares, 2), p))
+                    fills.append((d.date().isoformat(), "ADD", round(shares, 2), raw))
             if do_exit:
-                proceeds = shares * p * (1 - cost)
-                trades.append((d.date().isoformat(), proceeds / (budget - cash + proceeds) if False else None))
+                proceeds = shares * raw * (1 - cost)
                 cash += proceeds
-                fills.append((d.date().isoformat(), "SELL", round(shares, 2), p))
+                fills.append((d.date().isoformat(), "SELL", round(shares, 2), raw))
+                trades.append((d.date().isoformat(), None))
                 shares, entry_px, stage = 0.0, None, 0
-                trades[-1] = (d.date().isoformat(), None)
-        elif shares == 0 and px_ok and sd is not None and sig.get(sd, 0.0) >= 1 and cash > p * 0.001:
+        elif shares == 0 and can_trade and sd is not None and sig.get(sd, 0.0) >= 1 and cash > raw * 0.001:
             spend = min(cash, budget * tiers[0])
             cash -= spend
-            shares = spend * (1 - cost) / p
-            entry_px = p
-            fills.append((d.date().isoformat(), "BUY", round(shares, 2), p))
+            shares = spend * (1 - cost) / raw
+            entry_px = raw
+            fills.append((d.date().isoformat(), "BUY", round(shares, 2), raw))
+    eq.attrs["avg_exposure"] = float(np.mean(inv) / np.mean(eq)) if np.mean(eq) > 0 else 0.0
     return eq, fills, trades
-
-
-def specialist_metrics(eq):
-    return metrics(eq)
 
 
 def fmt(m):
