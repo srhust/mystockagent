@@ -97,17 +97,18 @@ def compute_breadth(stock_closes: pd.DataFrame) -> pd.DataFrame:
     new_high: 收盘价创 250 日新高的个股占比
     """
     ma200 = stock_closes.rolling(200, min_periods=100).mean()
-    above = (stock_closes > ma200)
+    valid = stock_closes.notna() & ma200.notna()
+    above = (stock_closes > ma200).where(valid)
     breadth = above.mean(axis=1)
 
     roll_max = stock_closes.rolling(250, min_periods=100).max()
-    new_high = (stock_closes >= roll_max * 0.999)
+    new_high = (stock_closes >= roll_max * 0.999).where(valid)
     nh = new_high.mean(axis=1)
 
     out = pd.DataFrame({"breadth": breadth, "new_high": nh})
-    # 广度需要足够样本（至少5只有效）
-    valid = stock_closes.notna().sum(axis=1)
-    out.loc[valid < 5, ["breadth", "new_high"]] = np.nan
+    # 广度需要足够有效样本（至少5只同时有价格与均线）
+    valid_n = valid.sum(axis=1)
+    out.loc[valid_n < 5, ["breadth", "new_high"]] = np.nan
     return out
 
 

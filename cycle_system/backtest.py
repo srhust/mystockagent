@@ -60,8 +60,10 @@ def run_backtest(dfs: dict, meta: dict, mode="right", cost_rate=0.0015,
 
     closes = pd.DataFrame({name: df["close"] for name, df in dfs.items()}).reindex(cal)
     rets = closes.pct_change().fillna(0.0)
-    tgt = pd.DataFrame(targets).reindex(cal).fillna(0).astype(int)
-    strength = pd.DataFrame({name: strat.signal_strength(df) for name, df in dfs.items()}).reindex(cal).fillna(0)
+    # P0修正: T日收盘后生成的信号, T+1日才可成交(此处以T+1收盘价撮合)。
+    # 信号整体后移一天: tgt.loc[d] 实为 T=d-1 收盘后信号, 成交价 closes.loc[d]。
+    tgt = pd.DataFrame(targets).reindex(cal).fillna(0).astype(int).shift(1)
+    strength = pd.DataFrame({name: strat.signal_strength(df) for name, df in dfs.items()}).reindex(cal).fillna(0).shift(1)
 
     n_days = len(cal)
     sectors = list(dfs.keys())

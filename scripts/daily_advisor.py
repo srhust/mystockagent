@@ -88,12 +88,14 @@ for r in T.itertuples():
                 adds.append(f"{lv * 100:.0f}%档已加35@{px:.2f}")
                 used += 1
         tot = 30 + 35 * used
-        avg_c = (30 * e_px + sum(35 * float(df['close'].loc[e_day:]) [ (df['close'].loc[e_day:] <= e_px*(1+lv)).idxmax() ] for lv, w in [(-0.15,35),(-0.30,35)][:used])) / tot if False else None
+        # P0修正: 份额法均价 = Σ投入 / Σ(投入/价格); 金额等分加仓时算术加权会高估均价
         units = [(30, e_px)] + [(35, float(df["close"].loc[e_day:])[(df["close"].loc[e_day:] <= e_px * (1 + lv))].iloc[0]) for lv, _ in [(-0.15, 0), (-0.30, 0)][:used]]
-        avg_c = sum(u * p for u, p in units) / (30 + 35 * used)
+        shares = sum(u / p for u, p in units)
+        avg_c = tot / shares
         fl = float(df["close"].iloc[-1]) / avg_c - 1
         nxt = f"下一档: {'-' if used>=2 else ['15%','30%'][used]}加35" if used < 2 else "已满仓100"
-        L.append(f"- **{r.sector}** 持仓: 已投入{tot}/100, 均价{avg_c:.2f}, 浮动{fl * 100:+.1f}%, "
+        L.append(f"- **{r.sector}** 理论重建持仓(非真实账本,待portfolio/positions账本建立后替代): "
+                 f"已投入{tot}/100, 均价{avg_c:.2f}, 浮动{fl * 100:+.1f}%, "
                  f"出场 temp>{ex}(当前{r.temp:.0f}°), {nxt}")
     elif r.temp < 25:
         px = float(df["close"].iloc[-1])

@@ -53,7 +53,7 @@ for name, mkt, fn in LIST:
         continue
     r = [t[2] for t in trs]
     tag = "含未平仓" if trs[-1][1] == "持仓中" else ""
-    print(f"{name}: {len(trs)}笔 均值{np.mean(r) * 100:+.1f}% 合计{(1 + np.prod(1 + np.array(r))) * 100 - 100:+.0f}% "
+    print(f"{name}: {len(trs)}笔 均值{np.mean(r) * 100:+.1f}% 合计{(np.prod(1 + np.array(r)) - 1) * 100:+.0f}% "
           f"胜{sum(x > 0 for x in r)}/{len(r)} {tag}")
     for a, b, v, d in trs:
         print(f"   {a} -> {b}  {v * 100:+.1f}%  ({d}天)")
