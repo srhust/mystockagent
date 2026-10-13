@@ -40,8 +40,10 @@ for name, d in dfs.items():
         idx = [i for i in range(len(c)) if mask[i]]
         return [s for k, s in enumerate(idx) if k == 0 or s - idx[k - 1] > 60]
 
-    ev_base = events([np.isfinite(dd[i]) and (((det["watch"].values[i] * 0) == 0) and False or False) for i in range(len(c))])  # placeholder
-    # 基线事件: temp<12 ∨ 自适应回撤(与capture口径一致)
+    def days(mask):
+        return [i for i in range(len(c)) if mask[i]]
+
+    # 覆盖口径统一: 用全部信号日(不折叠)判定谷底±60日覆盖; 事件级Precision用折叠事件
     lo, hi = c.rolling(1250, min_periods=500).min(), c.rolling(1250, min_periods=500).max()
     pp = (c - lo) / (hi - lo)
     r120 = c.pct_change(120).rolling(1250, min_periods=500).rank(pct=True)
@@ -49,7 +51,8 @@ for name, d in dfs.items():
     temp = (100 * (0.60 * pp + 0.25 * r120 + 0.15 * r60)).values
     dep = pd.Series(-dd).rolling(1250, min_periods=250).max().values
     thr = np.maximum(0.30, 0.70 * dep)
-    ev_base = events([np.isfinite(dd[i]) and ((np.isfinite(temp[i]) and temp[i] < 12) or dd[i] <= -thr[i]) for i in range(len(c))])
+    base_days = [np.isfinite(dd[i]) and ((np.isfinite(temp[i]) and temp[i] < 12) or dd[i] <= -thr[i]) for i in range(len(c))]
+    ev_base = events(base_days)
     ev_A = events((det["start"] * det["pathA"]).values)
     ev_B = events(det["pathB"].values)
     ev_C = events(det["pathC"].values)
@@ -61,9 +64,9 @@ for name, d in dfs.items():
         for s in evs:
             if np.isfinite(lv[s]):
                 prec[k].append(int(lv[s]))
-    # 漏检谷底(基线未覆盖±60日)被三路径覆盖数
+    # 漏检谷底(基线日级未覆盖±60日)被三路径覆盖数
     for t0 in cyc:
-        if not any(abs(s - t0) <= 60 for s in ev_base):
+        if not any(abs(s - t0) <= 60 for s in days(base_days)):
             hit = sum(1 for k in ("A", "B", "C") if any(abs(s - t0) <= 60 for s in grp[k]))
             if hit:
                 rows.append((name, str(c.index[t0].date()), hit))
@@ -74,3 +77,4 @@ print(f"有效启动Precision(事件级): base={P['base']} A(V型)={P['A']} B(U�
 new_cov = pd.DataFrame(rows, columns=["sector", "trough", "paths"])
 print(f"\n基线漏检谷底被三路径新增覆盖: {new_cov.sector.nunique() and len(new_cov)}轮")
 print(new_cov.groupby('paths').size().to_string())
+

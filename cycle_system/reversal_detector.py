@@ -21,8 +21,8 @@ def detect(close, ref, breadth=None, volume=None):
     bd = (breadth - breadth.shift(20)) if breadth is not None else pd.Series(0.0, index=close.index)
     mom20 = close.pct_change(20)
     mom_improve = mom20 > mom20.shift(10)
-    vol_narrow = close.pct_change().rolling(40).std() < close.pct_change().rolling(120).std() * 0.9
-    no_new_low = close > close.rolling(40).min() * 1.01
+    vol_narrow = close.pct_change().rolling(40).std() < close.pct_change().rolling(120).std() * 0.95
+    no_new_low = close > close.rolling(40).min()
     ma20_slope = ma20 > ma20.shift(5)
     brk20 = close > close.rolling(20).max().shift(1)
     vol_surge = pd.Series(False, index=close.index)
@@ -36,12 +36,12 @@ def detect(close, ref, breadth=None, volume=None):
     improve = (mom_improve.astype(int) + (rs20 > 0).astype(int) + (bd > 0).astype(int))
     early = ((watch_A | watch_B | watch_C) & (improve >= 2)).astype(int)
     start = ((watch_A & (close > ma20) & (rs20 > 0) & (bd > 0.02))
-             | (watch_B & brk20 & ma20_slope & (bd > 0))
+             | (watch_B & brk20 & ma20_slope & (bd >= 0))
              | (watch_C & brk20 & (rs20 > 0) & (bd > 0))
              | (watch_A & vol_surge & (bd > 0.05))).astype(int)  # 快速通道含末项
     watch = (watch_A | watch_B | watch_C).astype(int)
     return pd.DataFrame({"watch": watch, "early": early, "start": start,
-                         "pathA": (start & watch_A).astype(int), "pathB": (start & watch_B & ~watch_A).astype(int),
+                         "pathA": (start & watch_A).astype(int), "pathB": (start & watch_B & ~(watch_A & (close > ma20) & (rs20 > 0) & (bd > 0.02))).astype(int),
                          "pathC": (start & watch_C).astype(int), "rs20": rs20, "bd": bd})
 
 
