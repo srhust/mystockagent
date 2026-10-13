@@ -102,6 +102,25 @@ for r in T.itertuples():
         L.append(f"- 候选 {r.sector}({r.cat}, {r.temp:.0f}°{r.stage}): 触发temp<12后买30, "
                  f"加档参考价 {px * 0.85:.2f}(-15%) / {px * 0.70:.2f}(-30%), 出场temp>{ex}")
 L.append("")
+# V4回撤锚状态(统一信号引擎: adaptive_threshold = max(0.30, 0.70×1250日最深回撤))
+try:
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "cycle_system"))
+    from signal_engine import adaptive_threshold, drawdown
+
+    L.append("## V4回撤锚(统一引擎: dd≤-max(0.30,0.70×最深回撤)触发)")
+    for r in T.itertuples():
+        df = dfs[r.sector]
+        c = df["close"].dropna()
+        if len(c) < 1250:
+            continue
+        dd_s = drawdown(c)
+        dd = dd_s.iloc[-1]
+        thr = float(adaptive_threshold(dd_s).iloc[-1])
+        state = "已触发" if dd <= -thr else f"距触发{(dd / thr + 1) * 100:.0f}%"
+        L.append(f"- {r.sector}: 当前回撤{dd * 100:.1f}%, 阈值-{thr * 100:.0f}%, {state}")
+except ImportError:
+    L.append("> V4回撤锚: signal_engine 未就绪")
+
 L.append("> 纪律: ①温度<12才买, 不等确认; ②加仓按价格档位机械执行; ③金融类出场75, 其余85; "
          "④专户资金独立于组合, 单行业集中风险自担。")
 

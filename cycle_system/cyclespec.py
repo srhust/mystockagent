@@ -17,6 +17,7 @@ import config
 # 行业 -> 产业驱动规格
 SPECS = {
     "煤炭开采加工": dict(fut="JM0", indicator="焦煤期货位置(动力煤现货待接入)", direction="low_is_good", lag="0"),
+    "煤炭": dict(fut="JM0", indicator="焦煤期货位置(动力煤现货待接入)", direction="low_is_good", lag="0"),
     "工业金属": dict(fut="CU0", indicator="铜期货位置(库存/升贴水待接入)", direction="low_is_good", lag="0"),
     "养殖": dict(fut="LH0", indicator="生猪期货位置(2021上市,能繁母猪待接入)", direction="low_is_good", lag="0"),
     "贵金属": dict(fut="AU0", indicator="沪金位置(实际驱动为实际利率,慎用)", direction="low_is_good", lag="0"),
@@ -101,7 +102,7 @@ def industry_cycle_state(sector: str, date, max_pos: float = 0.60):
     优先级: 产业现货序列(猪价/BDI) > 期货位置。"""
     spec = SPECS.get(sector)
     if spec is None:
-        return None, None, "无规格"
+        return None, None, "无规格(未经过产业周期确认)"
     if sector == "养殖":
         pos = series_position("ind_hogprice", date)
         if pos is not None:
@@ -111,8 +112,8 @@ def industry_cycle_state(sector: str, date, max_pos: float = 0.60):
         if pos is not None:
             return pos < max_pos, pos, "BDI分位"
     if spec.get("fut") is None:
-        return None, None, spec["indicator"] + "(待接入)"
+        return None, None, spec["indicator"] + "(未经过产业周期确认)"
     pos = fut_position(spec["fut"], date)
     if pos is None:
-        return None, None, "期货数据不足"
+        return None, None, "期货数据不足(未经过产业周期确认)"
     return pos < max_pos, pos, spec["indicator"]
