@@ -8,14 +8,20 @@ import numpy as np
 import pandas as pd
 
 
-def temperature(close: pd.Series) -> pd.Series:
-    """行业温度 0-100（与 cycle_system.strategy 完全同参）。"""
+def temperature_v4_price(close: pd.Series) -> pd.Series:
+    """V4研究用温度(仅价格3因子): 60%价格位置+25%120日动量+15%60日动量。
+    注意: 与 cycle_engine.compute_temperature() 的五因子版本(v1: +PB+广度+量能)是两套定义,
+    不得混用比较。生产系统仍以 v1 五因子为准。"""
     lo = close.rolling(1250, min_periods=500).min()
     hi = close.rolling(1250, min_periods=500).max()
     pp = (close - lo) / (hi - lo)
     r120 = close.pct_change(120).rolling(1250, min_periods=500).rank(pct=True)
     r60 = close.pct_change(60).rolling(1250, min_periods=500).rank(pct=True)
     return 100 * (0.60 * pp + 0.25 * r120 + 0.15 * r60)
+
+
+# 向后兼容别名(仅限V4研究脚本)
+temperature = temperature_v4_price
 
 
 def drawdown(close: pd.Series) -> pd.Series:

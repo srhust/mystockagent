@@ -4,6 +4,8 @@ data/
 *.csv.gz
 output/acl_out/
 .pip_tmp/
+.libs/
+.pip/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
