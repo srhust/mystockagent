@@ -47,8 +47,9 @@ def build_labels(close, trough_idx, bottom_halfwidth=10):
     return lab
 
 
-def build_features(close, prev_trough_idx, sox=None):
-    """全部T日可得。prev_trough_idx: T日已知的过去谷底位置列表。"""
+def build_features(close, prev_trough_idx, sox=None, confirm_idx=None):
+    """全部T日可得。prev_trough_idx: 过去谷底位置列表; confirm_idx(审查十五轮P0): 各谷的zigzag确认日,
+    给出时该谷特征仅在确认日之后可见(as-of纪律)。"""
     c = close
     f = pd.DataFrame(index=c.index)
     hi252 = c.rolling(252, min_periods=200).max()
@@ -64,18 +65,22 @@ def build_features(close, prev_trough_idx, sox=None):
     hi_day = hi252.index.to_series().groupby([c.index.to_series().dt.year]).transform("first")  # placeholder
     days_since_high = pd.Series(np.arange(len(c)), index=c.index) - pd.Series(np.arange(len(c)), index=c.index).where(c >= hi252, np.nan).ffill()
     f["decline_days"] = days_since_high
-    # 距上一谷底天数(T日已知的历史信息)
+    # 距上一谷底天数(仅计T日已确认的谷: confirm_idx给出时按确认日解锁)
     pti = sorted(prev_trough_idx)
+    if confirm_idx is not None:
+        pairs = sorted((int(a), int(t)) for a, t in zip(confirm_idx, pti) if np.isfinite(a))
+        avail = [a for a, _ in pairs]
+        tr_of = [t for _, t in pairs]
+    else:
+        avail, tr_of = pti, pti
     dist = np.full(len(c), np.nan)
-    for i, t in enumerate(pti):
-        pass
     j = 0
     cur = np.nan
     for i in range(len(c)):
-        while j < len(pti) and pti[j] <= i:
+        while j < len(avail) and avail[j] <= i:
             j += 1
         if j > 0:
-            cur = float(i - pti[j - 1])  # 审查十四轮修复: 逐日重算(原实现j先advance后不再更新, dist恒为0)
+            cur = float(i - tr_of[j - 1])  # 审查十四轮修复+审查十五轮as-of: 逐日重算, 谷按确认日解锁
         dist[i] = cur
     f["days_since_prev_trough"] = dist
     if sox is not None:
@@ -114,6 +119,19 @@ def fit_expanding(feats, labels, *, start=750, targets=("P_bottom_20d", "P_rever
             preds[t].iloc[i:] = lr.predict_proba(Xz)[:, 1]
             coefs[t] = dict(zip(feats.columns, np.round(lr.coef_[0], 2)))
     return preds, coefs
+
+
+def match_events_to_troughs(events, troughs, max_after=120):
+    """审查十五轮P0: 统一一匹配器 — 全局贪心最近优先(每事件≤1谷, 每谷≤1事件), Precision/Recall由同一份配对导出。
+    有效对: 0 ≤ t-w ≤ max_after (预警在前, 谷在其后max_after日内)。返回 [(w, t, t-w)] 按距离升序。"""
+    pairs = sorted(((w, t, t - w) for w in events for t in troughs if 0 <= t - w <= max_after), key=lambda p: p[2])
+    used_w, used_t, out = set(), set(), []
+    for w, t, gap in pairs:
+        if w not in used_w and t not in used_t:
+            used_w.add(w)
+            used_t.add(t)
+            out.append((w, t, gap))
+    return out
 
 
 def trough_confirm_idx(close, troughs, rebound=0.30):

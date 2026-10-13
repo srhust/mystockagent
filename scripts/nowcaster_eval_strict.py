@@ -16,7 +16,7 @@ import numpy as np
 import pandas as pd
 
 import config
-from bottom_nowcaster import build_features
+from bottom_nowcaster import build_features, match_events_to_troughs
 
 STOCKS = {"MU": "MU.csv", "STX": "stx.csv", "WDC": "wdc.csv", "AMAT": "amat.csv", "LRCX": "lrcx.csv",
           "QCOM": "qcom.csv", "TXN": "txn.csv", "INTC": "intc.csv", "KLAC": "klac.csv", "ASML": "asml.csv", "TER": "ter.csv"}
@@ -59,34 +59,14 @@ for name, fn in STOCKS.items():
         pivots.append(("L", lo_i))
     qual = [t for t in sorted(set(i for k, i in pivots if k == "L"))
             if len(c.iloc[t + 1:t + 121]) >= 60 and float(c.iloc[t + 1:t + 121].max() / c.iloc[t] - 1) >= 0.50]
-    # P0-2: 一对一 — 每预警配W后H内首个谷(严格), H_MAX=120为假警判定窗
+    # P0-2(审查十五轮): 统一一匹配 — P与R由同一份配对导出(贪心最近优先)
     H_MAX = 120
-    used = set()
-    strict = {h: 0 for h in HORIZONS}
-    post_dd = []
-    fa120 = 0
-    for w in events:
-        troughs_in = [t for t in qual if w <= t <= w + H_MAX and t not in used]
-        if troughs_in:
-            t0 = min(troughs_in)
-            used.add(t0)
-            for h in HORIZONS:
-                if t0 <= w + h:
-                    strict[h] += 1
-            post_dd.append(float(c.iloc[w:min(len(c), w + 60)].min() / c.iloc[w] - 1))
-        else:
-            fa120 += 1
-    # P0-1: 召回 = 每谷之前H日内存在未占用预警(一对一: 谷取最近预警)
-    recall = {h: 0 for h in HORIZONS}
-    wused = set()
-    for t in qual:
-        cands = [w for w in events if t - 60 <= w <= t and w not in wused]  # 60日窗内预警可覆盖20/60两口径
-        if cands:
-            w0 = max(cands)
-            for h in HORIZONS:
-                if w0 >= t - h:
-                    recall[h] += 1
-            wused.add(w0)
+    matched = match_events_to_troughs(events, qual, max_after=H_MAX)
+    strict = {h: sum(1 for _, _, g in matched if g <= h) for h in HORIZONS}
+    post_dd = [float(c.iloc[w:min(len(c), w + 60)].min() / c.iloc[w] - 1) for w, _, _ in matched]
+    fa120 = len(events) - len(matched)
+    # 召回=同一份配对(每谷至多配一警), 与精度完全一致
+    recall = {h: sum(1 for _, _, g in matched if g <= h) for h in HORIZONS}
     r = dict(stock=name, n_ev=len(events), n_tr=len(qual),
              prec20=strict[20] / len(events) if events else np.nan, prec60=strict[60] / len(events) if events else np.nan,
              rec20=recall[20] / len(qual) if qual else np.nan, rec60=recall[60] / len(qual) if qual else np.nan,
