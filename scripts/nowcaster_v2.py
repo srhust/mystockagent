@@ -101,6 +101,36 @@ for y0 in years[2:]:
             preds[n][t].loc[seg.index] = iso.predict(lr.predict_proba(seg / 1 * 0 + (seg - mu_) / sd_)[:, 1])
 
 print("\n=== v2 盲回放(质量谷底+分层校准) ===")
+print("\n=== 稀有事件口径: 分位数阈值(每股价P98/P99为预警线) ===")
+for n in meta:
+    d = meta[n]
+    p = preds[n]["P_bottom_20d"]
+    pv = p.dropna()
+    for q in (0.98, 0.99):
+        thr = float(np.quantile(pv, q))
+        segs = []
+        for i in range(len(p)):
+            if np.isfinite(p.iloc[i]) and p.iloc[i] >= thr:
+                if segs and i - segs[-1][-1] <= 5:
+                    segs[-1].append(i)
+                else:
+                    segs.append([i])
+        hits, lead_lags, miss = 0, [], []
+        for t in d["troughs"]:
+            cand = [s[0] for s in segs if t - 250 <= s[0] <= t + 60]
+            if cand:
+                hits += 1
+                lead_lags.append(cand[-1] - t)
+            else:
+                miss.append(str(d["close"].index[t].date()))
+        zone = set()
+        for t in d["troughs"]:
+            zone.update(range(max(0, t - 10), min(len(d["close"]), t + 11)))
+        fa = [s for s in segs if not any(k in zone for k in s)]
+        yrs = (d["close"].index[-1] - d["close"].index[0]).days / 365.25
+        print(f"{n} P{int(q*100)}(thr={thr:.2f}): 召回{hits}/{len(d['troughs'])} 假警{len(fa)}({len(fa)/yrs:.1f}/年) "
+              f"提前量中位{int(np.median(lead_lags)) if lead_lags else 'NA'}日 漏检{miss[:4]}")
+
 for n in meta:
     d = meta[n]
     p = preds[n]["P_bottom_20d"]
