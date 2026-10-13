@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """审查十二轮v3: v2 + SEC免费产业特征(营收YoY/加速度/毛利率/存货比, as-of=提交日)。
 仅2017+可用(ASC606), 早期行中性填充999标记缺失; 对照v2检验产业证据的增量。"""
 import os
@@ -85,11 +85,12 @@ for y0 in years[2:]:
     for t in TARGETS:
         X = pd.concat([train[n][0] for n in meta])
         y = pd.concat([train[n][1][t] for n in meta])
-        Xn = X.replace(999.0, np.nan).fillna(X.replace(999.0, np.nan).median())  # 审查十二轮: 中位数填充保留全部行
+        Xn = X.replace(999.0, np.nan)
+        Xn = Xn.dropna(axis=1, how="all")  # 审查十三轮: 全NaN列(如inv缺失)剔除, 防中位数链失效
+        Xn = Xn.fillna(Xn.median())
         ok = np.isfinite(Xn).all(axis=1).values & np.isfinite(y).values
         X2, y2 = Xn[ok], y[ok]
         if len(X2) < 800 or y2.nunique() < 2:
-            print(f"DBGSkip {y0} {t} len={len(X2)} nun={y2.nunique()} nanY={int((~np.isfinite(y)).sum())}")
             continue
         mu_, sd_ = X2.mean(), X2.std().replace(0, 1)
         lr = LogisticRegression(C=0.5, max_iter=1000).fit((X2 - mu_) / sd_, y2)
@@ -97,7 +98,7 @@ for y0 in years[2:]:
         for n in meta:
             f, lab = train[n]
             fz = (f - mu_) / sd_
-            fz = fz.replace(999.0, np.nan).fillna(Xn.median())
+            fz = fz.reindex(columns=X2.columns).replace(999.0, np.nan).fillna(X2.median())
             fz = fz[np.isfinite(fz).all(axis=1).values]
             if len(fz) < 100:
                 continue
@@ -109,7 +110,7 @@ for y0 in years[2:]:
                 continue
             iso = IsotonicRegression(out_of_bounds="clip", y_min=0.01, y_max=0.99).fit(p_in[k], y_in.values[k].astype(float))
             seg = meta[n]["f"][(meta[n]["f"].index >= refit_date) & (meta[n]["f"].index < pd.Timestamp(f"{y0+1}-01-01"))]
-            segn = seg.replace(999.0, np.nan).fillna(Xn.median())
+            segn = seg.reindex(columns=X2.columns).replace(999.0, np.nan).fillna(X2.median())
             seg = segn[np.isfinite(segn).all(axis=1).values]
             if len(seg) == 0:
                 continue
@@ -152,6 +153,7 @@ for n in meta:
     m = np.isfinite(pr) & np.isfinite(yv) & (d["close"].index >= "2017-06-01")
     if m.sum() > 100:
         print(f"   Brier {float(np.mean((pr[m]-yv[m])**2)):.3f} 校准: " + " ".join(f"[{lo:.1f},{lo+0.2:.1f})->{yv[m&(pr>=lo)&(pr<lo+0.2)].mean():.2f}(n={(m&(pr>=lo)&(pr<lo+0.2)).sum()})" for lo in (0.4, 0.6, 0.8) if (m & (pr >= lo) & (pr < lo + 0.2)).sum() >= 5))
+
 
 
 
