@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """Phase5/资金分配对照实验: 9只高保真ETF, V4入场+30/35/35+t85dd出场。
 S1 静态六槽等权(Baseline参照, 已有5.96%) vs S2 动态机会分配(score加权, cap 35%, watch预留20%)。
 S2账本: 共享现金池, 入场时按allocate()定预算, 30%首仓/35%×2加仓, 出场释放。T+1, 0.1%/边。"""
@@ -58,7 +58,9 @@ cal = pd.DatetimeIndex(sorted(set().union(*[set(d["px"].index) for d in data.val
 names = list(data)
 
 
-def run_dynamic():
+def run_dynamic(cap=0.35):
+    import capital_allocator as CA
+    globals()['allocate'] = lambda cands, nw, eq, cash: CA.allocate(cands, nw, eq, cash, cap_conc=cap)
     """动态分配账本: 逐日T+1执行。持仓: {sid: {budget, cash_left, shares, stage}}。"""
     cash, pos, eq = CAP, {}, pd.Series(np.nan, index=cal)
     for i, d in enumerate(cal):
@@ -114,7 +116,10 @@ def run_dynamic():
     return eq.dropna()
 
 
-eq1 = run_dynamic()
-m = metrics(eq1)
-print(f"S2 动态机会分配: CAGR {m['CAGR']*100:+.2f}% Sharpe {m['Sharpe']:.2f} MDD {m['MDD']*100:.1f}% 恢复{m['recovery_days']}日")
+import capital_allocator as CA
+for cap in (0.35, 0.60, 0.80, 1.00):
+    globals()['allocate'] = lambda cands, nw, eq, cash, _cap=cap: CA.allocate(cands, nw, eq, cash, cap_conc=_cap)
+    eq1 = run_dynamic()
+    m = metrics(eq1)
+    print(f"S2 动态分配 cap={cap:.0%}: CAGR {m['CAGR']*100:+.2f}% Sharpe {m['Sharpe']:.2f} MDD {m['MDD']*100:.1f}% 恢复{m['recovery_days']}日")
 print("S1 静态六槽等权 (Baseline参照): CAGR +5.96% Sharpe 0.50 MDD -21.4% 恢复627日")

@@ -10,8 +10,8 @@ EXIT_TOP, EXIT_DD = 85.0, -0.25
 
 
 def unified(v4, brk, ext, close, *, max_adds=2):
-    """状态机v2 (CycleTrend-v1): FLAT→POSITION→EXIT; 一轮一cycle_id。
-    入场: V4(左)∨brk(右), 仅FLAT时; 加仓: 持仓中brk再确认∨MA20回踩后重上, 每轮≤max_adds; 出场: ext。
+    """状态机v2.1 (审查六轮: 消除双重T+1): 信号当日产出entry/add, 引擎负责唯一一次T+1执行。
+    入场: V4(左)∨brk(右), 仅FLAT时; 加仓: 持仓中brk再确认∨MA20回踩, 每轮≤max_adds; 出场: ext。
     返回 (entry, add, n_cycles)。防重: 出场后5日内不再入场。"""
     idx = close.index
     entry = pd.Series(0.0, index=idx)
@@ -20,17 +20,16 @@ def unified(v4, brk, ext, close, *, max_adds=2):
     ma20 = close.rolling(20).mean()
     pull = (close < ma20 * 1.03) & (close.shift(1) < close.rolling(5).mean()) & (close > ma20 * 0.98)
     v4v, bv, ev = v4.values, brk.values, ext.values
-    for i in range(1, len(idx)):
-        sd = idx[i - 1]
-        if pos and ev[i - 1] >= 1:
+    for i in range(len(idx)):
+        if pos and ev[i] >= 1:
             pos, adds, cooldown = 0, 0, 5
         elif cooldown > 0:
             cooldown -= 1
-        elif not pos and cooldown == 0 and (v4v[i - 1] >= 1 or bv[i - 1] >= 1):
+        elif not pos and cooldown == 0 and (v4v[i] >= 1 or bv[i] >= 1):
             pos, adds = 1, 0
             cyc += 1
             entry.iloc[i] = 1.0
-        elif pos and adds < max_adds and (bv[i - 1] >= 1 or pull.iloc[i - 1]):
+        elif pos and adds < max_adds and (bv[i] >= 1 or pull.iloc[i]):
             add.iloc[i] = 1.0
             adds += 1
     return entry, add, cyc

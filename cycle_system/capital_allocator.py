@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """capital_allocator.py (CycleTrend-v1 Phase5): 机会驱动的动态资金分配, 与买卖点信号研究解耦。
 输入: cash, positions, candidates(各行业T-1可得特征), risk caps。
 评分OpportunityScore(可解释, 全部已验证组件): 深度分(dd/自适应thr) + 低温分(temp) — 越深越冷越高。
@@ -19,15 +19,16 @@ def opportunity_score(temp, dd, thr):
     return float(np.clip(0.5 * depth + 0.5 * cold, 0.0, 1.0))
 
 
-def allocate(candidates, n_watch, equity, cash):
+def allocate(candidates, n_watch, equity, cash, *, cap_conc=CAP_CONC, reserve=RESERVE):
     """candidates: {sector: score}; 返回 {sector: target_budget}。score加权+集中度上限+观察预留。"""
     if not candidates:
         return {}
-    usable = equity * (1 - (RESERVE if n_watch > len(candidates) else 0.0))
+    usable = equity * (1 - (reserve if n_watch > len(candidates) else 0.0))
     usable = min(usable, cash)
     tot = sum(candidates.values())
     out = {}
     for s, sc in candidates.items():
         w = sc / tot if tot > 0 else 0.0
-        out[s] = min(usable * w, equity * CAP_CONC)
+        out[s] = min(usable * w, equity * cap_conc)
     return out
+

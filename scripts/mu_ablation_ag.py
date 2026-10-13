@@ -92,7 +92,7 @@ for tag, sig0, addsrc, ex, tr in CONFIGS:
     else:
         entry, add_sig, ncyc = unified(sig0, addsrc, exts[ex], c)
     eq, fills, _ = run_specialist(c, entry, exts[ex].reindex(cal).fillna(0), cal, budget=BUDGET,
-                                  cost=0.001, tranches=(0.30, 0.35, 0.35) if tr is None else tr,
+                                  cost=0.001, tranches=tr,  # 审查六轮: None=真一次性, 不再静默启用30/35/35
                                   add_sig=add_sig if addsrc is not None else None,
                                   add_frac=0.35, max_adds=2)
     caps = trip_stats(fills, cal, cycles, c)
@@ -100,3 +100,4 @@ for tag, sig0, addsrc, ex, tr in CONFIGS:
     med = np.nanmedian(caps) * 100 if caps else float("nan")
     tot = np.nansum(caps) * 100 if caps else 0
     print(f"{tag:<44}{med:>7.0f}%{tot:>7.0f}%{len(caps):>6}   账户CAGR {m_cagr*100:+.2f}% 状态机轮次{ncyc}")
+
