@@ -146,7 +146,7 @@ def run_specialist(px, sig, ext, cal, *, budget, cost=0.0015, tranches=(0.30, 0.
         if shares > 0 and can_trade:
             do_exit = bool(ext.get(sd, 0.0)) if sd is not None else False
             do_add = False
-            if not do_exit and stage < len(tiers) - 1:
+            if not do_exit and (stage < len(tiers) - 1 or add_sig is not None):
                 if add_sig is not None:
                     do_add = bool(add_sig.get(sd, 0.0)) and adds_used < max_adds  # 顺势加仓: 信号T-1确认
                 elif entry_px is not None and np.isfinite(prev_px):
@@ -178,5 +178,6 @@ def run_specialist(px, sig, ext, cal, *, budget, cost=0.0015, tranches=(0.30, 0.
 def fmt(m):
     return (f"CAGR {m['CAGR']*100:+.2f}% Sharpe {m['Sharpe']:.2f} Calmar {m['Calmar']:.2f} "
             f"MDD {m['MDD']*100:.1f}% 谷底{m['trough'].date()} 恢复{m['recovery_days']}日")
+
 
 
