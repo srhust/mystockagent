@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """审查十二轮v2: ①谷底质量过滤(谷后120日内涨幅≥50%才算周期底, 与audit口径对齐) ②分层校准(每股自己的isotonic)。
 达标线: MU recall≥7/合格谷底, 假警≤2/年, P0.8桶实现率≥0.6。"""
 import os
@@ -81,11 +81,12 @@ for y0 in years[2:]:
             continue
         mu_, sd_ = X.mean(), X.std().replace(0, 1)
         lr = LogisticRegression(C=0.5, max_iter=1000).fit((X - mu_) / sd_, y)
-        half = len(X) // 2
+        pass_half = len(X) // 2
         for n in meta:  # 分层校准: 每股用自己训练段后半的out-of-fold预测拟合isotonic
             f, lab = train[n]
             fz = (f - mu_) / sd_
             fz = fz[np.isfinite(fz).all(axis=1).values]  # 审查十二轮: 校准段同样去NaN
+            half = len(fz) // 2  # 审查十二轮: 每股自身half(原误用池化half致早期股被全跳)
             if len(fz) <= half or len(fz) < 50:
                 continue  # 该股此年样本不足(如WDC在2012年前)
             p_in = lr.predict_proba(fz.iloc[half:])[:, 1]
@@ -162,3 +163,5 @@ for n in meta:
         brier = float(np.mean((pr[m] - y[m]) ** 2))
         cal_s = " ".join(f"[{lo:.1f},{lo+0.2:.1f})->{y[m & (pr>=lo)&(pr<lo+0.2)].mean():.2f}(n={(m&(pr>=lo)&(pr<lo+0.2)).sum()})" for lo in (0.2, 0.4, 0.6, 0.8) if (m & (pr >= lo) & (pr < lo + 0.2)).sum() >= 10)
         print(f"   {t}: Brier {brier:.3f} {cal_s}")
+
+

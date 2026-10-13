@@ -80,6 +80,9 @@ def build_features(close, prev_trough_idx, sox=None):
     if sox is not None:
         rs = (c / sox.reindex(c.index))
         f["rs20"] = rs.pct_change(20)
+    # 审查十二轮: 结构性NaN中性填充(避免早期行全灭导致训练集枯竭)
+    f["decline_days"] = f["decline_days"].fillna(0.0)
+    f["days_since_prev_trough"] = f["days_since_prev_trough"].fillna(999.0)
     return f
 
 
@@ -110,3 +113,4 @@ def fit_expanding(feats, labels, *, start=750, targets=("P_bottom_20d", "P_rever
             preds[t].iloc[i:] = lr.predict_proba(Xz)[:, 1]
             coefs[t] = dict(zip(feats.columns, np.round(lr.coef_[0], 2)))
     return preds, coefs
+
