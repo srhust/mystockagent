@@ -52,9 +52,12 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
     fees = 0.0
     halve_proceeds = 0.0
     hd = hold_days if hold_days else HOLD
+    if hold_days is not None:
+        assert isinstance(hold_days, int) and hold_days > 0, f"hold_days须为正整数: {hold_days}"
+        hd = hold_days
     cash_h = pd.Series(np.nan, index=dt_index)
     funnel = dict(n1=0, n2=0, n3=0, n4=0, r_cash=0, r_price=0, r_rank=0, reconf=0, halve_funded_n=0, halve_funded_amt=0.0, collide=0)
-    rejs, fills = [], []
+    rejs, fills, collisions = [], [], []
     for k, d in enumerate(dt_index):
         if k == 0:
             eq.iloc[0] = cash + sum(reserve.values())
@@ -109,6 +112,7 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
             act = fsm_decide(risk_mode, state[s], entry_i[s], i_own, below, in_ev, hd)
             if act == "EXIT" and in_ev and state[s] != "FLAT" and (i_own - entry_i[s]) >= hd:
                 funnel["collide"] += 1  # HOLD到期与新事件同日: FSM优先退出(冻结), 统计冲突
+                collisions.append((s, d))
             if act:
                 orders[s] = (act, 0.0, sd)
         cands.sort(reverse=True)
@@ -226,7 +230,7 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
         cash_h.iloc[k] = cash
         sh_h.iloc[k] = [shares[s] for s in universe]
     if collect is not None:
-        collect.update(eq=eq, sh=sh_h, cash=cash_h, funnel=funnel, rejs=rejs, halve_proceeds=halve_proceeds, fills=fills, sources_end=list(sources))
+        collect.update(eq=eq, sh=sh_h, cash=cash_h, funnel=funnel, rejs=rejs, halve_proceeds=halve_proceeds, fills=fills, sources_end=list(sources), collisions=collisions)
     return eq, shares, fees
 
 
