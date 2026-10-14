@@ -80,6 +80,6 @@ for mode, label in [("X2", "MA100退出"), ("X3", "25%跟踪")]:
         rows.append(dict(trough=str(c.index[t].date()), entry=str(c.index[e].date()), exit=str(c.index[x_i].date()),
                          ret=f"{ret:.0%}", mae=f"{mae:.0%}", 周期涨幅=f"{cyc:.0%}", 捕获率=f"{cap:.0%}" if np.isfinite(cap) else "-"))
     d = pd.DataFrame(rows)
-    rets = pd.to_numeric(d["ret"], errors="coerce").dropna()
+    rets = pd.to_numeric(d["ret"].astype(str).str.rstrip("%"), errors="coerce").dropna() / 100.0
     print(f"\n=== {label}: {len(rets)}/{len(qual)}轮触发, 胜{(rets>0).sum()}/{len(rets)}, 均收益{rets.mean():.0%} ===")
     print(d.to_string(index=False))
