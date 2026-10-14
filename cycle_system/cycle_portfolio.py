@@ -36,17 +36,32 @@ def v2ar_target(below, entry_budget, entry_shares, shares, p):
     return "BUY", max(0.0, min(tgt - cur, max_buy_cash))
 
 
-def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d, dt_index, ownpos_d, budget=100.0, collect=None, reserve_mode=False, hold_days=None):
-    cash = float(budget)
-    reserve = {s: 0.0 for s in universe}
-    sources = deque([("INITIAL", cash)])  # P0-2 资金来源账本(FIFO)
-    state = {s: "FLAT" for s in universe}
-    entry_i = {s: -999 for s in universe}
-    entry_budget = {s: 0.0 for s in universe}
-    entry_shares = {s: 0.0 for s in universe}
-    shares = {s: 0.0 for s in universe}
-    pending = {}
-    stale = {s: np.nan for s in universe}
+def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d, dt_index, ownpos_d, budget=100.0, collect=None, reserve_mode=False, hold_days=None, block=None, reentry_after_exit=False, init_state=None, return_state=False):
+    block = block or set()
+    if init_state is not None:
+        cash = float(init_state["cash"])
+        reserve = dict(init_state["reserve"])
+        sources = deque(init_state["sources"])
+        state = dict(init_state["state"])
+        entry_i = dict(init_state["entry_i"])
+        entry_budget = dict(init_state["entry_budget"])
+        entry_shares = dict(init_state["entry_shares"])
+        shares = dict(init_state["shares"])
+        pending = dict(init_state["pending"])
+        stale = dict(init_state["stale"])
+        if init_state.get("last_date") is not None:
+            assert dt_index[0] > init_state["last_date"], f"重启日期必须晚于已处理日 {init_state['last_date']}"
+    else:
+        cash = float(budget)
+        reserve = {s: 0.0 for s in universe}
+        sources = deque([("INITIAL", cash)])  # P0-2 资金来源账本(FIFO)
+        state = {s: "FLAT" for s in universe}
+        entry_i = {s: -999 for s in universe}
+        entry_budget = {s: 0.0 for s in universe}
+        entry_shares = {s: 0.0 for s in universe}
+        shares = {s: 0.0 for s in universe}
+        pending = {}
+        stale = {s: np.nan for s in universe}
     eq = pd.Series(np.nan, index=dt_index)
     sh_h = pd.DataFrame(0.0, index=dt_index, columns=universe)
     fees = 0.0
@@ -59,10 +74,10 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
     funnel = dict(n1=0, n2=0, n3=0, n4=0, r_cash=0, r_price=0, r_rank=0, reconf=0, halve_funded_n=0, halve_funded_amt=0.0, collide=0)
     rejs, fills, collisions = [], [], []
     for k, d in enumerate(dt_index):
-        if k == 0:
+        if k == 0 and init_state is None:
             eq.iloc[0] = cash + sum(reserve.values())
             continue
-        sd = dt_index[k - 1]
+        sd = init_state["last_date"] if k == 0 else dt_index[k - 1]  # 增量重放: 首日为完整处理日, 信号日=上段末日
         mkey = sd.to_period("M")
         px_today = {s: px_d[s].get(d, np.nan) for s in universe}
         px_yest = {s: px_d[s].get(sd, np.nan) for s in universe}
@@ -103,6 +118,9 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
             if state[s] == "FLAT" and in_ev:
                 funnel["n1"] += 1
                 sc = score_snap.get((mkey, s), np.nan)
+                if (s, sd) in block:
+                    funnel["blocked"] = funnel.get("blocked", 0) + 1
+                    continue
                 if np.isfinite(sc):
                     funnel["n2"] += 1
                     cands.append((sc, s))
@@ -110,12 +128,17 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
                     funnel["r_rank"] += 1
                 continue
             act = fsm_decide(risk_mode, state[s], entry_i[s], i_own, below, in_ev, hd)
+            if act == "EXIT" and in_ev and reentry_after_exit:
+                sc = score_snap.get((mkey, s), np.nan)
+                if (s, sd) not in block and np.isfinite(sc):
+                    cands.append((sc, s))  # 反事实: 退出后同日重评入场
             if act == "EXIT" and in_ev and state[s] != "FLAT" and (i_own - entry_i[s]) >= hd:
                 funnel["collide"] += 1  # HOLD到期与新事件同日: FSM优先退出(冻结), 统计冲突
                 collisions.append((s, d))
             if act:
                 orders[s] = (act, 0.0, sd)
         cands.sort(reverse=True)
+        reenters = []
         for r, (sc, s) in enumerate(cands):
             if r <= 1:
                 funnel["n3"] += 1
@@ -123,6 +146,8 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
                 funnel["r_rank"] += 1
             if r <= 1 and state[s] == "FLAT":
                 orders[s] = ("ENTER", (1.0 if len(cands) == 1 else (0.6 if r == 0 else 0.4)), sd)
+            elif r <= 1 and state[s] != "FLAT" and reentry_after_exit:
+                reenters.append((s, (1.0 if len(cands) == 1 else (0.6 if r == 0 else 0.4)), sd))
         for s, (act, pw, sig_d) in list(orders.items()):
             if not (np.isfinite(px_today[s]) and px_today[s] > 0 and listed_d[s].get(d, False)):
                 pending[s] = (act, pw, sig_d)
@@ -181,14 +206,19 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
                 side, amt = v2ar_target(below2, entry_budget[s], entry_shares[s], shares[s], p)
                 if side == "BUY" and amt > 0:
                     buys[s] = (amt, 0.0, sig_d)
+        for s, pw, sig_d in reenters:  # 反事实: EXIT已成交后同日重评入场(现金已释放)
+            if not (np.isfinite(px_today[s]) and px_today[s] > 0 and listed_d[s].get(d, False)):
+                continue
+            buys[s] = (pw * nav_sig, pw, sig_d)
+        reenters_names = {s for s, _, _ in reenters}
         need = sum(v[0] for v in buys.values())
         sc = min(1.0, cash / need) if need > 0 else 0.0
         for s, (amt, pw, sig_d) in buys.items():
             p = px_today[s]
             spend = min(amt * sc, cash)
-            act = orders[s][0]
+            act = "ENTER" if (s not in orders or s in reenters_names) else orders[s][0]  # reentry同日重入场(EXIT已执行)
             if spend <= 1e-9:
-                if act == "ENTER":
+                if act == "ENTER" and s not in reenters_names:
                     funnel["r_cash"] += 1
                     rejs.append((s, d, p))
                 continue
@@ -219,7 +249,7 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
                     funnel["halve_funded_amt"] += comp["RISK_HALVE"]
         nav_now = cash + sum(reserve.values()) + sum(shares[s] * stale[s] for s in universe if shares[s] > 0)
         for s in universe:
-            assert (state[s] == "FLAT") == (shares[s] <= 1e-12)
+            assert (state[s] == "FLAT") == (shares[s] <= 1e-12), f"状态-股数不一致 {s} {d}: state={state[s]} shares={shares[s]}"
         assert cash >= -1e-9 and nav_now > 0
         # P0-3 真守恒恒等式: ΔNAV = Σ q_{t-1}ΔP − fee_t (+reserve变动净零)
         dnav = nav_now - nav_prev
@@ -231,6 +261,7 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
         sh_h.iloc[k] = [shares[s] for s in universe]
     if collect is not None:
         collect.update(eq=eq, sh=sh_h, cash=cash_h, funnel=funnel, rejs=rejs, halve_proceeds=halve_proceeds, fills=fills, sources_end=list(sources), collisions=collisions)
+        collect["end_state"] = dict(cash=cash, reserve=dict(reserve), sources=list(sources), state=dict(state), entry_i=dict(entry_i), entry_budget=dict(entry_budget), entry_shares=dict(entry_shares), shares=dict(shares), pending=dict(pending), stale=dict(stale), last_date=dt_index[-1], fees=fees)
     return eq, shares, fees
 
 
