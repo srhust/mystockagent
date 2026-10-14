@@ -48,6 +48,8 @@ for i in range(1, n):
             last_end = d2
             crash_start = None
         pend = None
+    reason = ""
+    decision = ""
     if vel[i] and not in_pos and pend is None and crash_start is None and i - last_end > 90:
         crash_start = i
         reason = "ARM急跌"
