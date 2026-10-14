@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """审查四十一轮: ①V2aR共享目标仓位函数(TRIM05/GROW10同受entry_shares上限) ②真逐日T10(现金/股数/NAV历史, 首差异全上下文)
 ③全订单缺价保护(ENTER/HALVE/TRIM05/GROW10/EXIT统一, 缺价转PENDING保留意图) ④N3→N4拒单原因分解(资金不足/已持仓/缺价/排名落选)
 ⑤V2aF Reserve vs Recycle消融(减仓现金隔离 vs 回池) ⑥池级矩阵重跑。"""
@@ -137,6 +137,8 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
                 funnel["n3"] += 1
             else:
                 funnel["r_rank"] += 1
+            if r <= 1 and state[s] == "FLAT":
+                orders[s] = "ENTER"  # 胜出候选→入场订单(缺价时phase-3统一转PENDING)
         # 3) 卖出类执行(全部先过可成交检查)
         for s, act in list(orders.items()):
             if not (np.isfinite(px_today[s]) and px_today[s] > 0 and listed_d[s].get(d, False)):
@@ -187,9 +189,9 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
             p = px_today[s]
             spend = min(amt * sc, cash)
             if spend <= 1e-9:
-                if orders[s] == "ENTER":
+                if orders[s] == "ENTER" and s in w_map:
                     funnel["r_cash"] += 1
-                    pending[s] = "ENTER"  # 资金不足: 保留入场意图至现金可用
+                    pending[s] = "ENTER"  # 当日胜出但现金不足: 保留意图
                 continue
             fee = spend * COST
             fees += fee
