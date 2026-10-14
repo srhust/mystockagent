@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """cycle_portfolio 正式回归测试(审查四十五轮): 合成场景覆盖 as-of预算快照/EXIT缺价成交日期/FIFO来源守恒/守恒恒等式。
 运行: python -m pytest tests/test_cycle_portfolio.py -q"""
 import os
@@ -63,13 +63,53 @@ def test_v2ar_shares_cap():
 
 
 def test_fsm_priorities():
-    """FSM优先级: FLAT+事件→ENTER; FULL到期→EXIT优先于风险动作; FROZEN仅到期EXIT。"""
+    """FSM优先级: FLAT+事件→ENTER; FULL到期→EXIT优先于风险动作; FROZEN仅到期EXIT; hold_days显式参数生效。"""
     assert fsm_decide("V2aF", "FLAT", -999, 5, True, True) == "ENTER"
     assert fsm_decide("V2aF", "FULL", 0, HOLD, True, False) == "EXIT"
+    assert fsm_decide("V2aF", "FULL", 0, HOLD, True, False, hold_days=HOLD) == "EXIT"
+    assert fsm_decide("V2aF", "FULL", 0, 60, True, False, hold_days=60) == "EXIT"  # 60日期限: 60天即到期
+    assert fsm_decide("V2aF", "FULL", 0, 60, False, False, hold_days=120) is None  # 120日期限: 60天未到期且无破位
     assert fsm_decide("V2aF", "FULL", 0, 5, True, False) == "HALVE"
     assert fsm_decide("V2aR", "FULL", 0, 5, True, False) == "V2AR_TGT"
     assert fsm_decide("V2aF", "FROZEN", 0, 5, True, False) is None
     assert fsm_decide("V2aF", "FROZEN", 0, HOLD, True, False) == "EXIT"
+
+
+def test_fifo_reserve_release_order():
+    """Reserve: HALVE现金隔离, EXIT时以RESERVE_RELEASE入队, 顺序在NORMAL_EXIT之后, 金额=减仓所得。"""
+    n = 8
+    dts = pd.date_range("2022-01-03", periods=n, freq="B")
+    px = pd.Series(10.0, index=dts)
+    ma = pd.Series([1000.0, 1000.0, 1000.0, 5.0, 5.0, 5.0, 5.0, 5.0], index=dts)  # day3决策(sd=day2,ma=1000)HALVE→day3成交
+    snap = _snap(dts, ["MU"])
+    collect = {}
+    run_contract(["MU"], snap, "V2aF", {"MU": px}, {"MU": ma}, {"MU": {1}}, {"MU": pd.Series(True, index=dts)},
+                 dts, {"MU": pd.Series(np.arange(n), index=dts)}, collect=collect, reserve_mode=True, hold_days=3)
+    srcs = collect["sources_end"]
+    labels = [x[0] for x in srcs]
+    assert "RESERVE_RELEASE" in labels
+    assert labels.index("RESERVE_RELEASE") == labels.index("NORMAL_EXIT") + 1  # 释放紧跟退出入队
+    rel_amt = srcs[labels.index("RESERVE_RELEASE")][1]
+    assert abs(rel_amt - (9.985 / 2 * 10 * (1 - COST))) < 0.01  # 减仓所得精确入账
+    halves = [f for f in collect["fills"] if f[3] == "HALVE"]
+    assert len(halves) == 1 and abs(halves[0][4] * halves[0][5] * (1 - COST) - rel_amt) < 0.01
+
+
+def test_order_invariance_reserve():
+    """reserve_mode=True下反转股票表结果一致(多标的竞争+隔离现金)。"""
+    dts = pd.date_range("2022-01-03", periods=8, freq="B")
+    pxA = pd.Series(10.0, index=dts)
+    pxB = pd.Series(10.0, index=dts)
+    ma = pd.Series([1000.0, 1000.0, 5.0, 5.0, 5.0, 5.0, 5.0, 5.0], index=dts)
+    snap = _snap(dts, ["A", "B"])
+    own = {s: pd.Series(np.arange(8), index=dts) for s in ("A", "B")}
+    ev = {"A": {0, 2}, "B": {0, 2}}
+    li = {s: pd.Series(True, index=dts) for s in ("A", "B")}
+    px = {"A": pxA, "B": pxB}
+    e1, s1, _ = run_contract(["A", "B"], snap, "V2aF", px, {"A": ma, "B": ma}, ev, li, dts, own, reserve_mode=True, hold_days=4)
+    e2, s2, _ = run_contract(["B", "A"], snap, "V2aF", px, {"A": ma, "B": ma}, ev, li, dts, own, reserve_mode=True, hold_days=4)
+    assert abs(float(e1.iloc[-1]) - float(e2.iloc[-1])) < 1e-9
+    assert abs(s1["A"] - s2["A"]) < 1e-9 and abs(s1["B"] - s2["B"]) < 1e-9
 
 
 def test_v0_frozen_final_mu():

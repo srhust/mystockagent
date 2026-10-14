@@ -10,11 +10,11 @@ COST = 0.0015
 HOLD, DEDUP = 120, 60
 
 
-def fsm_decide(mode, state, entry_i, i_own, below, in_ev):
+def fsm_decide(mode, state, entry_i, i_own, below, in_ev, hold_days=None):
     if state == "FLAT":
         return "ENTER" if in_ev else None
     if state == "FULL":
-        if (i_own - entry_i) >= HOLD:
+        if (i_own - entry_i) >= (hold_days if hold_days else HOLD):
             return "EXIT"
         if mode == "V2aF" and below:
             return "HALVE"
@@ -22,7 +22,7 @@ def fsm_decide(mode, state, entry_i, i_own, below, in_ev):
             return "V2AR_TGT"
         return None
     if state == "FROZEN":
-        return "EXIT" if (i_own - entry_i) >= HOLD else None
+        return "EXIT" if (i_own - entry_i) >= (hold_days if hold_days else HOLD) else None
     return None
 
 
@@ -36,7 +36,7 @@ def v2ar_target(below, entry_budget, entry_shares, shares, p):
     return "BUY", max(0.0, min(tgt - cur, max_buy_cash))
 
 
-def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d, dt_index, ownpos_d, budget=100.0, collect=None, reserve_mode=False):
+def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d, dt_index, ownpos_d, budget=100.0, collect=None, reserve_mode=False, hold_days=None):
     cash = float(budget)
     reserve = {s: 0.0 for s in universe}
     sources = deque([("INITIAL", cash)])  # P0-2 资金来源账本(FIFO)
@@ -51,7 +51,9 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
     sh_h = pd.DataFrame(0.0, index=dt_index, columns=universe)
     fees = 0.0
     halve_proceeds = 0.0
-    funnel = dict(n1=0, n2=0, n3=0, n4=0, r_cash=0, r_price=0, r_rank=0, reconf=0, halve_funded_n=0, halve_funded_amt=0.0)
+    hd = hold_days if hold_days else HOLD
+    cash_h = pd.Series(np.nan, index=dt_index)
+    funnel = dict(n1=0, n2=0, n3=0, n4=0, r_cash=0, r_price=0, r_rank=0, reconf=0, halve_funded_n=0, halve_funded_amt=0.0, collide=0)
     rejs, fills = [], []
     for k, d in enumerate(dt_index):
         if k == 0:
@@ -78,7 +80,7 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
             if np.isfinite(px_today[s]) and px_today[s] > 0 and listed_d[s].get(d, False):
                 if act == "V2AR_TGT":
                     below_now = bool(px_yest[s] < ma100_d[s].get(sd, np.nan)) if np.isfinite(ma100_d[s].get(sd, np.nan)) else False
-                    new_act = fsm_decide(risk_mode, state[s], entry_i[s], ownpos_d[s].get(sd, -1), below_now, ownpos_d[s].get(sd, -1) in ev_d[s])
+                    new_act = fsm_decide(risk_mode, state[s], entry_i[s], ownpos_d[s].get(sd, -1), below_now, ownpos_d[s].get(sd, -1) in ev_d[s], hd)
                     if new_act != act:
                         funnel["reconf"] += 1
                     act = new_act if new_act else act
@@ -104,7 +106,9 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
                 else:
                     funnel["r_rank"] += 1
                 continue
-            act = fsm_decide(risk_mode, state[s], entry_i[s], i_own, below, in_ev)
+            act = fsm_decide(risk_mode, state[s], entry_i[s], i_own, below, in_ev, hd)
+            if act == "EXIT" and in_ev and state[s] != "FLAT" and (i_own - entry_i[s]) >= hd:
+                funnel["collide"] += 1  # HOLD到期与新事件同日: FSM优先退出(冻结), 统计冲突
             if act:
                 orders[s] = (act, 0.0, sd)
         cands.sort(reverse=True)
@@ -219,9 +223,10 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
         assert abs(dnav - (mkt - day_fee)) < 0.02, f"守恒失败 {d:.date()} {dnav:.4f} vs {mkt - day_fee:.4f}"
         assert abs(sum(a for _, a in sources) - cash) < 1e-8 * max(1.0, abs(cash)), f"来源账本不守恒 {d}"
         eq.iloc[k] = nav_now
+        cash_h.iloc[k] = cash
         sh_h.iloc[k] = [shares[s] for s in universe]
     if collect is not None:
-        collect.update(eq=eq, sh=sh_h, funnel=funnel, rejs=rejs, halve_proceeds=halve_proceeds, fills=fills)
+        collect.update(eq=eq, sh=sh_h, cash=cash_h, funnel=funnel, rejs=rejs, halve_proceeds=halve_proceeds, fills=fills, sources_end=list(sources))
     return eq, shares, fees
 
 
