@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """审查三十八轮: 执行契约落地 — ①唯一FSM决策核心fsm_decide(单股与池级同调, 池级不再自建状态转换)
 ②状态-份额逐日一致性断言(FULL⇒shares>0, FLAT⇒shares==0) ③顺序不变批量成交(先全部决策→批量卖→按比例分配买)
 ④冻结buy-once契约: 月度排名只控制新资金准入, 不强制卖出旧持仓; 退出仅由HOLD到期或风险机制触发
@@ -78,7 +78,9 @@ def apply_sell(cash, shares, p, sell_sh):
     return cash + proceeds, shares - sell_sh, fee
 
 
-def run_contract(universe, sched, risk_mode, closes_d, ma100_d, ev_d, px_d, listed_d, dt_index, budget=100.0):
+def run_contract(universe, sched, risk_mode, closes_d, ma100_d, ev_d, px_d, listed_d, dt_index, budget=100.0, ownpos_d=None):
+    if ownpos_d is None:
+        ownpos_d = {s: pd.Series(np.arange(len(px_d[s])), index=px_d[s].index) for s in universe}
     """唯一执行器: 单股(universe=["MU"], sched仅事件日w=1.0)与池级同一路径。
     批量成交: 决策(全部)→卖(EXIT/HALVE/TRIM05)→买(ENTER按w×nav预算, GROW10, 现金不足按比例分配)。"""
     n = len(dt_index)
@@ -106,8 +108,9 @@ def run_contract(universe, sched, risk_mode, closes_d, ma100_d, ev_d, px_d, list
             if not listed_d[s].get(d, False) or not np.isfinite(px_today[s]) or px_today[s] <= 0:
                 continue  # 缺价: 无成交, 状态保持(缺价日入场决策转PENDING由事件在下一可执行日重判)
             below = bool(px_yest[s] < ma100_d[s].get(sd, np.nan)) if np.isfinite(ma100_d[s].get(sd, np.nan)) else False
-            in_ev = i - 1 in ev_d[s]
-            hold_expired = entry_i[s] >= 0 and (i - 1 - entry_i[s]) >= HOLD
+            i_own = ownpos_d[s].get(sd, -1)
+            in_ev = i_own in ev_d[s]
+            hold_expired = entry_i[s] >= 0 and (i_own - entry_i[s]) >= HOLD
             w = cur_w.get(s, 0.0)
             if state[s] == "FLAT" and in_ev and w <= 0:
                 continue  # buy-once: 无新预算不入场
@@ -149,7 +152,7 @@ def run_contract(universe, sched, risk_mode, closes_d, ma100_d, ev_d, px_d, list
             if act == "ENTER":
                 cash, shares[s], fee = apply_enter(cash, shares[s], p, amt * sc)
                 fees += fee
-                state[s], entry_i[s] = "FULL", i - 1
+                state[s], entry_i[s] = "FULL", ownpos_d[s].get(sd, -1)
             else:
                 buy = min(amt, cash)
                 cash, shares[s], fee = apply_enter(cash, shares[s], p, buy)
