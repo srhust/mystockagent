@@ -123,4 +123,6 @@ for label, ws in plans.items():
     print(f"{label}: 终值{float(eq.iloc[-1]):.1f} MDD{mdd:.0%} 真实平均暴露{float(expo.mean()):.0%} 比值{float(eq.iloc[-1])/abs(mdd):.0f}")
 eqc, expoc = run_ledger(weights_by_exec, start_day)
 eqc.to_csv(os.path.join(config.DATA_DIR, "allocator_wf_v2_equity.csv"))
-print(f"C现金月度: 平均暴露{float(expoc.mean()):.0%}, 零暴露日占比{float((expoc < 0.01).mean()):.0%}")
+wf_w = pd.DataFrame({d: w for d, w in weights_by_exec.items()}).T
+wf_w.reindex(columns=POOL).fillna(0.0).to_csv(os.path.join(config.DATA_DIR, "allocator_wf_v2_weights.csv"))
+print(f"C现金月度: 平均暴露{float(expoc.mean()):.0%}, 零暴露日占比{float((expoc < 0.01).mean()):.0%}; 月度权重明细已存allocator_wf_v2_weights.csv")
