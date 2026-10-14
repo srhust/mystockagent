@@ -146,4 +146,4 @@ for hold in (60, 90, 120, 180):
             idle = float((collect["cash"] / eq).mean())
             yr = eq.resample("YE").last().pct_change()
             y = {str(d.year): float(v) for d, v in yr.items()}
-            print(f"{hold} | {mode} | {label} | {float(eq.iloc[-1]):.0f} {cagr:+.1%} {sharpe:.2f} {mdd:.0%} {calmar:.2f} | {f['n4']}/{avg_hold if np.isfinite(avg_hold) else -1:.0f}/{idle:.0%} | {sum(1 for x in collect['fills'] if x[3]=='HALVE')}/{collect['halve_proceeds']:.0f} | {fees:.0f} | {f['collide']} | {y.get('2011', float('nan')):+.0%}/{y.get('2020', float('nan')):+.0%}/{y.get('2025', float('nan')):+.0%}")
+            print(f"{hold} | {mode} | {label} | {float(eq.iloc[-1]):.0f} {cagr:+.1%} {sharpe:.2f} {mdd:.0%} {calmar:.2f} | {f['n4']}/{avg_hold if np.isfinite(avg_hold) else -1:.0f}/{idle:.0%} | {sum(1 for x in collect['fills'] if x[3]=='HALVE')}/{collect['halve_proceeds']:.0f} | {fees:.0f} | {f['collide']} | 2020:{y.get('2020', float('nan')):+.0%} 2025:{y.get('2025', float('nan')):+.0%}")
