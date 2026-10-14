@@ -74,7 +74,7 @@ for mode, label in [("X2", "MA100退出"), ("X3", "25%跟踪")]:
                 break
         x_i = exit_i if exit_i is not None else n - 1
         xfill = min(x_i + 1, n - 1)  # 审查二十二轮: 退出T+1成交
-        ret = (pxs[xfill] / pxs[efill] - 1) * (1 - 2 * 0.0015)  # 净收益(双边15bp)
+        ret = (pxs[xfill] / pxs[efill]) * (1 - 0.0015) ** 2 - 1  # 审查二十三轮: 正确双边费净收益
         mae = min(0.0, float((pxs[efill + 1:x_i + 1].min() / pxs[efill]) - 1))  # MAE≤0定义
         # 周期顶 = 谷底t至下一次30%回撤前(或序列末)的最高点; 捕获率 = 净收益 / 完整谷→顶涨幅
         nxt_h = [i for k2, i in pivots if k2 == "H" and i > t]
@@ -84,6 +84,6 @@ for mode, label in [("X2", "MA100退出"), ("X3", "25%跟踪")]:
         rows.append(dict(trough=str(c.index[t].date()), entry=str(c.index[e].date()), T1成交=str(c.index[efill].date()), exit成交=str(c.index[xfill].date()),
                          净收益=f"{ret:.0%}", mae=f"{mae:.0%}", 谷到顶=f"{cyc:.0%}", 捕获率=f"{cap:.0%}" if np.isfinite(cap) else "-"))
     d = pd.DataFrame(rows)
-    rets = pd.to_numeric(d["ret"].astype(str).str.rstrip("%"), errors="coerce").dropna() / 100.0
+    rets = pd.to_numeric(d["净收益"].astype(str).str.rstrip("%"), errors="coerce").dropna() / 100.0
     print(f"\n=== {label}: {len(rets)}/{len(qual)}轮触发, 胜{(rets>0).sum()}/{len(rets)}, 均收益{rets.mean():.0%} ===")
     print(d.to_string(index=False))
