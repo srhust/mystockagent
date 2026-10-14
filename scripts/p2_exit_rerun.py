@@ -18,37 +18,27 @@ import mu_af_v2 as M
 
 
 def run_position_ledger(px, pos, budget=100.0, cost=0.0015):
-    """pos: 0/1目标仓位Series(T日收盘决定)。T+1成交。返回(权益Series, 逐笔[(日,买价,卖价,净收益率,持仓日)])。"""
+    """pos: 0/1目标仓位Series(T日收盘决定)。审查十九轮修复: T-1收盘决策→T日收盘成交(真T+1, 原实现晚2日)。"""
     cash, shares = float(budget), 0.0
     in_pos = False
-    pend = None
-    entry_px = np.nan
-    entry_i = -1
     eq = pd.Series(np.nan, index=px.index)
     ledger = []
     pxs = px.values
     ps = pos.reindex(px.index).fillna(0.0).values
     for i in range(1, len(px)):
         p = pxs[i]
-        if pend is not None:
-            kind = pend
-            if kind == "buy":
-                shares = cash * (1 - cost) / p
-                entry_px = p
-                entry_i = i
-                cash = 0.0
-                in_pos = True
-            else:
-                cash = shares * p * (1 - cost)
-                ledger.append((px.index[i], p / entry_px - 1, i - entry_i))
-                shares = 0.0
-                in_pos = False
-            pend = None
-        want = bool(ps[i - 1] >= 0.5)  # T-1收盘的目标仓位
-        if want and not in_pos and pend is None:
-            pend = "buy"
-        elif (not want) and in_pos and pend is None:
-            pend = "sell"
+        want = bool(ps[i - 1] >= 0.5)  # T-1收盘已知 → T日收盘成交(真T+1)
+        if want and not in_pos:
+            shares = cash * (1 - cost) / p
+            entry_px = p
+            entry_i = i
+            cash = 0.0
+            in_pos = True
+        elif (not want) and in_pos:
+            cash = shares * p * (1 - cost)
+            ledger.append((px.index[i], p / entry_px - 1, i - entry_i))
+            shares = 0.0
+            in_pos = False
         eq.iloc[i] = cash + shares * p
     eq = eq.ffill().fillna(budget)
     return eq, ledger
