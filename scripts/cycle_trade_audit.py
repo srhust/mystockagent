@@ -73,15 +73,17 @@ for mode, label in [("X2", "MA100退出"), ("X3", "25%跟踪")]:
                 exit_i = i
                 break
         x_i = exit_i if exit_i is not None else n - 1
-        xfill = min(x_i + 1, n - 1)  # 审查二十二轮: 退出T+1成交
-        ret = (pxs[xfill] / pxs[efill]) * (1 - 0.0015) ** 2 - 1  # 审查二十三轮: 正确双边费净收益
-        mae = min(0.0, float((pxs[efill + 1:x_i + 1].min() / pxs[efill]) - 1))  # MAE≤0定义
+        xfill = min(x_i + 1, n - 1)  # 退出T+1成交
+        open_trade = exit_i is None  # 审查二十四轮: 数据末日仍未退出=未平仓
+        ret = (pxs[xfill] / pxs[efill]) * (1 - 0.0015) ** 2 - 1  # 正确双边费净收益
+        mae = min(0.0, float((pxs[efill:xfill + 1].min() / pxs[efill]) - 1))  # MAE覆盖至实际成交日(含成交日与隔夜跳空)
         # 周期顶 = 谷底t至下一次30%回撤前(或序列末)的最高点; 捕获率 = 净收益 / 完整谷→顶涨幅
         nxt_h = [i for k2, i in pivots if k2 == "H" and i > t]
         top_i = nxt_h[0] if nxt_h else n - 1
         cyc = float(pxs[top_i] / pxs[t] - 1)
         cap = ret / (pxs[top_i] / pxs[t] - 1) if pxs[top_i] > pxs[t] else np.nan
-        rows.append(dict(trough=str(c.index[t].date()), entry=str(c.index[e].date()), T1成交=str(c.index[efill].date()), exit成交=str(c.index[xfill].date()),
+        rows.append(dict(trough=str(c.index[t].date()), entry=str(c.index[e].date()), T1成交=str(c.index[efill].date()),
+                         exit成交=("未平仓" if open_trade else str(c.index[xfill].date())),
                          净收益=f"{ret:.0%}", mae=f"{mae:.0%}", 谷到顶=f"{cyc:.0%}", 捕获率=f"{cap:.0%}" if np.isfinite(cap) else "-"))
     d = pd.DataFrame(rows)
     rets = pd.to_numeric(d["净收益"].astype(str).str.rstrip("%"), errors="coerce").dropna() / 100.0
