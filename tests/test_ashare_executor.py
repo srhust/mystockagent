@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """Ashare-Stock 阶段1 R2 负例: 计划/成交分离·分期交易制度·原子账本·T+1可卖·费用守恒。"""
 import hashlib
 import json
@@ -83,7 +83,7 @@ def test_limit_and_halt_rejections():
 def test_ledger_atomic_and_t1_sellable():
     """R4: 可信通道+execution_date绑定+同日不可卖+节假日日历+原子性。"""
     tmp = tempfile.mkdtemp()
-    led = Ledger("M", nav0=20000.0, root=tmp)
+    led = Ledger("M", nav0=20000.0, root=tmp, test_mode=True)
     led.advance_day("2026-10-15")
     plan = create_plan("600019", "BUY", "2026-10-15", px_ref=10.0, cash_budget=20000.0)
     led.register_plan(plan)  # N2: 可信通道
@@ -139,8 +139,45 @@ def test_ledger_atomic_and_t1_sellable():
     with pytest.raises(AssertionError, match="仅FILLED"):
         led.apply({"code": "600019", "action": "BUY", "status": "REJECTED", "reason": "limit_up", "cash_delta": 0}, allow_unplanned=True)
 
+def test_b1_b2_b3_identity_and_lots():
+    """B1: 计划—成交字段级绑定; B2: unplanned仅test_mode+scoring强制False; B3: 主板卖出整手。"""
+    tmp = tempfile.mkdtemp()
+    led = Ledger("PROD", nav0=20000.0, root=tmp)  # 正式账本(无test_mode)
+    led.advance_day("2026-10-16")
+    bp = create_plan("600019", "BUY", "2026-10-15", px_ref=10.0, cash_budget=20000.0)
+    led.register_plan(bp)
+    with pytest.raises(AssertionError, match="test_mode"):
+        led.apply({"code": "600019", "action": "BUY", "status": "FILLED", "plan_hash": "nofake", "shares": 100, "cash_delta": -1025.01, "price": 10.2, "notional": 1020.0, "fees": 5.01, "execution_date": "2026-10-16", "signal_px": 10.0}, allow_unplanned=True)  # B2: 正式账本禁unplanned
+    # B1: 登记BUY计划后提交SELL成交→拒绝; 方向/股票/预算不符→拒绝
+    # B1: 同plan_hash换方向在PROD账本被拒(账本测试转入B1负例段)
+    led2 = Ledger("P2", nav0=20000.0, root=tmp)
+    led2.advance_day("2026-10-16")
+    led2.register_plan(bp)
+    bf = execute_plan(bp, "2026-10-16", px_t1=10.2, prev_close=10.0)
+    led2.apply(bf)  # 正式通道: 计划—成交绑定通过
+    assert led2.pos["600019"]["total"] == bf["shares"]
+    # B1负例: 登记BUY计划(未执行)→提交同hash的SELL成交(方向不符)→拒绝且零副作用; 股票不符同理
+    snap = (led2.cash, json.dumps(led2.pos, sort_keys=True))
+    bp2 = create_plan("600019", "BUY", "2026-10-15", px_ref=10.0, cash_budget=50000.0)
+    led2.register_plan(bp2)  # 登记但未执行
+    with pytest.raises(AssertionError, match="股票/方向"):
+        led2.apply({"code": "600019", "action": "SELL", "status": "FILLED", "plan_hash": bp2["plan_hash"], "shares": 100, "cash_delta": 1000.0, "price": 10.0, "notional": 1000.0, "fees": 5.0, "execution_date": "2026-10-16", "signal_px": 10.0})
+    with pytest.raises(AssertionError, match="股票/方向"):
+        led2.apply({"code": "000630", "action": "BUY", "status": "FILLED", "plan_hash": bp2["plan_hash"], "shares": 100, "cash_delta": -1005.01, "price": 10.0, "notional": 1000.0, "fees": 5.01, "execution_date": "2026-10-16", "signal_px": 10.0})
+    assert (led2.cash, json.dumps(led2.pos, sort_keys=True)) == snap
+    # B3: 主板卖出150股 execute_plan拒绝; 不足一手余额经开关+账本total验证
+    r = execute_plan(create_plan("600019", "SELL", "2026-10-15", px_ref=10.0, shares=150, created_at="2026-10-15T16:00:00+08:00"), "2026-10-16", px_t1=10.2, prev_close=10.0)
+    assert r["status"] == "REJECTED" and r["reason"] == "bad_lot"
+    # B2: 测试账本unplanned成交scoring强制False且审计标记
+    ledT = Ledger("TEST1", nav0=20000.0, root=tmp, test_mode=True)
+    ledT.advance_day("2026-10-16")
+    ledT.apply({"code": "600019", "action": "BUY", "status": "FILLED", "plan_hash": "t1", "shares": 100, "cash_delta": -1025.01, "price": 10.2, "notional": 1020.0, "fees": 5.01, "execution_date": "2026-10-16", "signal_px": 10.0, "scoring": True}, allow_unplanned=True)
+    last = json.loads(open(ledT.log_p, encoding="utf-8").readlines()[-1])
+    assert last["unplanned"] is True and last["scoring"] is False  # 强制不计分
+
+
 def test_nav_missing_price_and_fees():
-    led = Ledger("X", nav0=20000.0, root=tempfile.mkdtemp())
+    led = Ledger("X", nav0=20000.0, root=tempfile.mkdtemp(), test_mode=True)
     led.advance_day("2026-10-16")
     plan = create_plan("600019", "BUY", "2026-10-15", px_ref=10.0, cash_budget=20000.0)
     led.register_plan(plan)

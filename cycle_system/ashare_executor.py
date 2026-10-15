@@ -120,8 +120,10 @@ def execute_plan(plan: dict, trade_date_t1, px_t1: float, prev_close: float, hal
                 "cash_delta": -round(notional + fee, 2), "signal_px": plan["signal_px"], "scoring": True}
     shares = plan["shares"]
     base, step = lot_step(code)
-    if shares < base and not (allow_residual_sell and code.startswith("68") and shares > 0):
-        return {**rej, "reason": "bad_lot"}  # A5: 科创板余额<200一次性卖出由账本验证total==shares
+    if (shares - base) % step != 0:
+        return {**rej, "reason": "bad_lot"}  # B3: 完整整手规则(主板150股拒; 科创板step=1恒过)
+    if shares < base and not (allow_residual_sell and shares > 0):
+        return {**rej, "reason": "bad_lot"}  # 余额卖出: 各板块不足一手须显式开关+账本验证total==shares
     notional = shares * price
     fee = fees(code, notional, True)
     return {"plan_hash": plan["plan_hash"], "code": code, "action": "SELL", "status": "FILLED", "execution_date": str(_next_bdate(plan["trade_date"]).date()),
@@ -132,12 +134,13 @@ def execute_plan(plan: dict, trade_date_t1, px_t1: float, prev_close: float, hal
 class Ledger:
     """单策略独立账本: 原子apply(先验证后提交, 异常零副作用) + A股T+1可卖约束 + append-only审计。"""
 
-    def __init__(self, name: str, nav0: float = 20000.0, root: str = "output/ashare"):
+    def __init__(self, name: str, nav0: float = 20000.0, root: str = "output/ashare", test_mode: bool = False):
         self.name, self.nav0 = name, nav0
         self.cash = float(nav0)
         self.pos = {}  # code -> {"total": int, "sellable": int}  (sellable=当日可卖, 买入当日不增)
         self.trading_day = None
         self.registered = {}  # plan_hash -> plan (可信通道: 仅接受已登记冻结计划的ExecutionResult)
+        self.test_mode = test_mode  # B2: allow_unplanned仅限test_mode账本
         os.makedirs(root, exist_ok=True)
         self.log_p = os.path.join(root, f"ledger_{name}.jsonl")
 
@@ -161,6 +164,17 @@ class Ledger:
         assert ph and ph not in getattr(self, "_executed", set()), f"A3: 重复成交拒绝: {ph}"
         assert ph in self.registered or allow_unplanned, "N2: 成交必须关联已登记冻结计划(allow_unplanned仅限测试构造, 不计分)"
         assert fill.get("fees", 0) >= 0, "N2: 费用必须非负"
+        if not allow_unplanned:
+            pl = self.registered[ph]  # B1: 计划—成交字段级身份绑定
+            assert pl["code"] == fill["code"] and pl["action"] == fill["action"], "B1: 成交与登记计划的股票/方向不符"
+            assert fill.get("signal_px") == pl.get("signal_px"), "B1: signal_px与计划不符"
+            if fill["action"] == "SELL":
+                assert shares == pl["shares"], "B1: 卖出股数与计划不符"
+            else:
+                assert round(fill["notional"], 2) + fill["fees"] <= pl["cash_budget"] + 1e-6, "B1: 成交总额超出计划预算"
+        if allow_unplanned:
+            assert self.test_mode, "B2: allow_unplanned仅限test_mode测试账本, 正式账户禁用"
+            fill = {**fill, "scoring": False}  # 测试成交强制不计分
         assert fill.get("execution_date") == self.trading_day, f"N3: 成交日与账本交易日不一致: fill={fill.get('execution_date')} ledger={self.trading_day}"
         code, shares, delta = fill["code"], fill["shares"], fill["cash_delta"]
         assert isinstance(shares, int) and not isinstance(shares, bool) and shares > 0, f"A3: 股数必须为正整数: {shares}"
