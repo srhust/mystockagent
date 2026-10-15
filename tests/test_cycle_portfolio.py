@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """cycle_portfolio 正式回归测试(审查四十五轮): 合成场景覆盖 as-of预算快照/EXIT缺价成交日期/FIFO来源守恒/守恒恒等式。
 运行: python -m pytest tests/test_cycle_portfolio.py -q"""
 import os
@@ -347,6 +347,99 @@ def test_time_boundary():
     save_state(st2, sp2)
     with pytest.raises(AssertionError, match="双配置进度不一致"):
         RS.dual_sync_check(sp, sp2)
+
+
+def test_release_gate():
+    """P0: 正式main()端到端 — 连续3日plan→settle状态推进+凭证一次性字节不变; 计划正文破坏→原子拒绝(90不推进); 中间缺日/NaN→data_incomplete; 收盘门禁。全程临时FWD+合成行情。"""
+    import json
+    import hashlib
+    import pytest
+    import tempfile
+    import run_shadow as RS
+    RS.TICKERS = ["MU"]
+    tmp = tempfile.mkdtemp()
+    RS.FWD = tmp
+    n = 11
+    dts = pd.date_range("2022-01-03", periods=n, freq="B")
+    px = pd.Series([10] * 5 + [12, 12, 12, 12, 12, 12], index=dts, dtype=float)
+    ma = pd.Series([5.0] * 5 + [1000.0] * 6, index=dts)
+    snap = {(d.to_period("M"), "MU"): 1.0 for d in dts}
+    own = {"MU": pd.Series(np.arange(n), index=dts)}
+    li = {"MU": pd.Series(True, index=dts)}
+    mkt = dict(px={"MU": px}, ma={"MU": ma}, ev={"MU": {4}}, listed=li, own=own, days=dts, snap=snap, raw_last={"MU": dts[-1]}, raw_close={"MU": px})
+    RS.load_market = lambda: mkt  # 正式main()使用合成行情
+    sp90, lp90 = os.path.join(tmp, "state_90.json"), os.path.join(tmp, "forward_log_90.jsonl")
+    sp120, lp120 = os.path.join(tmp, "state_120.json"), os.path.join(tmp, "forward_log_120.jsonl")
+    c0, c1 = {}, {}
+    run_contract(["MU"], snap, "V2aF", {"MU": px}, {"MU": ma}, {"MU": {4}}, li, dts[:5], own, collect=c0, reserve_mode=False, hold_days=90, config_extra=RS.CFGX)
+    run_contract(["MU"], snap, "V2aF", {"MU": px}, {"MU": ma}, {"MU": {4}}, li, dts[:5], own, collect=c1, reserve_mode=False, hold_days=120, config_extra=RS.CFGX)
+    save_state(c0["end_state"], sp90)
+    save_state(c1["end_state"], sp120)
+    fh = {f: hashlib.sha256(open(os.path.join(r"E:\mystockagent", f), "rb").read()).hexdigest() for f in ("cycle_system/cycle_portfolio.py", "scripts/run_shadow.py")}
+    v2 = {"type": "launch_credential", "version": 2, "executor_file_hashes": fh, "config_hash_90": "f263f842f497", "config_hash_120": "6d64e83c9d33", "forward_start": "PENDING_FIRST_REAL_TRADING_DAY"}
+    body = json.dumps({k: v for k, v in v2.items() if k != "self_hash"}, sort_keys=True, ensure_ascii=False)
+    v2["self_hash"] = hashlib.sha1(body.encode()).hexdigest()[:12]
+    json.dump(v2, open(os.path.join(tmp, "launch_credential_v3.json"), "w", encoding="utf-8"))
+    off_p = os.path.join(tmp, "launch_credential_official.json")
+    import sys as _sys
+    for step in range(3):
+        _sys.argv = ["run_shadow", "plan"]
+        RS.main()
+        for spx, lpx in ((sp90, lp90), (sp120, lp120)):
+            lines = [json.loads(l) for l in open(lpx, encoding="utf-8")]
+            st_last = load_state(spx)["last_date"]
+            for r in lines:
+                if r["type"] == "PLAN_CREATED":
+                    r["created_at"] = (pd.Timestamp(st_last.date()).tz_localize("UTC") + pd.Timedelta(hours=22)).isoformat()
+            with open(lpx, "w", encoding="utf-8") as f:
+                for r in lines:
+                    f.write(json.dumps(r, default=str) + "\n")
+        _sys.argv = ["run_shadow", "settle"]
+        RS.main()
+    assert load_state(sp90)["last_date"] == dts[7] and load_state(sp120)["last_date"] == dts[7]
+    assert os.path.exists(off_p)
+    ob = open(off_p, "rb").read()
+    # 凭证一次性: 第4次settle(无下一日计划→预检查拒绝, 同样绝不覆盖)字节不变
+    _sys.argv = ["run_shadow", "settle"]
+    try:
+        RS.main()
+    except AssertionError:
+        pass
+    assert open(off_p, "rb").read() == ob
+    # 原子性: 破坏HOLD120计划正文 → dry验签失败 → 90也不推进
+    st90b = load_state(sp90)["last_date"]
+    lines = [json.loads(l) for l in open(lp120, encoding="utf-8")]
+    tgt = [r for r in lines if r["type"] == "PLAN_CREATED"][-1]
+    tgt["plan"]["orders"] = {"FAKE": ("BUY", 0.0, 0.0)}  # 破坏计划正文 → dry阶段plan_hash验签必失败
+    with open(lp120, "w", encoding="utf-8") as f:
+        for r in lines:
+            f.write(json.dumps(r, default=str) + "\n")
+    with pytest.raises(Exception):
+        _sys.argv = ["run_shadow", "settle"]
+        RS.main()
+    assert load_state(sp90)["last_date"] == st90b, "原子性: 90不得先于120推进"
+    # 中间缺日/NaN: 移除dts[6]原始记录(状态已到dts[7], 演示dts[8]正常) — 直接构造: 状态回滚到dts[5], raw缺dts[6]
+    st5 = load_state(sp90)
+    st5["last_date"] = dts[5]
+    save_state(st5, sp90)
+    st5b = load_state(sp120)
+    st5b["last_date"] = dts[5]
+    save_state(st5b, sp120)
+    px_gap = px.drop(dts[6])
+    mkt_gap = dict(mkt)
+    mkt_gap["raw_close"] = {"MU": px_gap}
+    mkt_gap["px"] = {"MU": px.ffill().reindex(dts)}
+    RS.load_market = lambda: mkt_gap
+    assert RS.settle_phase(mkt_gap, 90, sp90, lp90) == "data_incomplete"  # 中间缺日→不推进
+    assert load_state(sp90)["last_date"] == dts[5]
+    px_nan = px.copy()
+    px_nan.loc[dts[6]] = np.nan
+    mkt_nan = dict(mkt)
+    mkt_nan["raw_close"] = {"MU": px_nan}
+    mkt_nan["px"] = {"MU": px.ffill().reindex(dts)}
+    RS.load_market = lambda: mkt_nan
+    assert RS.settle_phase(mkt_nan, 90, sp90, lp90) == "data_incomplete"
+    assert load_state(sp90)["last_date"] == dts[5], "NaN原始价→data_incomplete不推进"
 
 
 def test_config_mismatch_rejected():

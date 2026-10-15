@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """正式每日前向影子驱动入口(只读, 无交易接口)。用法: python scripts/run_shadow.py
 特性: 重复启动安全(无新交易日直接退出)/漏日拒绝/已登记成交的修订冲突检测(重算哈希不符即拒绝静默恢复)/
 PLAN_EXECUTED存逐笔成交/状态哈希链断言/真实首日自动签发正式启动凭证。"""
@@ -218,8 +218,8 @@ def plan_time_valid(created_at, T, Tp1):
     if ts.tzinfo is None:
         ts = ts.tz_localize("UTC")
     et = ts.tz_convert("America/New_York").replace(tzinfo=None)
-    lo = session_close_et(T)
-    hi = _dt.datetime.combine(Tp1.date(), _dt.time(9, 30))
+    lo = pd.Timestamp(session_close_et(T))
+    hi = pd.Timestamp(_dt.datetime.combine(Tp1.date(), _dt.time(9, 30)))
     return lo <= et < hi
 
 
@@ -325,8 +325,8 @@ def plan_phase(mkt, hold, state_path, log_path):
     return "planned"
 
 
-def settle_phase(mkt, hold, state_path, log_path, allow_replay=False):
-    """P0阶段二: T+1收盘数据到达后消费事前计划; created_at晚于成交日→phase_mode=late_created且scoring=false; 计划缺失→PLAN_MISSING。"""
+def settle_phase(mkt, hold, state_path, log_path, allow_replay=False, dry=False):
+    """P0阶段二: T+1收盘数据到达后消费事前计划。dry=True仅完整校验不写盘(原子性: 双配置先dry后commit)。"""
     px_d, ma100_d, ev_d, listed_d, ownpos_d, days_all, snap = mkt["px"], mkt["ma"], mkt["ev"], mkt["listed"], mkt["own"], mkt["days"], mkt["snap"]
     st, done, created, executed_recs, _ = _load_run_ctx(hold, state_path, log_path)
     cal = us_calendar(mkt["days"][0] - pd.Timedelta(days=400), pd.Timestamp.now() + pd.Timedelta(days=400))
@@ -334,27 +334,37 @@ def settle_phase(mkt, hold, state_path, log_path, allow_replay=False):
     if pos0 + 1 >= len(cal):
         return "calendar_exhausted"
     d = cal[pos0 + 1]
-    missing_raw = [s for s in TICKERS if mkt["raw_last"][s] < d]  # P0: 原始CSV到达性(前向填充之前), 估值价不可用于判断
-    if d > days_all[-1] or missing_raw:
-        return "data_incomplete"  # T+1收盘数据未到达/部分股票未更新, 等待
+    if not dry:  # P0: 收盘门禁 — 实际时钟必须晚于成交日NYSE收盘(含提前收盘日)
+        close_et = pd.Timestamp(session_close_et(d)).tz_localize("America/New_York").tz_convert("UTC")
+        if pd.Timestamp.now(tz="UTC") < close_et.tz_convert("UTC"):
+            return "market_not_closed"
+    bad_raw = [s for s in TICKERS if d not in mkt["raw_close"][s].index or not np.isfinite(mkt["raw_close"][s].loc[d])]  # P0: 原始记录存在且有效(防中间缺日/NaN被前向填充掩盖)
+    if d > days_all[-1] or bad_raw:
+        if not dry and bad_raw:
+            with open(log_path, "a", encoding="utf-8") as f:
+                f.write(json.dumps({"type": "DATA_INCOMPLETE", "date": d.isoformat(), "missing": bad_raw, "scoring": False}, default=str) + "\n")
+        return "data_incomplete"  # T+1收盘数据未到达/部分股票中间缺日或无效价, 等待
     fp = content_fingerprint(mkt, cal[pos0])  # P1: 内容指纹锚定<=T已验收历史; 追加式指纹链(不覆盖)
     fp_p = os.path.join(FWD, "_data_fp.jsonl")
     base = None
     if os.path.exists(fp_p):
         for l in open(fp_p, encoding="utf-8"):
             r = json.loads(l)
+            if r.get("asof") and r.get("fp"):  # P1: 全历史链复核 — 任意已验收日的价格修订均可发现(不只基准段)
+                if r.get("fp") != content_fingerprint(mkt, pd.Timestamp(r["asof"])):
+                    with open(fp_p, "a", encoding="utf-8") as f:
+                        f.write(json.dumps({"type": "DATA_REVISION", "asof": r["asof"], "scoring": False}, default=str) + "\n")
+                    raise AssertionError(f"历史行情内容修订: asof={r['asof']}指纹变化, 拒绝计分, 人工裁决")
             if r.get("base"):
                 base = r
-                if r.get("fp") != content_fingerprint(mkt, pd.Timestamp(r["asof"])):  # 基准段历史被修订(即使asof已推进)
-                    with open(fp_p, "a", encoding="utf-8") as f:
-                        f.write(json.dumps({"type": "DATA_REVISION", "base_asof": r["asof"], "scoring": False}, default=str) + "\n")
-                    raise AssertionError(f"历史行情内容修订: 基准段(asof={r['asof']})指纹变化, 拒绝计分, 人工裁决")
     if base is None:
-        with open(fp_p, "a", encoding="utf-8") as f:
-            f.write(json.dumps({"base": True, "asof": str(cal[pos0].date()), "fp": fp}, default=str) + "\n")
+        if not dry:
+            with open(fp_p, "a", encoding="utf-8") as f:
+                f.write(json.dumps({"base": True, "asof": str(cal[pos0].date()), "fp": fp}, default=str) + "\n")
     else:
-        with open(fp_p, "a", encoding="utf-8") as f:
-            f.write(json.dumps({"asof": str(cal[pos0].date()), "fp": fp}, default=str) + "\n")
+        if not dry:
+            with open(fp_p, "a", encoding="utf-8") as f:
+                f.write(json.dumps({"asof": str(cal[pos0].date()), "fp": fp}, default=str) + "\n")
     plan_rec = None
     if os.path.exists(log_path):
         for l in open(log_path, encoding="utf-8"):
@@ -386,8 +396,12 @@ def settle_phase(mkt, hold, state_path, log_path, allow_replay=False):
         if state_hash(st) != rec["new_state_hash"] or serialize_fills(ca["fills"]) != rec["fills"]:
             raise AssertionError(f"数据修订冲突: {d} 重算与已登记PLAN_EXECUTED不一致, 拒绝静默恢复")
     else:
+        if dry:  # P0: 原子性 — dry仅校验(计划验签/apply/冲突检测全部执行), 不写任何文件
+            return "dry_ok"
         with open(log_path, "a", encoding="utf-8") as f:
             f.write(json.dumps({"type": "PLAN_EXECUTED", "plan_id": pp["plan_hash"], "date": d.isoformat(), "phase_mode": phase_mode, "scoring": bool(scoring), "fills": serialize_fills(ca["fills"]), "eq": round(float(ca["eq"].iloc[0]), 6), "fees_cum": round(st["fees"], 4), "data_fingerprint": fp, "new_state_hash": state_hash(st)}, default=str) + "\n")
+    if dry:
+        return "dry_ok"
     save_state(st, state_path)
     return "settled"
 
@@ -433,10 +447,10 @@ def main():
             print(f"replay[{hold}]: {r}(scoring=false)")
         return
     # settle: 正式路径 — 身份校验前移到任何账户写入之前(P0)
-    cred_p = os.path.join(FWD, "launch_credential_v2.json")
+    cred_p = os.path.join(FWD, "launch_credential_v3.json")
     if os.path.exists(cred_p):
         cred0 = json.load(open(cred_p, encoding="utf-8"))
-        fh0 = {f: hashlib.sha256(open(os.path.join(r"E:\mystockagent", f), "rb").read()).hexdigest()[:16] for f in ("cycle_system/cycle_portfolio.py", "scripts/run_shadow.py")}
+        fh0 = {f: hashlib.sha256(open(os.path.join(r"E:\mystockagent", f), "rb").read()).hexdigest() for f in ("cycle_system/cycle_portfolio.py", "scripts/run_shadow.py")}
         miss0 = [f for f in fh0 if f not in cred0.get("executor_file_hashes", {})]
         mism0 = [f for f in fh0 if f in cred0.get("executor_file_hashes", {}) and cred0["executor_file_hashes"][f] != fh0[f]]
         assert not mism0 and not miss0, f"凭证身份不完整或不符: mismatch={mism0} missing={miss0}, 拒绝结算"
@@ -454,11 +468,13 @@ def main():
         assert pc and plan_time_valid(pc[0]["created_at"], load_state(paths[hold][0])["last_date"], d_next), f"HOLD{hold} 预检查失败: 缺少合格事前计划({d_next.date()}), 拒绝结算"
     start_navs = {hold: round(nav_of(load_state(paths[hold][0]), mkt["px"]), 6) for hold in (90, 120)}
     assert all(v > 0 for v in start_navs.values()), f"起点NAV无效: {start_navs}"
+    results_dry = {hold: settle_phase(mkt, hold, *paths[hold], dry=True) for hold in (90, 120)}  # P0: 原子性 — 两配置全部dry校验通过才进入持久化
+    assert all(r == "dry_ok" for r in results_dry.values()), f"预校验失败: {results_dry}, 未写入任何账户"
     results = {hold: settle_phase(mkt, hold, *paths[hold]) for hold in (90, 120)}
     print(f"settle: {results} | 起点NAV(处理前冻结): {start_navs} | 数据截止: {data_cutoff}")
     if not os.path.exists(off_p) and os.path.exists(cred_p) and results[90] == results[120] == "settled":  # 仅首次签发
         cred = json.load(open(cred_p, encoding="utf-8"))
-        fh = {f: hashlib.sha256(open(os.path.join(r"E:\mystockagent", f), "rb").read()).hexdigest()[:16] for f in ("cycle_system/cycle_portfolio.py", "scripts/run_shadow.py")}
+        fh = {f: hashlib.sha256(open(os.path.join(r"E:\mystockagent", f), "rb").read()).hexdigest() for f in ("cycle_system/cycle_portfolio.py", "scripts/run_shadow.py")}
         if cred.get("forward_start") == "PENDING_FIRST_REAL_TRADING_DAY":
             for hold in (90, 120):
                 exs = [json.loads(l) for l in open(paths[hold][1], encoding="utf-8") if json.loads(l)["type"] == "PLAN_EXECUTED"]
