@@ -429,30 +429,62 @@ def test_release_gate():
     with pytest.raises(AssertionError, match="验签失败"):
         RS.main()
     assert hashlib.sha256(open(sp90, "rb").read()).hexdigest() + hashlib.sha256(open(lp90, "rb").read()).hexdigest() == h90_before, "原子性: 90状态与日志字节级零变化"
-    # 凭证缺失 fail-closed
+    # P0-1: 结算未成功不得提交事务完成 — 120返回market_not_closed → TXN_ABORTED, 无BOTH_COMMITTED
+    with open(lp120, "w", encoding="utf-8") as f:
+        for r in [json.loads(l) for l in open(lp120, encoding="utf-8")]:
+            if not (r["type"] == "PLAN_CREATED" and r["date"][:10] == str(dts[8].date())):
+                f.write(json.dumps(r, default=str) + "\n")  # 删除被破坏计划
+    _sys.argv = ["run_shadow", "plan"]
+    RS.main()  # 120重新生成dts[8]计划
+    for spx, lpx in ((sp90, lp90), (sp120, lp120)):
+        lines2 = [json.loads(l) for l in open(lpx, encoding="utf-8")]
+        st_last = load_state(spx)["last_date"]
+        for r in lines2:
+            if r["type"] == "PLAN_CREATED" and r["date"][:10] == str(dts[8].date()):
+                r["created_at"] = (pd.Timestamp(st_last.date()).tz_localize("UTC") + pd.Timedelta(hours=22)).isoformat()
+        with open(lpx, "w", encoding="utf-8") as f:
+            for r in lines2:
+                f.write(json.dumps(r, default=str) + "\n")
+    orig_sp = RS.settle_phase
+
+    def fake_sp(mk, hold, *a, **kw):
+        if hold == 120 and kw.get("dry") is not True and kw.get("recovery") is not True:
+            return "market_not_closed"
+        return orig_sp(mk, hold, *a, **kw)
+
+    RS.settle_phase = fake_sp
+    _sys.argv = ["run_shadow", "settle"]
+    with pytest.raises(AssertionError, match="结算未成功"):
+        RS.main()
+    RS.settle_phase = orig_sp
+    txn_recs = [json.loads(l) for l in open(os.path.join(tmp, "dual_txn.jsonl"), encoding="utf-8")]
+    assert any(r.get("phase") == "TXN_ABORTED" for r in txn_recs)
+    assert not any(r.get("phase") == "BOTH_COMMITTED" and r["date"] == str(dts[8].date()) and not r.get("recovered") for r in txn_recs)
+    # P0-2: 凭证缺失 → 恢复不执行(120回滚状态不动)
+    st120_pre = load_state(sp120)["last_date"]
     os.rename(os.path.join(tmp, "launch_credential_v3.json"), os.path.join(tmp, "v3.bak"))
     with pytest.raises(AssertionError, match="候选凭证缺失"):
+        _sys.argv = ["run_shadow", "settle"]
         RS.main()
+    assert load_state(sp120)["last_date"] == st120_pre, "fail-closed: 凭证缺失时恢复不得先执行"
     os.rename(os.path.join(tmp, "v3.bak"), os.path.join(tmp, "launch_credential_v3.json"))
-    # 事务恢复: 120回滚到dts[6]+构造未完成BOTH_PREPARED(dts[7]) → main幂等补齐落后方(不计新分)
-    st6 = load_state(sp120)
-    st6["last_date"] = dts[6]
-    save_state(st6, sp120)
-    txn_p = os.path.join(tmp, "dual_txn.jsonl")
-    tl = [json.loads(l) for l in open(txn_p, encoding="utf-8")]
-    kept = [r for r in tl if not (r.get("date") == str(dts[7].date()) and r.get("phase") in ("HOLD90_COMMITTED", "BOTH_COMMITTED"))]
-    if not any(r.get("date") == str(dts[7].date()) and r.get("phase") == "BOTH_PREPARED" for r in kept):
-        kept.append({"phase": "BOTH_PREPARED", "date": str(dts[7].date())})
-    with open(txn_p, "w", encoding="utf-8") as f:
-        for r in kept:
+    # P0-3: 恢复遇冻结计划缺失 → 拒绝重生成
+    st120_r = load_state(sp120)
+    st120_r["last_date"] = dts[6]
+    save_state(st120_r, sp120)
+    txn_recs.append({"phase": "BOTH_PREPARED", "date": str(dts[7].date())})
+    with open(os.path.join(tmp, "dual_txn.jsonl"), "w", encoding="utf-8") as f:
+        for r in txn_recs:
             f.write(json.dumps(r, default=str) + "\n")
+    # 删除120在dts[7]的PLAN_CREATED(冻结计划不存在)
+    with open(lp120, "w", encoding="utf-8") as f:
+        for r in [json.loads(l) for l in open(lp120, encoding="utf-8")]:
+            if not (r["type"] == "PLAN_CREATED" and r["date"][:10] == str(dts[7].date())):
+                f.write(json.dumps(r, default=str) + "\n")
     _sys.argv = ["run_shadow", "settle"]
-    try:
-        RS.main()  # 恢复完成后预检查(无dts[8]合格计划)拒绝 — 恢复本身必须已完成
-    except AssertionError as e:
-        assert "预检查失败" in str(e) or "验签" in str(e)
-    assert load_state(sp120)["last_date"] == dts[7], "事务恢复: 120被幂等补齐至dts[7]"
-    # 中间缺日/NaN: 移除dts[6]原始记录(状态已到dts[7], 演示dts[8]正常) — 直接构造: 状态回滚到dts[5], raw缺dts[6]
+    with pytest.raises(AssertionError, match="拒绝重生成"):
+        RS.main()
+    assert load_state(sp120)["last_date"] == dts[6], "P0-3: 冻结计划缺失时状态不得推进"
     st5 = load_state(sp90)
     st5["last_date"] = dts[5]
     save_state(st5, sp90)
