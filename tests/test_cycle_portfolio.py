@@ -248,7 +248,7 @@ def test_recover_with_fills():
     own = {"MU": pd.Series(np.arange(n), index=dts)}
     ev = {"MU": {4}}
     li = {"MU": pd.Series(True, index=dts)}
-    mkt = dict(px={"MU": px}, ma={"MU": ma}, ev=ev, listed=li, own=own, days=dts, snap=snap)
+    mkt = dict(px={"MU": px}, ma={"MU": ma}, ev=ev, listed=li, own=own, days=dts, snap=snap, raw_last={"MU": dts[-1]}, raw_close={"MU": px})
     import tempfile
     tmp = tempfile.mkdtemp()
     sp, lp = os.path.join(tmp, "s.json"), os.path.join(tmp, "l.jsonl")
@@ -302,7 +302,7 @@ def test_time_boundary():
     ma = pd.Series([1000.0] * 5 + [5.0] * 5, index=dts)
     snap = {(d.to_period("M"), "MU"): 1.0 for d in dts}
     own = {"MU": pd.Series(np.arange(n), index=dts)}
-    mkt = dict(px={"MU": px}, ma={"MU": ma}, ev={"MU": {4}}, listed={"MU": pd.Series(True, index=dts)}, own=own, days=dts, snap=snap)
+    mkt = dict(px={"MU": px}, ma={"MU": ma}, ev={"MU": {4}}, listed={"MU": pd.Series(True, index=dts)}, own=own, days=dts, snap=snap, raw_last={"MU": dts[-1]}, raw_close={"MU": px})
     mkt_T = dict(mkt)
     mkt_T["days"] = dts[:5]
     mkt_T["px"] = {"MU": px[:5]}
