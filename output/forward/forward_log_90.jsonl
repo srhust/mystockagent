@@ -1,3 +1,4 @@
 {"type": "PLAN_CREATED", "plan_id": "4526c3a00f7b", "date": "2026-10-13T00:00:00", "plan": {"date": {"__ts__": "2026-10-13T00:00:00"}, "sd": {"__ts__": "2026-10-12T00:00:00"}, "signal_nav": 1904.0958060075332, "orders": {}, "reenters": [], "config_hash": "f263f842f497", "state_hash": "889fb48c1cb7", "input_hash": "c59e69b85ea8", "plan_hash": "4526c3a00f7b"}}
 {"type": "PLAN_EXECUTED", "plan_id": "4526c3a00f7b", "date": "2026-10-13T00:00:00", "fills": [], "eq": 1904.095806, "fees_cum": 60.2422, "new_state_hash": "3e97028a6435"}
 {"type": "DATA_INCOMPLETE", "date": "2026-10-14T00:00:00", "missing": ["MU", "WDC", "STX", "TSM", "AMAT", "LRCX", "KLAC", "ASML", "TER", "FCX", "CAT", "QCOM", "TXN", "INTC"], "scoring": false}
+{"type": "DATA_INCOMPLETE", "date": "2026-10-14T00:00:00", "missing": ["MU", "WDC", "STX", "TSM", "AMAT", "LRCX", "KLAC", "ASML", "TER", "FCX", "CAT", "QCOM", "TXN", "INTC"], "scoring": false}
