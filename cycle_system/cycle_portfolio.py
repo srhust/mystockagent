@@ -64,6 +64,8 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
                 import json as _j0
                 _hh = _hl0.sha1(_j0.dumps(cfg, sort_keys=True, default=str).encode()).hexdigest()[:12]
                 assert _hh == init_state["config_hash"], f"配置哈希不一致: {init_state['config_hash']} vs {_hh}"
+            elif require_config:
+                assert False, "快照缺少config_hash, 前向模式拒绝恢复"
         elif require_config:
             assert False, "快照缺少配置签名, 拒绝恢复(前向模式)"
     else:
@@ -117,6 +119,20 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
         if exec_plan is not None:
             # P0: 计划驱动执行 — 消费已冻结的T日计划, 不重新决策/排名
             assert exec_plan.get("date") == d and exec_plan.get("sd") == sd, f"计划与执行日不匹配: plan={exec_plan.get('date')}/sd={exec_plan.get('sd')} vs d={d}/sd={sd}"
+            if require_config:  # P0前向模式: 四项哈希缺一不可
+                for _hk in ("config_hash", "state_hash", "input_hash", "plan_hash"):
+                    assert exec_plan.get(_hk), f"计划缺少{_hk}, 前向模式拒绝执行"
+            if exec_plan.get("plan_hash"):  # P0: 计划内容防篡改(plan_hash覆盖除自身外全部字段)
+                import hashlib as _hl3
+                import json as _j3
+                _body = {k: v for k, v in exec_plan.items() if k != "plan_hash"}
+                _ph = _hl3.sha1(_j3.dumps(_enc(_body), sort_keys=True, default=str).encode()).hexdigest()[:12]
+                assert exec_plan["plan_hash"] == _ph, f"计划内容被修改: plan_hash {exec_plan['plan_hash']} vs {_ph}"
+            if init_state is not None and exec_plan.get("state_hash"):  # P0: 计划必须产生于当前状态
+                import hashlib as _hl2
+                import json as _j2
+                _sh = _hl2.sha1(_j2.dumps(_enc(dict(init_state)), sort_keys=True, default=str).encode()).hexdigest()[:12]
+                assert exec_plan["state_hash"] == _sh, f"计划状态身份不符: plan={exec_plan['state_hash']} vs state={_sh}"
             if init_state is not None and init_state.get("config_hash") and exec_plan.get("config_hash"):
                 assert exec_plan["config_hash"] == init_state["config_hash"], f"计划配置身份不符: {exec_plan.get('config_hash')} vs {init_state.get('config_hash')}"
             pending.clear()  # 计划已含恢复动作; 未成交时按计划元组重新入队
@@ -378,8 +394,10 @@ def plan_next_day(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, ownpos_d
     val_sig_p = {s: (px_d[s].get(sd, np.nan) if np.isfinite(px_d[s].get(sd, np.nan)) else state["stale"].get(s, np.nan)) for s in universe}
     signal_nav = float(state["cash"] + sum(state["reserve"].values()) + sum(state["shares"][s] * val_sig_p[s] for s in universe if state["shares"][s] > 0))
     state_hash = _hlp.sha1(_jp.dumps(_enc(dict(state)), sort_keys=True, default=str).encode()).hexdigest()[:12]
-    input_hash = _hlp.sha1(_jp.dumps({"sd": str(sd), "mkey": str(mkey), "px": {s: val_sig_p[s] for s in universe}, "scores": {s: score_snap.get((mkey, s)) for s in universe}}, sort_keys=True, default=str).encode()).hexdigest()[:12]
-    return {"date": d_next, "sd": sd, "signal_nav": signal_nav, "orders": orders, "reenters": reenters, "config_hash": state.get("config_hash"), "state_hash": state_hash, "input_hash": input_hash}
+    input_hash = _hlp.sha1(_jp.dumps({"sd": str(sd), "mkey": str(mkey), "px": {s: val_sig_p[s] for s in universe}, "ma100": {s: (float(ma100_d[s].get(sd)) if np.isfinite(ma100_d[s].get(sd, np.nan)) else None) for s in universe}, "ev_pos": {s: (ownpos_d[s].get(sd, -1) in ev_d[s]) for s in universe}, "scores": {s: score_snap.get((mkey, s)) for s in universe}}, sort_keys=True, default=str).encode()).hexdigest()[:12]
+    _plan = {"date": d_next, "sd": sd, "signal_nav": signal_nav, "orders": orders, "reenters": reenters, "config_hash": state.get("config_hash"), "state_hash": state_hash, "input_hash": input_hash}
+    _plan["plan_hash"] = _hlp.sha1(_jp.dumps(_enc(dict(_plan)), sort_keys=True, default=str).encode()).hexdigest()[:12]
+    return _plan
 
 
 def apply_day(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d, ownpos_d, state, plan, d_next, hold_days=None, budget=100.0, reserve_mode=False, collect=None, config_extra=None, require_config=False):

@@ -174,6 +174,63 @@ def test_plan_apply_persistence():
     assert st2["last_date"] == st["last_date"] and st2["shares"] == st["shares"] and abs(st2["fees"] - st["fees"]) < 1e-12
 
 
+def test_plan_integrity():
+    """P0: 计划完整性 — 同日期不同状态被state_hash拒绝; 篡改signal_nav被plan_hash拒绝; 缺哈希前向模式拒绝。"""
+    import pytest
+    n = 10
+    dts = pd.date_range("2022-01-03", periods=n, freq="B")
+    px = pd.Series([10, 10, 10, 10, 10, 12, 12, 12, 12, 12], index=dts, dtype=float)
+    ma = pd.Series([1000.0] * 5 + [5.0] * 5, index=dts)
+    snap = {(d.to_period("M"), "MU"): 1.0 for d in dts}
+    own = {"MU": pd.Series(np.arange(n), index=dts)}
+    ev = {"MU": {1}}
+    li = {"MU": pd.Series(True, index=dts)}
+    c1 = {}
+    run_contract(["MU"], snap, "V2aF", {"MU": px}, {"MU": ma}, ev, li, dts[:5], own, collect=c1, reserve_mode=False, hold_days=5, config_extra={"scorer": "12m/edge"})
+    st = c1["end_state"]
+    plan = plan_next_day(["MU"], snap, "V2aF", {"MU": px}, {"MU": ma}, ev, own, st, dts[5], hold_days=5, calendar=dts)
+    ca = apply_day(["MU"], snap, "V2aF", {"MU": px}, {"MU": ma}, ev, li, own, st, plan, dts[5], hold_days=5, require_config=True)
+    st2 = ca["end_state"]
+    plan2 = plan_next_day(["MU"], snap, "V2aF", {"MU": px}, {"MU": ma}, ev, own, st2, dts[6], hold_days=5, calendar=dts)
+    st3 = dict(st2)
+    st3["cash"] = st2["cash"] + 10.0  # 同last_date不同现金 → state_hash必须拒绝
+    with pytest.raises(AssertionError, match="状态身份不符"):
+        apply_day(["MU"], snap, "V2aF", {"MU": px}, {"MU": ma}, ev, li, own, st3, plan2, dts[6], hold_days=5, require_config=True)
+    p2 = dict(plan)
+    p2["signal_nav"] *= 2
+    with pytest.raises(AssertionError, match="计划内容被修改"):
+        apply_day(["MU"], snap, "V2aF", {"MU": px}, {"MU": ma}, ev, li, own, st, p2, dts[5], hold_days=5, require_config=True)
+    p3 = {k: v for k, v in plan.items() if k != "input_hash"}
+    with pytest.raises(AssertionError, match="缺少input_hash"):
+        apply_day(["MU"], snap, "V2aF", {"MU": px}, {"MU": ma}, ev, li, own, st, p3, dts[5], hold_days=5, require_config=True)
+
+
+def test_enter_budget_frozen():
+    """P0: ENTER专项 — 冻结signal_nav, 修改T日价格, 买入预算/金额/股数不变。"""
+    n = 10
+    dts = pd.date_range("2022-01-03", periods=n, freq="B")
+    px = pd.Series([10, 10, 10, 10, 10, 12, 12, 12, 12, 12], index=dts, dtype=float)
+    ma = pd.Series([1000.0] * 5 + [5.0] * 5, index=dts)
+    snap = {(d.to_period("M"), "MU"): 1.0 for d in dts}
+    own = {"MU": pd.Series(np.arange(n), index=dts)}
+    ev = {"MU": {4}}
+    li = {"MU": pd.Series(True, index=dts)}
+    c1 = {}
+    run_contract(["MU"], snap, "V2aF", {"MU": px}, {"MU": ma}, ev, li, dts[:5], own, collect=c1, reserve_mode=False, hold_days=5, config_extra={"scorer": "12m/edge"})
+    st = c1["end_state"]
+    plan = plan_next_day(["MU"], snap, "V2aF", {"MU": px}, {"MU": ma}, ev, own, st, dts[5], hold_days=5, calendar=dts)
+    nav_f = plan["signal_nav"]
+    caA = apply_day(["MU"], snap, "V2aF", {"MU": px}, {"MU": ma}, ev, li, own, st, plan, dts[5], hold_days=5)
+    px_m = px.copy()
+    px_m.iloc[4] = 30.0
+    caB = apply_day(["MU"], snap, "V2aF", {"MU": px_m}, {"MU": ma}, ev, li, own, st, plan, dts[5], hold_days=5)
+    assert caA["fills"] == caB["fills"]
+    entA = [f for f in caA["fills"] if f[3] == "ENTER"][0]
+    q_exp = 1.0 * nav_f * (1 - COST) / 12.0
+    assert abs(entA[4] - q_exp) < 1e-9
+    assert plan["signal_nav"] == nav_f
+
+
 def test_config_mismatch_rejected():
     """P1负例: 90日状态按120日恢复必须被拒绝(pytest.raises区分真实拒绝与测试自造异常)。"""
     import pytest

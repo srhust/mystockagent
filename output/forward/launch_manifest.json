@@ -1,0 +1,16 @@
+{
+ "type": "launch_manifest",
+ "protocol_self_hash": "dbb40a1447c5",
+ "protocol_code_sha": "099d6d8ebea14bc64960e755c059bc9daaeb4b1b",
+ "manifest_code_sha": "fc1cf2a156d9b27e6a23a1b2d139647d6823ee99",
+ "executor_config_hash_90": "f263f842f497",
+ "rule_semantics_unchanged": true,
+ "rule_semantics_evidence": "config_hash跨代码版本稳定(f263f842f497)",
+ "data_cutoff": "2026-10-13",
+ "data_hash": "4704521e9bc6",
+ "forward_start": null,
+ "start_nav_90": null,
+ "start_nav_120": null,
+ "note": "forward_start/起点NAV在实际首个前向交易日由run_shadow启动写入, 本文件只追加修订不覆盖",
+ "self_hash": "df3ed2f18622"
+}
