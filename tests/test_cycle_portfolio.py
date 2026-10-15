@@ -231,6 +231,59 @@ def test_enter_budget_frozen():
     assert plan["signal_nav"] == nav_f
 
 
+def test_recover_with_fills():
+    """P0: 非空成交(ENTER+HALVE)同数据恢复成功; T+1价格修订→冲突拒绝。serialize_fills写盘/比较同口径。"""
+    import pytest
+    import json
+    import run_shadow as RS
+    RS.TICKERS = ["MU"]  # 合成单标的场景(模块函数按全局TICKERS迭代)
+    n = 10
+    dts = pd.date_range("2022-01-03", periods=n, freq="B")
+    px = pd.Series([10, 10, 10, 10, 10, 12, 12, 12, 12, 12], index=dts, dtype=float)
+    ma = pd.Series([1000.0] * 5 + [5.0] * 5, index=dts)
+    snap = {(d.to_period("M"), "MU"): 1.0 for d in dts}
+    own = {"MU": pd.Series(np.arange(n), index=dts)}
+    ev = {"MU": {4}}
+    li = {"MU": pd.Series(True, index=dts)}
+    mkt = dict(px={"MU": px}, ma={"MU": ma}, ev=ev, listed=li, own=own, days=dts, snap=snap)
+    import tempfile
+    tmp = tempfile.mkdtemp()
+    sp, lp = os.path.join(tmp, "s.json"), os.path.join(tmp, "l.jsonl")
+    c1 = {}
+    run_contract(["MU"], snap, "V2aF", {"MU": px}, {"MU": ma}, ev, li, dts[:5], own, collect=c1, reserve_mode=False, hold_days=5, config_extra=RS.CFGX)
+    save_state(c1["end_state"], sp)
+    # d5: 事前计划→settle(ENTER成交) → d6: plan→settle(HALVE成交, ma跌)
+    assert RS.plan_phase(mkt, 5, sp, lp) == "planned"
+    assert RS.settle_phase(mkt, 5, sp, lp) == "settled"
+    st_d5 = load_state(sp)
+    assert RS.plan_phase(mkt, 5, sp, lp) == "planned"
+    assert RS.settle_phase(mkt, 5, sp, lp) == "settled"
+    exs = [json.loads(l) for l in open(lp, encoding="utf-8") if json.loads(l)["type"] == "PLAN_EXECUTED"]
+    all_acts = {f[3] for e in exs for f in e["fills"]}
+    assert "ENTER" in all_acts, f"场景无ENTER: {all_acts}"
+    # 同数据恢复: 已登记成交重算一致(serialize口径) → 成功
+    save_state(st_d5, sp)  # 回滚到d5末(模拟EXECUTED已写但状态未存)
+    assert RS.settle_phase(mkt, 5, sp, lp) == "settled"
+    exs2 = [json.loads(l) for l in open(lp, encoding="utf-8") if json.loads(l)["type"] == "PLAN_EXECUTED"]
+    assert len(exs2) == len(exs)  # EXECUTED幂等不重复
+    # T+1价格修订 → 拒绝
+    save_state(st_d5, sp)
+    px_rev = px.copy()
+    px_rev.iloc[6] = 99.0
+    mkt_rev = dict(mkt)
+    mkt_rev["px"] = {"MU": px_rev}
+    with pytest.raises(AssertionError, match="数据修订冲突"):
+        RS.settle_phase(mkt_rev, 5, sp, lp)
+
+
+def test_nav_of_full_valuation():
+    """P0: nav_of=现金+储备+Σ持仓×估值价(非仅现金)。"""
+    import run_shadow as RS
+    st = dict(cash=5.0, reserve={"X": 3.0}, shares={"X": 10.0}, stale={"X": np.nan}, last_date=pd.Timestamp("2022-01-04"))
+    px = {"X": pd.Series([7.0, 9.0], index=pd.date_range("2022-01-03", periods=2))}
+    assert abs(RS.nav_of(st, px) - (5.0 + 3.0 + 10.0 * 9.0)) < 1e-9  # 用last_date收盘价9, 非cash 5
+
+
 def test_config_mismatch_rejected():
     """P1负例: 90日状态按120日恢复必须被拒绝(pytest.raises区分真实拒绝与测试自造异常)。"""
     import pytest

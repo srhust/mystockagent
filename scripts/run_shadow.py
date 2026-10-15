@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """正式每日前向影子驱动入口(只读, 无交易接口)。用法: python scripts/run_shadow.py
 特性: 重复启动安全(无新交易日直接退出)/漏日拒绝/已登记成交的修订冲突检测(重算哈希不符即拒绝静默恢复)/
 PLAN_EXECUTED存逐笔成交/状态哈希链断言/真实首日自动签发正式启动凭证。"""
@@ -114,6 +114,22 @@ def load_market():
     return dict(px=PXd, ma=MA100d, ev=ev_all, listed=LISTd, own=OWNPOS, days=days, snap=SNAP)
 
 
+def serialize_fills(fills):
+    """唯一成交序列化口径: 写盘与恢复比较共用(P0: 避免Timestamp/浮点原值与格式化值不等导致的假冲突)。"""
+    return [[s, str(sig), str(fd), act, round(q, 6), round(p, 4), round(fee, 6)] for s, sig, fd, act, q, p, fee in fills]
+
+
+def nav_of(state, px_d):
+    """P0: 完整账户NAV = 现金+储备+Σ持仓×估值价(T收盘, 缺价用stale)。"""
+    sd = state["last_date"]
+    total = float(state["cash"]) + sum(state["reserve"].values())
+    for s, q in state["shares"].items():
+        if q > 0:
+            pv = px_d[s].get(sd, np.nan)
+            total += q * (pv if np.isfinite(pv) else state["stale"].get(s, np.nan))
+    return total
+
+
 def shadow_run(mkt, hold, state_path, log_path, crash_after_plan_at=None, crash_after_exec_at=None):
     """每日影子循环: 计划落盘→执行→EXECUTED(逐笔)落盘→状态存盘。已登记成交重算不符→修订冲突拒绝。"""
     px_d, ma100_d, ev_d, listed_d, ownpos_d, days_all, snap = mkt["px"], mkt["ma"], mkt["ev"], mkt["listed"], mkt["own"], mkt["days"], mkt["snap"]
@@ -134,7 +150,7 @@ def shadow_run(mkt, hold, state_path, log_path, crash_after_plan_at=None, crash_
                     pending_plan = _dec(r["plan"])
     pos0 = list(days_all).index(st["last_date"])
     todo = list(days_all[pos0 + 1:])
-    if not todo:
+    if len(todo) == 0:
         return "no_new_trading_day"
     for j, d in enumerate(todo):
         if pending_plan is not None and pending_plan["date"] == d:
@@ -152,11 +168,11 @@ def shadow_run(mkt, hold, state_path, log_path, crash_after_plan_at=None, crash_
         st = ca["end_state"]
         if pp["plan_hash"] in done:  # P0: 已登记成交 → 重算必须与已确认记录一致(行情修订检测)
             rec = executed_recs[pp["plan_hash"]]
-            if state_hash(st) != rec["new_state_hash"] or [list(f) for f in ca["fills"]] != rec["fills"]:
+            if state_hash(st) != rec["new_state_hash"] or serialize_fills(ca["fills"]) != rec["fills"]:
                 raise AssertionError(f"数据修订冲突: {d} 重算状态哈希/成交与已登记PLAN_EXECUTED不一致, 拒绝静默恢复(生成修订事件, 人工裁决)")
         else:
             with open(log_path, "a", encoding="utf-8") as f:
-                f.write(json.dumps({"type": "PLAN_EXECUTED", "plan_id": pp["plan_hash"], "date": d.isoformat(), "fills": [[s, str(sig), str(fd), act, round(q, 6), round(p, 4), round(fee, 6)] for s, sig, fd, act, q, p, fee in ca["fills"]], "eq": round(float(ca["eq"].iloc[0]), 6), "fees_cum": round(st["fees"], 4), "new_state_hash": state_hash(st)}, default=str) + "\n")
+                f.write(json.dumps({"type": "PLAN_EXECUTED", "plan_id": pp["plan_hash"], "date": d.isoformat(), "fills": serialize_fills(ca["fills"]), "eq": round(float(ca["eq"].iloc[0]), 6), "fees_cum": round(st["fees"], 4), "new_state_hash": state_hash(st)}, default=str) + "\n")
         if crash_after_exec_at == j:
             return "crash_after_exec"
         save_state(st, state_path)
@@ -171,31 +187,116 @@ def shadow_run(mkt, hold, state_path, log_path, crash_after_plan_at=None, crash_
     return "done"
 
 
+def _load_run_ctx(hold, state_path, log_path):
+    st = load_state(state_path)
+    done, created, executed_recs, pending_plan = set(), set(), {}, None
+    if os.path.exists(log_path):
+        for l in open(log_path, encoding="utf-8"):
+            r = json.loads(l)
+            if r.get("type") == "PLAN_EXECUTED":
+                done.add(r["plan_id"])
+                executed_recs[r["plan_id"]] = r
+            elif r.get("type") == "PLAN_CREATED":
+                created.add(r["plan_id"])
+                if r["plan_id"] not in done:
+                    pending_plan = _dec(r["plan"])
+    return st, done, created, executed_recs, pending_plan
+
+
+def plan_phase(mkt, hold, state_path, log_path):
+    """P0阶段一: T日收盘后生成并持久化T+1冻结计划(created_at真实生成时间, 之后不可覆盖)。只做紧邻下一交易日。"""
+    px_d, ma100_d, ev_d, ownpos_d, days_all, snap = mkt["px"], mkt["ma"], mkt["ev"], mkt["own"], mkt["days"], mkt["snap"]
+    st, done, created, _, pending_plan = _load_run_ctx(hold, state_path, log_path)
+    pos0 = list(days_all).index(st["last_date"])
+    todo = days_all[pos0 + 1:]
+    if len(todo) == 0:
+        return "no_new_trading_day"
+    d = todo[0]
+    if pending_plan is not None and pending_plan["date"] == d:
+        return "plan_exists"
+    pp = plan_next_day(TICKERS, snap, "V2aF", px_d, ma100_d, ev_d, ownpos_d, st, d, hold_days=hold, calendar=days_all)
+    if pp["plan_hash"] not in created:
+        with open(log_path, "a", encoding="utf-8") as f:
+            f.write(json.dumps({"type": "PLAN_CREATED", "plan_id": pp["plan_hash"], "date": d.isoformat(), "created_at": pd.Timestamp.now().isoformat(), "plan": _enc(dict(pp))}, default=str) + "\n")
+    return "planned"
+
+
+def settle_phase(mkt, hold, state_path, log_path, allow_replay=False):
+    """P0阶段二: T+1收盘后读取此前已登记计划模拟成交; 计划缺失→PLAN_MISSING拒绝计分(allow_replay仅供bootstrap回放)。"""
+    px_d, ma100_d, ev_d, listed_d, ownpos_d, days_all, snap = mkt["px"], mkt["ma"], mkt["ev"], mkt["listed"], mkt["own"], mkt["days"], mkt["snap"]
+    st, done, created, executed_recs, _ = _load_run_ctx(hold, state_path, log_path)
+    pos0 = list(days_all).index(st["last_date"])
+    todo = days_all[pos0 + 1:]
+    if len(todo) == 0:
+        return "no_new_trading_day"
+    d = todo[0]
+    plan_rec = None
+    if os.path.exists(log_path):
+        for l in open(log_path, encoding="utf-8"):
+            r = json.loads(l)
+            if r.get("type") == "PLAN_CREATED" and r.get("date") == d.isoformat():
+                plan_rec = r
+    if plan_rec is None:
+        if not allow_replay:
+            with open(log_path, "a", encoding="utf-8") as f:
+                f.write(json.dumps({"type": "PLAN_MISSING", "date": d.isoformat(), "scoring": False}, default=str) + "\n")
+            return "plan_missing"
+        pp = plan_next_day(TICKERS, snap, "V2aF", px_d, ma100_d, ev_d, ownpos_d, st, d, hold_days=hold, calendar=days_all)
+        if pp["plan_hash"] not in created:
+            with open(log_path, "a", encoding="utf-8") as f:
+                f.write(json.dumps({"type": "PLAN_CREATED", "plan_id": pp["plan_hash"], "date": d.isoformat(), "created_at": pd.Timestamp.now().isoformat(), "mode": "replay", "plan": _enc(dict(pp))}, default=str) + "\n")
+    else:
+        pp = _dec(plan_rec["plan"])  # P0: 消费事前计划
+        body = {k: v for k, v in pp.items() if k != "plan_hash"}
+        assert hashlib.sha1(json.dumps(_enc(body), sort_keys=True, default=str).encode()).hexdigest()[:12] == pp["plan_hash"], "事前计划验签失败"
+    ca = apply_day(TICKERS, snap, "V2aF", px_d, ma100_d, ev_d, listed_d, ownpos_d, st, pp, d, hold_days=hold, require_config=True)
+    st = ca["end_state"]
+    if pp["plan_hash"] in done:
+        rec = executed_recs[pp["plan_hash"]]
+        if state_hash(st) != rec["new_state_hash"] or serialize_fills(ca["fills"]) != rec["fills"]:
+            raise AssertionError(f"数据修订冲突: {d} 重算与已登记PLAN_EXECUTED不一致, 拒绝静默恢复")
+    else:
+        with open(log_path, "a", encoding="utf-8") as f:
+            f.write(json.dumps({"type": "PLAN_EXECUTED", "plan_id": pp["plan_hash"], "date": d.isoformat(), "phase_mode": "replay" if plan_rec is None else "forward", "fills": serialize_fills(ca["fills"]), "eq": round(float(ca["eq"].iloc[0]), 6), "fees_cum": round(st["fees"], 4), "new_state_hash": state_hash(st)}, default=str) + "\n")
+    save_state(st, state_path)
+    return "settled"
+
+
 def main():
+    mode = sys.argv[1] if len(sys.argv) > 1 else "auto"
     mkt = load_market()
+    paths = {hold: (os.path.join(FWD, f"state_{hold}.json"), os.path.join(FWD, f"forward_log_{hold}.jsonl")) for hold in (90, 120)}
+    ld90 = load_state(paths[90][0])["last_date"]
+    ld120 = load_state(paths[120][0])["last_date"]
+    assert ld90 == ld120, f"双配置进度不一致: 90={ld90} vs 120={ld120}, 拒绝运行"  # P0: 计分日期范围必须一致
     data_cutoff = str(mkt["days"][-1].date())
-    cred_p = os.path.join(FWD, "launch_credential.json")
-    results = {}
-    for hold in (90, 120):
-        results[hold] = shadow_run(mkt, hold, os.path.join(FWD, f"state_{hold}.json"), os.path.join(FWD, f"forward_log_{hold}.jsonl"))
-    print(f"HOLD90: {results[90]} | HOLD120: {results[120]} | 数据截止: {data_cutoff}")
-    if results[90] == "no_new_trading_day":
-        print("无新增交易日, 退出(重复启动安全)")
+    if data_cutoff == str(ld90.date()):
+        print(f"无新增交易日(截止{data_cutoff}), 退出")
         return
-    # 真实首日: 签发正式启动凭证(执行器文件哈希复核+起点NAV+forward_start)
-    cred = json.load(open(cred_p, encoding="utf-8")) if os.path.exists(cred_p) else {}
-    fh = {f: hashlib.sha256(open(os.path.join(r"E:\mystockagent", f), "rb").read()).hexdigest()[:16] for f in ("cycle_system/cycle_portfolio.py", "scripts/run_shadow.py")}
-    if cred.get("forward_start") == "PENDING_FIRST_REAL_TRADING_DAY":
-        for f, h in cred.get("executor_file_hashes", {}).items():
-            if f in fh and fh[f] != h:
-                print(f"警告: 执行器文件{f}与候选凭证哈希不符({h}→{fh[f]}), 已记录")
-        cred2 = dict(cred)
-        cred2.update({"forward_start": data_cutoff, "start_nav_90": round(float(load_state(os.path.join(FWD, "state_90.json"))["cash"] + 0.0), 6), "start_nav_120": round(float(load_state(os.path.join(FWD, "state_120.json"))["cash"] + 0.0), 6), "executor_file_hashes_official": fh, "signed_at": pd.Timestamp.now().isoformat(), "scoring": True, "price_basis": "T+1日收盘价模拟成交(非实盘可实现收益口径)"})
-        body = json.dumps({k: v for k, v in cred2.items() if k != "self_hash"}, sort_keys=True, ensure_ascii=False)
-        cred2["self_hash"] = hashlib.sha1(body.encode()).hexdigest()[:12]
-        with open(os.path.join(FWD, "launch_credential_official.json"), "w", encoding="utf-8") as f:
-            json.dump(cred2, f, ensure_ascii=False, indent=1)
-        print(f"正式启动凭证已签发: forward_start={data_cutoff} self={cred2['self_hash']}")
+    start_navs = None
+    if mode in ("settle", "auto"):
+        start_navs = {hold: round(nav_of(load_state(paths[hold][0]), mkt["px"]), 6) for hold in (90, 120)}  # P0: 处理前冻结完整持仓估值NAV
+        assert all(v > 0 for v in start_navs.values()), f"起点NAV无效: {start_navs}"
+    if mode in ("plan", "auto"):
+        print({hold: plan_phase(mkt, hold, *paths[hold]) for hold in (90, 120)})
+    if mode in ("settle", "auto"):
+        results = {hold: settle_phase(mkt, hold, *paths[hold], allow_replay=(mode == "auto")) for hold in (90, 120)}
+        print(f"settle: {results} | 起点NAV(处理前冻结): {start_navs} | 数据截止: {data_cutoff}")
+        cred_p = os.path.join(FWD, "launch_credential.json")
+        if os.path.exists(cred_p) and results[90] == results[120] == "settled":
+            cred = json.load(open(cred_p, encoding="utf-8"))
+            fh = {f: hashlib.sha256(open(os.path.join(r"E:\mystockagent", f), "rb").read()).hexdigest()[:16] for f in ("cycle_system/cycle_portfolio.py", "scripts/run_shadow.py")}
+            mismatch = [f for f, h in cred.get("executor_file_hashes", {}).items() if f in fh and fh[f] != h]
+            if cred.get("forward_start") == "PENDING_FIRST_REAL_TRADING_DAY":
+                assert not mismatch, f"执行器文件哈希与候选凭证不符{mismatch}, 拒绝签发(硬门槛)"  # P1: 不再仅警告
+                first_day = mkt["days"][list(mkt["days"]).index(ld90) + 1]  # 首个计分日=状态末日次一交易日
+                cred2 = dict(cred)
+                cred2.update({"forward_start": str(first_day.date()), "start_nav_90": start_navs[90], "start_nav_120": start_navs[120], "executor_file_hashes_official": fh, "signed_at": pd.Timestamp.now().isoformat(), "scoring": True, "price_basis": "T+1日收盘价模拟成交(非实盘可实现收益口径)"})
+                body = json.dumps({k: v for k, v in cred2.items() if k != "self_hash"}, sort_keys=True, ensure_ascii=False)
+                cred2["self_hash"] = hashlib.sha1(body.encode()).hexdigest()[:12]
+                with open(os.path.join(FWD, "launch_credential_official.json"), "w", encoding="utf-8") as f:
+                    json.dump(cred2, f, ensure_ascii=False, indent=1)
+                print(f"正式启动凭证已签发: forward_start={cred2['forward_start']} NAV90={start_navs[90]} NAV120={start_navs[120]}")
 
 
 if __name__ == "__main__":
