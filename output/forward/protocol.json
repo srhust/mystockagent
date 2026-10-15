@@ -48,5 +48,9 @@
  "observation_window_months": 24,
  "window_note": "24个月为预定观察窗口, 不代表两年即具统计显著性; 最终需考虑已完成交易数量与不确定区间",
  "early_stop": "仅允许因系统安全故障停止; 不因短期收益领先提前宣布胜者",
- "rule_freeze": "观察期内不修改任何交易规则; 不再进行HOLD参数搜索(60/90/120/180之外无新值)"
+ "rule_freeze": "观察期内不修改任何交易规则; 不再进行HOLD参数搜索(60/90/120/180之外无新值)",
+ "locked": true,
+ "code_sha": "099d6d8ebea14bc64960e755c059bc9daaeb4b1b",
+ "data_hash": "4704521e9bc6",
+ "self_hash": "dbb40a1447c5"
 }

@@ -59,6 +59,11 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
             if config_extra is not None:
                 for k2, v2 in config_extra.items():
                     assert cfg.get(k2) == v2, f"配置不符: {k2} {cfg.get(k2)} vs {v2}"
+            if init_state.get("config_hash"):  # P0: 哈希与内容一致性(防篡改)
+                import hashlib as _hl0
+                import json as _j0
+                _hh = _hl0.sha1(_j0.dumps(cfg, sort_keys=True, default=str).encode()).hexdigest()[:12]
+                assert _hh == init_state["config_hash"], f"配置哈希不一致: {init_state['config_hash']} vs {_hh}"
         elif require_config:
             assert False, "快照缺少配置签名, 拒绝恢复(前向模式)"
     else:
@@ -100,7 +105,10 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
         for s in universe:
             if np.isfinite(px_today[s]):
                 stale[s] = px_today[s]
-        nav_sig = cash + sum(reserve.values()) + sum(shares[s] * val_sig[s] for s in universe if shares[s] > 0)
+        if exec_plan is not None:
+            nav_sig = float(exec_plan["signal_nav"])  # P0: 预算冻结 — 使用T日冻结NAV, 不受T日数据修订影响
+        else:
+            nav_sig = cash + sum(reserve.values()) + sum(shares[s] * val_sig[s] for s in universe if shares[s] > 0)
         nav_prev = cash + sum(reserve.values()) + sum(shares[s] * stale_prev[s] for s in universe if shares[s] > 0)
         shares_prev = dict(shares)
         reserve_prev = sum(reserve.values())
@@ -109,6 +117,8 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
         if exec_plan is not None:
             # P0: 计划驱动执行 — 消费已冻结的T日计划, 不重新决策/排名
             assert exec_plan.get("date") == d and exec_plan.get("sd") == sd, f"计划与执行日不匹配: plan={exec_plan.get('date')}/sd={exec_plan.get('sd')} vs d={d}/sd={sd}"
+            if init_state is not None and init_state.get("config_hash") and exec_plan.get("config_hash"):
+                assert exec_plan["config_hash"] == init_state["config_hash"], f"计划配置身份不符: {exec_plan.get('config_hash')} vs {init_state.get('config_hash')}"
             pending.clear()  # 计划已含恢复动作; 未成交时按计划元组重新入队
         for s in list(pending.keys()):
             if exec_plan is not None:
@@ -294,7 +304,13 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
         collect.update(eq=eq, sh=sh_h, cash=cash_h, funnel=funnel, rejs=rejs, halve_proceeds=halve_proceeds, fills=fills, sources_end=list(sources), collisions=collisions)
         import hashlib as _hl
         import json as _json
-        cfg_full = dict(risk_mode=risk_mode, hold_days=hd, universe=tuple(universe), **(config_extra or {}))
+        if init_state is not None and init_state.get("config"):
+            cfg_full = dict(init_state["config"])  # P0: 配置身份跨日继承, 不因config_extra缺省而丢失
+            if config_extra is not None:
+                for k2, v2 in config_extra.items():
+                    assert cfg_full.get(k2) == v2, f"配置不符: {k2} {cfg_full.get(k2)} vs {v2}"
+        else:
+            cfg_full = dict(risk_mode=risk_mode, hold_days=hd, universe=tuple(universe), **(config_extra or {}))
         cfg_hash = _hl.sha1(_json.dumps(cfg_full, sort_keys=True, default=str).encode()).hexdigest()[:12]
         collect["end_state"] = dict(cash=cash, reserve=dict(reserve), sources=list(sources), state=dict(state), entry_i=dict(entry_i), entry_budget=dict(entry_budget), entry_shares=dict(entry_shares), shares=dict(shares), pending=dict(pending), stale=dict(stale), last_date=dt_index[-1], fees=fees, halve_proceeds=halve_proceeds, config=cfg_full, config_hash=cfg_hash)
     return eq, shares, fees
@@ -357,7 +373,13 @@ def plan_next_day(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, ownpos_d
             orders[s] = ("ENTER", w, sd)
         elif reentry_after_exit:
             reenters.append((s, w, sd))
-    return {"date": d_next, "sd": sd, "orders": orders, "reenters": reenters}
+    import hashlib as _hlp
+    import json as _jp
+    val_sig_p = {s: (px_d[s].get(sd, np.nan) if np.isfinite(px_d[s].get(sd, np.nan)) else state["stale"].get(s, np.nan)) for s in universe}
+    signal_nav = float(state["cash"] + sum(state["reserve"].values()) + sum(state["shares"][s] * val_sig_p[s] for s in universe if state["shares"][s] > 0))
+    state_hash = _hlp.sha1(_jp.dumps(_enc(dict(state)), sort_keys=True, default=str).encode()).hexdigest()[:12]
+    input_hash = _hlp.sha1(_jp.dumps({"sd": str(sd), "mkey": str(mkey), "px": {s: val_sig_p[s] for s in universe}, "scores": {s: score_snap.get((mkey, s)) for s in universe}}, sort_keys=True, default=str).encode()).hexdigest()[:12]
+    return {"date": d_next, "sd": sd, "signal_nav": signal_nav, "orders": orders, "reenters": reenters, "config_hash": state.get("config_hash"), "state_hash": state_hash, "input_hash": input_hash}
 
 
 def apply_day(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d, ownpos_d, state, plan, d_next, hold_days=None, budget=100.0, reserve_mode=False, collect=None, config_extra=None, require_config=False):
