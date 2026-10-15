@@ -240,7 +240,7 @@ def test_recover_with_fills():
     n = 10
     dts = pd.date_range("2022-01-03", periods=n, freq="B")
     px = pd.Series([10, 10, 10, 10, 10, 12, 12, 12, 12, 12], index=dts, dtype=float)
-    ma = pd.Series([1000.0] * 5 + [5.0] * 5, index=dts)
+    ma = pd.Series([5.0] * 5 + [1000.0] * 5, index=dts)  # below取sd=d-1=5: 昨收12<ma[5]=1000 → HALVE
     snap = {(d.to_period("M"), "MU"): 1.0 for d in dts}
     own = {"MU": pd.Series(np.arange(n), index=dts)}
     ev = {"MU": {4}}
@@ -260,7 +260,7 @@ def test_recover_with_fills():
     assert RS.settle_phase(mkt, 5, sp, lp) == "settled"
     exs = [json.loads(l) for l in open(lp, encoding="utf-8") if json.loads(l)["type"] == "PLAN_EXECUTED"]
     all_acts = {f[3] for e in exs for f in e["fills"]}
-    assert "ENTER" in all_acts, f"场景无ENTER: {all_acts}"
+    assert "ENTER" in all_acts and "HALVE" in all_acts, f"需含ENTER+HALVE: {all_acts}"  # P1: 两类成交均经恢复验收
     # 同数据恢复: 已登记成交重算一致(serialize口径) → 成功
     save_state(st_d5, sp)  # 回滚到d5末(模拟EXECUTED已写但状态未存)
     assert RS.settle_phase(mkt, 5, sp, lp) == "settled"
@@ -282,6 +282,66 @@ def test_nav_of_full_valuation():
     st = dict(cash=5.0, reserve={"X": 3.0}, shares={"X": 10.0}, stale={"X": np.nan}, last_date=pd.Timestamp("2022-01-04"))
     px = {"X": pd.Series([7.0, 9.0], index=pd.date_range("2022-01-03", periods=2))}
     assert abs(RS.nav_of(st, px) - (5.0 + 3.0 + 10.0 * 9.0)) < 1e-9  # 用last_date收盘价9, 非cash 5
+
+
+def test_time_boundary():
+    """P0: ①数据止于T仍能由独立日历生成T+1计划; settle等数据(data_incomplete) ②事后计划late_created不计分 ③无计划PLAN_MISSING不推进 ④双配置失步拒绝。"""
+    import pytest
+    import json
+    import tempfile
+    import run_shadow as RS
+    RS.TICKERS = ["MU"]
+    n = 10
+    dts = pd.date_range("2022-01-03", periods=n, freq="B")
+    px = pd.Series([10] * 5 + [12, 12, 12, 12, 12], index=dts, dtype=float)
+    ma = pd.Series([1000.0] * 5 + [5.0] * 5, index=dts)
+    snap = {(d.to_period("M"), "MU"): 1.0 for d in dts}
+    own = {"MU": pd.Series(np.arange(n), index=dts)}
+    mkt = dict(px={"MU": px}, ma={"MU": ma}, ev={"MU": {4}}, listed={"MU": pd.Series(True, index=dts)}, own=own, days=dts, snap=snap)
+    mkt_T = dict(mkt)
+    mkt_T["days"] = dts[:5]
+    mkt_T["px"] = {"MU": px[:5]}
+    tmp = tempfile.mkdtemp()
+    sp, lp = os.path.join(tmp, "s.json"), os.path.join(tmp, "l.jsonl")
+    c1 = {}
+    run_contract(["MU"], snap, "V2aF", mkt_T["px"], {"MU": ma}, {"MU": {4}}, {"MU": pd.Series(True, index=dts)}, dts[:5], own, collect=c1, reserve_mode=False, hold_days=5, config_extra=RS.CFGX)
+    save_state(c1["end_state"], sp)
+    # ① T+1(第6个交易日)行情不存在 → 计划仍能生成(日历=工作日近似, dts为连续工作日 ✓)
+    assert RS.plan_phase(mkt_T, 5, sp, lp) == "planned"
+    st_T = load_state(sp)
+    # ② settle: 数据未到 → data_incomplete; 注入T日created_at → 补数据后forward计分
+    assert RS.settle_phase(mkt_T, 5, sp, lp) == "data_incomplete"
+    assert load_state(sp)["last_date"] == st_T["last_date"]
+    lines = [json.loads(l) for l in open(lp, encoding="utf-8")]
+    for r in lines:
+        if r["type"] == "PLAN_CREATED":
+            r["created_at"] = pd.Timestamp(st_T["last_date"].date()).tz_localize("UTC").isoformat()
+    with open(lp, "w", encoding="utf-8") as f:
+        for r in lines:
+            f.write(json.dumps(r, default=str) + "\n")
+    assert RS.settle_phase(mkt, 5, sp, lp) == "settled"
+    exs = [json.loads(l) for l in open(lp, encoding="utf-8") if json.loads(l)["type"] == "PLAN_EXECUTED"]
+    assert exs[-1]["phase_mode"] == "forward" and exs[-1]["scoring"] is True
+    # ③ 事后计划(late_created): 新状态回滚到T, 计划created_at=现在 → scoring=false
+    save_state(st_T, sp)
+    lp2 = os.path.join(tmp, "l2.jsonl")
+    assert RS.plan_phase(mkt, 5, sp, lp2) == "planned"  # T+1行情已在, 事后才建计划
+    assert RS.settle_phase(mkt, 5, sp, lp2) == "settled"
+    ex2 = [json.loads(l) for l in open(lp2, encoding="utf-8") if json.loads(l)["type"] == "PLAN_EXECUTED"]
+    assert ex2[-1]["phase_mode"] == "late_created" and ex2[-1]["scoring"] is False
+    # ③b 无计划直接settle → PLAN_MISSING, 状态不推进
+    save_state(st_T, sp)
+    lp3 = os.path.join(tmp, "l3.jsonl")
+    assert RS.settle_phase(mkt, 5, sp, lp3) == "plan_missing"
+    assert load_state(sp)["last_date"] == st_T["last_date"]
+    assert any(json.loads(l)["type"] == "PLAN_MISSING" for l in open(lp3, encoding="utf-8"))
+    # ④ 双配置失步
+    sp2 = os.path.join(tmp, "s2.json")
+    st2 = dict(st_T)
+    st2["last_date"] = dts[3]
+    save_state(st2, sp2)
+    with pytest.raises(AssertionError, match="双配置进度不一致"):
+        RS.dual_sync_check(sp, sp2)
 
 
 def test_config_mismatch_rejected():

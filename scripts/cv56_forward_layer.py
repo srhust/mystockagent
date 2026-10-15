@@ -74,7 +74,7 @@ print(f"plan_phase: T+1={pc[0]['date']}计划已落盘(created_at={pc[0]['create
 rs1 = RS.settle_phase(mkt, 90, f"{base2}_state.json", f"{base2}_log.jsonl", allow_replay=False)  # 阶段二: 独立调用, 消费事前计划
 assert rs1 == "settled"
 ex2 = [json.loads(l) for l in open(f"{base2}_log.jsonl", encoding="utf-8") if json.loads(l)["type"] == "PLAN_EXECUTED"]
-assert len(ex2) == 1 and ex2[0]["phase_mode"] == "forward"
+assert len(ex2) == 1 and ex2[0]["phase_mode"] == "late_created" and ex2[0]["scoring"] is False  # 审57口径: 事后时间戳→不计分
 print(f"settle_phase: 消费事前计划成交{len(ex2[0]['fills'])}笔(phase_mode=forward) PASS")
 # 无计划日 → PLAN_MISSING拒绝计分
 rp2 = RS.plan_phase(mkt, 90, f"{base2}_state.json", f"{base2}_log.jsonl")  # 生成下一日计划

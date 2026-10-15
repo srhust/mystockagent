@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """正式每日前向影子驱动入口(只读, 无交易接口)。用法: python scripts/run_shadow.py
 特性: 重复启动安全(无新交易日直接退出)/漏日拒绝/已登记成交的修订冲突检测(重算哈希不符即拒绝静默恢复)/
 PLAN_EXECUTED存逐笔成交/状态哈希链断言/真实首日自动签发正式启动凭证。"""
@@ -119,6 +119,22 @@ def serialize_fills(fills):
     return [[s, str(sig), str(fd), act, round(q, 6), round(p, 4), round(fee, 6)] for s, sig, fd, act, q, p, fee in fills]
 
 
+def us_calendar(start, end):
+    """P0: 独立美股交易日历(工作日-联邦假日, 近似NYSE), 不依赖行情CSV; 带生成时间缓存。"""
+    cp = os.path.join(FWD, "calendar_us.json")
+    if os.path.exists(cp):
+        doc = json.load(open(cp, encoding="utf-8"))
+        if doc["start"] == str(start.date()) and doc["end"] == str(end.date()):
+            return pd.DatetimeIndex(pd.to_datetime(doc["days"]))
+    from pandas.tseries.holiday import USFederalHolidayCalendar
+    cal = USFederalHolidayCalendar()
+    holidays = cal.holidays(start=start, end=end)
+    days = pd.bdate_range(start, end).difference(pd.DatetimeIndex(holidays))
+    with open(cp, "w", encoding="utf-8") as f:
+        json.dump({"start": str(start.date()), "end": str(end.date()), "generated_at": pd.Timestamp.now(tz="UTC").isoformat(), "days": [str(d.date()) for d in days]}, f)
+    return days
+
+
 def nav_of(state, px_d):
     """P0: 完整账户NAV = 现金+储备+Σ持仓×估值价(T收盘, 缺价用stale)。"""
     sd = state["last_date"]
@@ -204,32 +220,34 @@ def _load_run_ctx(hold, state_path, log_path):
 
 
 def plan_phase(mkt, hold, state_path, log_path):
-    """P0阶段一: T日收盘后生成并持久化T+1冻结计划(created_at真实生成时间, 之后不可覆盖)。只做紧邻下一交易日。"""
-    px_d, ma100_d, ev_d, ownpos_d, days_all, snap = mkt["px"], mkt["ma"], mkt["ev"], mkt["own"], mkt["days"], mkt["snap"]
+    """P0阶段一: T日收盘后生成并持久化T+1冻结计划 — T+1来自独立交易日历(不要求T+1行情已存在)。"""
+    px_d, ma100_d, ev_d, ownpos_d, snap = mkt["px"], mkt["ma"], mkt["ev"], mkt["own"], mkt["snap"]
     st, done, created, _, pending_plan = _load_run_ctx(hold, state_path, log_path)
-    pos0 = list(days_all).index(st["last_date"])
-    todo = days_all[pos0 + 1:]
-    if len(todo) == 0:
-        return "no_new_trading_day"
-    d = todo[0]
+    cal = us_calendar(mkt["days"][0] - pd.Timedelta(days=400), pd.Timestamp.now() + pd.Timedelta(days=400))
+    pos0 = cal.get_loc(st["last_date"])
+    if pos0 + 1 >= len(cal):
+        return "calendar_exhausted"
+    d = cal[pos0 + 1]  # T+1由日历解析, 无需T+1行情
     if pending_plan is not None and pending_plan["date"] == d:
         return "plan_exists"
-    pp = plan_next_day(TICKERS, snap, "V2aF", px_d, ma100_d, ev_d, ownpos_d, st, d, hold_days=hold, calendar=days_all)
+    pp = plan_next_day(TICKERS, snap, "V2aF", px_d, ma100_d, ev_d, ownpos_d, st, d, hold_days=hold, calendar=cal)
     if pp["plan_hash"] not in created:
         with open(log_path, "a", encoding="utf-8") as f:
-            f.write(json.dumps({"type": "PLAN_CREATED", "plan_id": pp["plan_hash"], "date": d.isoformat(), "created_at": pd.Timestamp.now().isoformat(), "plan": _enc(dict(pp))}, default=str) + "\n")
+            f.write(json.dumps({"type": "PLAN_CREATED", "plan_id": pp["plan_hash"], "date": d.isoformat(), "created_at": pd.Timestamp.now(tz="UTC").isoformat(), "plan": _enc(dict(pp))}, default=str) + "\n")
     return "planned"
 
 
 def settle_phase(mkt, hold, state_path, log_path, allow_replay=False):
-    """P0阶段二: T+1收盘后读取此前已登记计划模拟成交; 计划缺失→PLAN_MISSING拒绝计分(allow_replay仅供bootstrap回放)。"""
+    """P0阶段二: T+1收盘数据到达后消费事前计划; created_at晚于成交日→phase_mode=late_created且scoring=false; 计划缺失→PLAN_MISSING。"""
     px_d, ma100_d, ev_d, listed_d, ownpos_d, days_all, snap = mkt["px"], mkt["ma"], mkt["ev"], mkt["listed"], mkt["own"], mkt["days"], mkt["snap"]
     st, done, created, executed_recs, _ = _load_run_ctx(hold, state_path, log_path)
-    pos0 = list(days_all).index(st["last_date"])
-    todo = days_all[pos0 + 1:]
-    if len(todo) == 0:
-        return "no_new_trading_day"
-    d = todo[0]
+    cal = us_calendar(mkt["days"][0] - pd.Timedelta(days=400), pd.Timestamp.now() + pd.Timedelta(days=400))
+    pos0 = cal.get_loc(st["last_date"])
+    if pos0 + 1 >= len(cal):
+        return "calendar_exhausted"
+    d = cal[pos0 + 1]
+    if d > days_all[-1]:
+        return "data_incomplete"  # P0: T+1收盘数据未到达, 等待
     plan_rec = None
     if os.path.exists(log_path):
         for l in open(log_path, encoding="utf-8"):
@@ -241,14 +259,18 @@ def settle_phase(mkt, hold, state_path, log_path, allow_replay=False):
             with open(log_path, "a", encoding="utf-8") as f:
                 f.write(json.dumps({"type": "PLAN_MISSING", "date": d.isoformat(), "scoring": False}, default=str) + "\n")
             return "plan_missing"
-        pp = plan_next_day(TICKERS, snap, "V2aF", px_d, ma100_d, ev_d, ownpos_d, st, d, hold_days=hold, calendar=days_all)
+        pp = plan_next_day(TICKERS, snap, "V2aF", px_d, ma100_d, ev_d, ownpos_d, st, d, hold_days=hold, calendar=cal)
         if pp["plan_hash"] not in created:
             with open(log_path, "a", encoding="utf-8") as f:
-                f.write(json.dumps({"type": "PLAN_CREATED", "plan_id": pp["plan_hash"], "date": d.isoformat(), "created_at": pd.Timestamp.now().isoformat(), "mode": "replay", "plan": _enc(dict(pp))}, default=str) + "\n")
+                f.write(json.dumps({"type": "PLAN_CREATED", "plan_id": pp["plan_hash"], "date": d.isoformat(), "created_at": pd.Timestamp.now(tz="UTC").isoformat(), "mode": "replay", "plan": _enc(dict(pp))}, default=str) + "\n")
+        scoring, phase_mode = False, "replay"
     else:
         pp = _dec(plan_rec["plan"])  # P0: 消费事前计划
         body = {k: v for k, v in pp.items() if k != "plan_hash"}
         assert hashlib.sha1(json.dumps(_enc(body), sort_keys=True, default=str).encode()).hexdigest()[:12] == pp["plan_hash"], "事前计划验签失败"
+        ca_ts = pd.Timestamp(plan_rec.get("created_at", "1970-01-01"))
+        pre = ca_ts.date() < d.date()  # P0: 事前窗口 = 计划生成日严格早于成交日
+        scoring, phase_mode = pre, ("forward" if pre else "late_created")
     ca = apply_day(TICKERS, snap, "V2aF", px_d, ma100_d, ev_d, listed_d, ownpos_d, st, pp, d, hold_days=hold, require_config=True)
     st = ca["end_state"]
     if pp["plan_hash"] in done:
@@ -257,46 +279,65 @@ def settle_phase(mkt, hold, state_path, log_path, allow_replay=False):
             raise AssertionError(f"数据修订冲突: {d} 重算与已登记PLAN_EXECUTED不一致, 拒绝静默恢复")
     else:
         with open(log_path, "a", encoding="utf-8") as f:
-            f.write(json.dumps({"type": "PLAN_EXECUTED", "plan_id": pp["plan_hash"], "date": d.isoformat(), "phase_mode": "replay" if plan_rec is None else "forward", "fills": serialize_fills(ca["fills"]), "eq": round(float(ca["eq"].iloc[0]), 6), "fees_cum": round(st["fees"], 4), "new_state_hash": state_hash(st)}, default=str) + "\n")
+            f.write(json.dumps({"type": "PLAN_EXECUTED", "plan_id": pp["plan_hash"], "date": d.isoformat(), "phase_mode": phase_mode, "scoring": bool(scoring), "data_fingerprint": hashlib.sha1("".join(str(x.date()) for x in days_all).encode()).hexdigest()[:12], "fills": serialize_fills(ca["fills"]), "eq": round(float(ca["eq"].iloc[0]), 6), "fees_cum": round(st["fees"], 4), "new_state_hash": state_hash(st)}, default=str) + "\n")
     save_state(st, state_path)
     return "settled"
 
 
+def dual_sync_check(p90, p120):
+    """P0: 双配置进度一致性(可pytest)。"""
+    a, b = load_state(p90)["last_date"], load_state(p120)["last_date"]
+    assert a == b, f"双配置进度不一致: 90={a} vs 120={b}, 拒绝运行"
+    return a
+
+
 def main():
-    mode = sys.argv[1] if len(sys.argv) > 1 else "auto"
+    mode = sys.argv[1] if len(sys.argv) > 1 else "status"
     mkt = load_market()
     paths = {hold: (os.path.join(FWD, f"state_{hold}.json"), os.path.join(FWD, f"forward_log_{hold}.jsonl")) for hold in (90, 120)}
-    ld90 = load_state(paths[90][0])["last_date"]
-    ld120 = load_state(paths[120][0])["last_date"]
-    assert ld90 == ld120, f"双配置进度不一致: 90={ld90} vs 120={ld120}, 拒绝运行"  # P0: 计分日期范围必须一致
-    data_cutoff = str(mkt["days"][-1].date())
-    if data_cutoff == str(ld90.date()):
-        print(f"无新增交易日(截止{data_cutoff}), 退出")
+    if mode == "status":  # P0: 无参数=只读查看, 不写任何文件
+        for hold in (90, 120):
+            st = load_state(paths[hold][0])
+            exs = [json.loads(l) for l in open(paths[hold][1], encoding="utf-8") if json.loads(l)["type"] == "PLAN_EXECUTED"]
+            fw = [r for r in exs if r.get("scoring")]
+            print(f"HOLD{hold}: 状态末日={st['last_date'].date()} NAV={nav_of(st, mkt['px']):.4f} 已结算={len(exs)} 计分={len(fw)}")
         return
-    start_navs = None
-    if mode in ("settle", "auto"):
-        start_navs = {hold: round(nav_of(load_state(paths[hold][0]), mkt["px"]), 6) for hold in (90, 120)}  # P0: 处理前冻结完整持仓估值NAV
-        assert all(v > 0 for v in start_navs.values()), f"起点NAV无效: {start_navs}"
-    if mode in ("plan", "auto"):
+    assert mode in ("plan", "settle", "replay"), "模式必须为plan/settle/replay/status, 禁止自动回放计分"
+    dual_sync_check(paths[90][0], paths[120][0])
+    data_cutoff = str(mkt["days"][-1].date())
+    if mode == "plan":
         print({hold: plan_phase(mkt, hold, *paths[hold]) for hold in (90, 120)})
-    if mode in ("settle", "auto"):
-        results = {hold: settle_phase(mkt, hold, *paths[hold], allow_replay=(mode == "auto")) for hold in (90, 120)}
-        print(f"settle: {results} | 起点NAV(处理前冻结): {start_navs} | 数据截止: {data_cutoff}")
-        cred_p = os.path.join(FWD, "launch_credential.json")
-        if os.path.exists(cred_p) and results[90] == results[120] == "settled":
-            cred = json.load(open(cred_p, encoding="utf-8"))
-            fh = {f: hashlib.sha256(open(os.path.join(r"E:\mystockagent", f), "rb").read()).hexdigest()[:16] for f in ("cycle_system/cycle_portfolio.py", "scripts/run_shadow.py")}
-            mismatch = [f for f, h in cred.get("executor_file_hashes", {}).items() if f in fh and fh[f] != h]
-            if cred.get("forward_start") == "PENDING_FIRST_REAL_TRADING_DAY":
-                assert not mismatch, f"执行器文件哈希与候选凭证不符{mismatch}, 拒绝签发(硬门槛)"  # P1: 不再仅警告
-                first_day = mkt["days"][list(mkt["days"]).index(ld90) + 1]  # 首个计分日=状态末日次一交易日
-                cred2 = dict(cred)
-                cred2.update({"forward_start": str(first_day.date()), "start_nav_90": start_navs[90], "start_nav_120": start_navs[120], "executor_file_hashes_official": fh, "signed_at": pd.Timestamp.now().isoformat(), "scoring": True, "price_basis": "T+1日收盘价模拟成交(非实盘可实现收益口径)"})
-                body = json.dumps({k: v for k, v in cred2.items() if k != "self_hash"}, sort_keys=True, ensure_ascii=False)
-                cred2["self_hash"] = hashlib.sha1(body.encode()).hexdigest()[:12]
-                with open(os.path.join(FWD, "launch_credential_official.json"), "w", encoding="utf-8") as f:
-                    json.dump(cred2, f, ensure_ascii=False, indent=1)
-                print(f"正式启动凭证已签发: forward_start={cred2['forward_start']} NAV90={start_navs[90]} NAV120={start_navs[120]}")
+        return
+    if mode == "replay":  # 历史补跑: 永不计分scoring=false, 不签发凭证
+        for hold in (90, 120):
+            r = settle_phase(mkt, hold, *paths[hold], allow_replay=True)
+            print(f"replay[{hold}]: {r}(scoring=false)")
+        return
+    # settle: 正式路径
+    start_navs = {hold: round(nav_of(load_state(paths[hold][0]), mkt["px"]), 6) for hold in (90, 120)}
+    assert all(v > 0 for v in start_navs.values()), f"起点NAV无效: {start_navs}"
+    results = {hold: settle_phase(mkt, hold, *paths[hold]) for hold in (90, 120)}
+    print(f"settle: {results} | 起点NAV(处理前冻结): {start_navs} | 数据截止: {data_cutoff}")
+    cred_p = os.path.join(FWD, "launch_credential_v2.json")
+    if os.path.exists(cred_p) and results[90] == results[120] == "settled":
+        cred = json.load(open(cred_p, encoding="utf-8"))
+        fh = {f: hashlib.sha256(open(os.path.join(r"E:\mystockagent", f), "rb").read()).hexdigest()[:16] for f in ("cycle_system/cycle_portfolio.py", "scripts/run_shadow.py")}
+        missing = [f for f in fh if f not in cred.get("executor_file_hashes", {})]
+        mismatch = [f for f in fh if f in cred.get("executor_file_hashes", {}) and cred["executor_file_hashes"][f] != fh[f]]
+        if cred.get("forward_start") == "PENDING_FIRST_REAL_TRADING_DAY":
+            assert not mismatch and not missing, f"凭证身份不完整或不符: mismatch={mismatch} missing={missing}, 拒绝签发"  # P0: 缺任一预期身份即拒绝
+            # P0: 双配置均须为合格事前计划(forward)且计分日期一致
+            for hold in (90, 120):
+                exs = [json.loads(l) for l in open(paths[hold][1], encoding="utf-8") if json.loads(l)["type"] == "PLAN_EXECUTED"]
+                assert exs and exs[-1]["scoring"] and exs[-1]["phase_mode"] == "forward", f"HOLD{hold}最后结算非合格事前计划, 拒绝签发"
+            first_day = mkt["days"][list(mkt["days"]).index(load_state(paths[90][0])["last_date"])]
+            cred2 = dict(cred)
+            cred2.update({"forward_start": str(first_day.date()), "start_nav_90": start_navs[90], "start_nav_120": start_navs[120], "verified_hashes": fh, "signed_at": pd.Timestamp.now(tz="UTC").isoformat(), "scoring": True, "price_basis": "T+1日收盘价模拟成交(非实盘可实现收益口径)", "normalization": "各配置以自身起点NAV归一化为100"})
+            body = json.dumps({k: v for k, v in cred2.items() if k != "self_hash"}, sort_keys=True, ensure_ascii=False)
+            cred2["self_hash"] = hashlib.sha1(body.encode()).hexdigest()[:12]
+            with open(os.path.join(FWD, "launch_credential_official.json"), "w", encoding="utf-8") as f:
+                json.dump(cred2, f, ensure_ascii=False, indent=1)
+            print(f"正式启动凭证已签发: forward_start={cred2['forward_start']} NAV90={start_navs[90]} NAV120={start_navs[120]}")
 
 
 if __name__ == "__main__":
