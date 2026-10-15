@@ -1,0 +1,2 @@
+{"type": "PLAN_CREATED", "plan_id": "173457c9c840", "date": "2026-10-13T00:00:00", "plan": {"date": {"__ts__": "2026-10-13T00:00:00"}, "sd": {"__ts__": "2026-10-12T00:00:00"}, "signal_nav": 1550.4689174186688, "orders": {}, "reenters": [], "config_hash": "6d64e83c9d33", "state_hash": "b03f2d5873e8", "input_hash": "c59e69b85ea8", "plan_hash": "173457c9c840"}}
+{"type": "PLAN_EXECUTED", "plan_id": "173457c9c840", "date": "2026-10-13T00:00:00", "fills": [], "eq": 1543.089284, "fees_cum": 36.6512, "new_state_hash": "00a8fa53a724"}
