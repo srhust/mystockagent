@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """正式每日前向影子驱动入口(只读, 无交易接口)。用法: python scripts/run_shadow.py
 特性: 重复启动安全(无新交易日直接退出)/漏日拒绝/已登记成交的修订冲突检测(重算哈希不符即拒绝静默恢复)/
 PLAN_EXECUTED存逐笔成交/状态哈希链断言/真实首日自动签发正式启动凭证。"""
@@ -352,8 +352,9 @@ def settle_phase(mkt, hold, state_path, log_path, allow_replay=False, dry=False)
             r = json.loads(l)
             if r.get("asof") and r.get("fp"):  # P1: 全历史链复核 — 任意已验收日的价格修订均可发现(不只基准段)
                 if r.get("fp") != content_fingerprint(mkt, pd.Timestamp(r["asof"])):
-                    with open(fp_p, "a", encoding="utf-8") as f:
-                        f.write(json.dumps({"type": "DATA_REVISION", "asof": r["asof"], "scoring": False}, default=str) + "\n")
+                    if not dry:  # P0: dry零写盘
+                        with open(fp_p, "a", encoding="utf-8") as f:
+                            f.write(json.dumps({"type": "DATA_REVISION", "asof": r["asof"], "scoring": False}, default=str) + "\n")
                     raise AssertionError(f"历史行情内容修订: asof={r['asof']}指纹变化, 拒绝计分, 人工裁决")
             if r.get("base"):
                 base = r
@@ -373,8 +374,9 @@ def settle_phase(mkt, hold, state_path, log_path, allow_replay=False, dry=False)
                 plan_rec = r
     if plan_rec is None:
         if not allow_replay:
-            with open(log_path, "a", encoding="utf-8") as f:
-                f.write(json.dumps({"type": "PLAN_MISSING", "date": d.isoformat(), "scoring": False}, default=str) + "\n")
+            if not dry:  # P0: dry零写盘
+                with open(log_path, "a", encoding="utf-8") as f:
+                    f.write(json.dumps({"type": "PLAN_MISSING", "date": d.isoformat(), "scoring": False}, default=str) + "\n")
             return "plan_missing"
         pp = plan_next_day(TICKERS, snap, "V2aF", px_d, ma100_d, ev_d, ownpos_d, st, d, hold_days=hold, calendar=cal)
         if pp["plan_hash"] not in created:
@@ -436,6 +438,26 @@ def main():
             print(f"HOLD{hold}: 状态末日={st['last_date'].date()} NAV={nav_of(st, mkt['px']):.4f} 已结算={len(exs)} 计分={len(fw)}")
         return
     assert mode in ("plan", "settle", "replay"), "模式必须为plan/settle/replay/status, 禁止自动回放计分"
+    # P0: 双配置事务恢复 — 上次BOTH_PREPARED未达BOTH_COMMITTED→用冻结计划幂等补齐落后方, 恢复完成前不计新分
+    txn_p = os.path.join(FWD, "dual_txn.jsonl")
+    txn_recs = [json.loads(l) for l in (open(txn_p, encoding="utf-8") if os.path.exists(txn_p) else [])]
+    pend = {}
+    for r in txn_recs:
+        if r.get("phase") == "BOTH_PREPARED":
+            pend[r["date"]] = False
+        elif r.get("phase") == "BOTH_COMMITTED":
+            pend[r["date"]] = True
+    for td, done in pend.items():
+        if done:
+            continue
+        print(f"事务恢复: {td} 未完成BOTH_COMMITTED → 幂等补齐(冻结计划, 不计新分)")
+        for hold in (90, 120):
+            stx = load_state(paths[hold][0])
+            if stx["last_date"].isoformat()[:10] < td:
+                rr = settle_phase(mkt, hold, *paths[hold], allow_replay=True)
+                assert rr == "settled", f"事务恢复失败 HOLD{hold}: {rr}"
+        with open(txn_p, "a", encoding="utf-8") as f:
+            f.write(json.dumps({"phase": "BOTH_COMMITTED", "date": td, "recovered": True}, default=str) + "\n")
     dual_sync_check(paths[90][0], paths[120][0])
     data_cutoff = str(mkt["days"][-1].date())
     if mode == "plan":
@@ -446,20 +468,21 @@ def main():
             r = settle_phase(mkt, hold, *paths[hold], allow_replay=True)
             print(f"replay[{hold}]: {r}(scoring=false)")
         return
-    # settle: 正式路径 — 身份校验前移到任何账户写入之前(P0)
+    # settle: 正式路径 — fail-closed: 候选凭证必须存在且身份匹配, 任何写入前校验(P0)
     cred_p = os.path.join(FWD, "launch_credential_v3.json")
-    if os.path.exists(cred_p):
-        cred0 = json.load(open(cred_p, encoding="utf-8"))
-        fh0 = {f: hashlib.sha256(open(os.path.join(r"E:\mystockagent", f), "rb").read()).hexdigest() for f in ("cycle_system/cycle_portfolio.py", "scripts/run_shadow.py")}
-        miss0 = [f for f in fh0 if f not in cred0.get("executor_file_hashes", {})]
-        mism0 = [f for f in fh0 if f in cred0.get("executor_file_hashes", {}) and cred0["executor_file_hashes"][f] != fh0[f]]
-        assert not mism0 and not miss0, f"凭证身份不完整或不符: mismatch={mism0} missing={miss0}, 拒绝结算"
+    assert os.path.exists(cred_p), "候选凭证缺失: fail-closed拒绝结算(Release Gate)"
+    cred0 = json.load(open(cred_p, encoding="utf-8"))
+    fh0 = {f: hashlib.sha256(open(os.path.join(r"E:\mystockagent", f), "rb").read()).hexdigest() for f in ("cycle_system/cycle_portfolio.py", "scripts/run_shadow.py")}
+    miss0 = [f for f in fh0 if f not in cred0.get("executor_file_hashes", {})]
+    mism0 = [f for f in fh0 if f in cred0.get("executor_file_hashes", {}) and cred0["executor_file_hashes"][f] != fh0[f]]
+    assert not mism0 and not miss0, f"凭证身份不完整或不符: mismatch={mism0} missing={miss0}, 拒绝结算"
     off_p = os.path.join(FWD, "launch_credential_official.json")
-    if os.path.exists(off_p):  # P0: 仅验证并保留 — 不阻断后续每日结算
+    if os.path.exists(off_p):  # P0: 仅验证并保留 — 不阻断后续每日结算; 策略身份与候选凭证交叉核对
         off = json.load(open(off_p, encoding="utf-8"))
         body = json.dumps({k: v for k, v in off.items() if k != "self_hash"}, sort_keys=True, ensure_ascii=False)
         assert hashlib.sha1(body.encode()).hexdigest()[:12] == off["self_hash"], "正式凭证自哈希校验失败"
-        print(f"正式凭证已存在(forward_start={off['forward_start']}), 校验通过, 继续结算")
+        assert off.get("config_hash_90") == cred0.get("config_hash_90") and off.get("config_hash_120") == cred0.get("config_hash_120"), "正式凭证与候选凭证策略身份不一致"
+        print(f"正式凭证已存在(forward_start={off['forward_start']}), 自哈希+策略身份校验通过, 继续结算")
     # P1: 计分前预检查 — 双配置事前计划均存在且窗口有效, 否则不写入任何账户
     cal_pre = us_calendar(mkt["days"][0] - pd.Timedelta(days=400), pd.Timestamp.now() + pd.Timedelta(days=400))
     d_next = cal_pre[cal_pre.get_loc(load_state(paths[90][0])["last_date"]) + 1]
@@ -470,7 +493,16 @@ def main():
     assert all(v > 0 for v in start_navs.values()), f"起点NAV无效: {start_navs}"
     results_dry = {hold: settle_phase(mkt, hold, *paths[hold], dry=True) for hold in (90, 120)}  # P0: 原子性 — 两配置全部dry校验通过才进入持久化
     assert all(r == "dry_ok" for r in results_dry.values()), f"预校验失败: {results_dry}, 未写入任何账户"
-    results = {hold: settle_phase(mkt, hold, *paths[hold]) for hold in (90, 120)}
+    d_txn = str(cal_pre[cal_pre.get_loc(load_state(paths[90][0])["last_date"]) + 1].date())
+    with open(txn_p, "a", encoding="utf-8") as f:
+        f.write(json.dumps({"phase": "BOTH_PREPARED", "date": d_txn, "configs": ["90", "120"]}, default=str) + "\n")
+    r90 = settle_phase(mkt, 90, *paths[90])
+    with open(txn_p, "a", encoding="utf-8") as f:
+        f.write(json.dumps({"phase": "HOLD90_COMMITTED", "date": d_txn}, default=str) + "\n")
+    r120 = settle_phase(mkt, 120, *paths[120])
+    with open(txn_p, "a", encoding="utf-8") as f:
+        f.write(json.dumps({"phase": "BOTH_COMMITTED", "date": d_txn}, default=str) + "\n")
+    results = {90: r90, 120: r120}
     print(f"settle: {results} | 起点NAV(处理前冻结): {start_navs} | 数据截止: {data_cutoff}")
     if not os.path.exists(off_p) and os.path.exists(cred_p) and results[90] == results[120] == "settled":  # 仅首次签发
         cred = json.load(open(cred_p, encoding="utf-8"))

@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """cycle_portfolio 正式回归测试(审查四十五轮): 合成场景覆盖 as-of预算快照/EXIT缺价成交日期/FIFO来源守恒/守恒恒等式。
 运行: python -m pytest tests/test_cycle_portfolio.py -q"""
 import os
@@ -406,18 +406,52 @@ def test_release_gate():
     except AssertionError:
         pass
     assert open(off_p, "rb").read() == ob
-    # 原子性: 破坏HOLD120计划正文 → dry验签失败 → 90也不推进
-    st90b = load_state(sp90)["last_date"]
+    # 原子性(修正假阳性): 先为次日(dts[8])生成两配置计划, 再篡改120未执行计划 → dry验签失败 → 90字节级零变化
+    _sys.argv = ["run_shadow", "plan"]
+    RS.main()
+    for spx, lpx in ((sp90, lp90), (sp120, lp120)):
+        lines = [json.loads(l) for l in open(lpx, encoding="utf-8")]
+        st_last = load_state(spx)["last_date"]
+        for r in lines:
+            if r["type"] == "PLAN_CREATED" and r["date"][:10] == str(dts[8].date()):
+                r["created_at"] = (pd.Timestamp(st_last.date()).tz_localize("UTC") + pd.Timedelta(hours=22)).isoformat()
+        with open(lpx, "w", encoding="utf-8") as f:
+            for r in lines:
+                f.write(json.dumps(r, default=str) + "\n")
     lines = [json.loads(l) for l in open(lp120, encoding="utf-8")]
-    tgt = [r for r in lines if r["type"] == "PLAN_CREATED"][-1]
-    tgt["plan"]["orders"] = {"FAKE": ("BUY", 0.0, 0.0)}  # 破坏计划正文 → dry阶段plan_hash验签必失败
+    tgt = [r for r in lines if r["type"] == "PLAN_CREATED" and r["date"][:10] == str(dts[8].date())][-1]
+    tgt["plan"]["orders"] = {"FAKE": ("BUY", 0.0, 0.0)}  # 破坏120未执行计划 → dry阶段plan_hash验签必失败
     with open(lp120, "w", encoding="utf-8") as f:
         for r in lines:
             f.write(json.dumps(r, default=str) + "\n")
-    with pytest.raises(Exception):
-        _sys.argv = ["run_shadow", "settle"]
+    h90_before = hashlib.sha256(open(sp90, "rb").read()).hexdigest() + hashlib.sha256(open(lp90, "rb").read()).hexdigest()
+    _sys.argv = ["run_shadow", "settle"]
+    with pytest.raises(AssertionError, match="验签失败"):
         RS.main()
-    assert load_state(sp90)["last_date"] == st90b, "原子性: 90不得先于120推进"
+    assert hashlib.sha256(open(sp90, "rb").read()).hexdigest() + hashlib.sha256(open(lp90, "rb").read()).hexdigest() == h90_before, "原子性: 90状态与日志字节级零变化"
+    # 凭证缺失 fail-closed
+    os.rename(os.path.join(tmp, "launch_credential_v3.json"), os.path.join(tmp, "v3.bak"))
+    with pytest.raises(AssertionError, match="候选凭证缺失"):
+        RS.main()
+    os.rename(os.path.join(tmp, "v3.bak"), os.path.join(tmp, "launch_credential_v3.json"))
+    # 事务恢复: 120回滚到dts[6]+构造未完成BOTH_PREPARED(dts[7]) → main幂等补齐落后方(不计新分)
+    st6 = load_state(sp120)
+    st6["last_date"] = dts[6]
+    save_state(st6, sp120)
+    txn_p = os.path.join(tmp, "dual_txn.jsonl")
+    tl = [json.loads(l) for l in open(txn_p, encoding="utf-8")]
+    kept = [r for r in tl if not (r.get("date") == str(dts[7].date()) and r.get("phase") in ("HOLD90_COMMITTED", "BOTH_COMMITTED"))]
+    if not any(r.get("date") == str(dts[7].date()) and r.get("phase") == "BOTH_PREPARED" for r in kept):
+        kept.append({"phase": "BOTH_PREPARED", "date": str(dts[7].date())})
+    with open(txn_p, "w", encoding="utf-8") as f:
+        for r in kept:
+            f.write(json.dumps(r, default=str) + "\n")
+    _sys.argv = ["run_shadow", "settle"]
+    try:
+        RS.main()  # 恢复完成后预检查(无dts[8]合格计划)拒绝 — 恢复本身必须已完成
+    except AssertionError as e:
+        assert "预检查失败" in str(e) or "验签" in str(e)
+    assert load_state(sp120)["last_date"] == dts[7], "事务恢复: 120被幂等补齐至dts[7]"
     # 中间缺日/NaN: 移除dts[6]原始记录(状态已到dts[7], 演示dts[8]正常) — 直接构造: 状态回滚到dts[5], raw缺dts[6]
     st5 = load_state(sp90)
     st5["last_date"] = dts[5]
