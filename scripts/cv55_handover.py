@@ -65,6 +65,8 @@ except AssertionError as e:
 mkt_ok = RS.load_market()
 r_ok = RS.shadow_run(mkt_ok, 90, f"{base}_state.json", f"{base}_log.jsonl")
 exs = [json.loads(l) for l in open(f"{base}_log.jsonl", encoding="utf-8") if json.loads(l)["type"] == "PLAN_EXECUTED"]
-assert r_ok in ("done", "no_new_trading_day") and len(exs) == 1
-print(f"同数据恢复: EXECUTED仍1条(幂等), 状态={r_ok} PASS")
+assert r_ok == "done"
+assert len(exs) == 1 + 3, f"应为首条幂等1条+后续3日=4, 实际{len(exs)}"  # 幂等: day0不重复; resume继续处理剩余3日
+assert exs[0]["plan_id"] == pp["plan_hash"] and exs[0]["fills"] == [[s, str(sig), str(fd), act, round(q, 6), round(p, 4), round(fee, 6)] for s, sig, fd, act, q, p, fee in ca["fills"]]
+print(f"同数据恢复: day0 EXECUTED幂等仍1条, 剩余3日正常推进(共{len(exs)}条), 首条逐笔一致 PASS")
 print("启动交接验收完成")
