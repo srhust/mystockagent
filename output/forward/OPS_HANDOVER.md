@@ -2,7 +2,7 @@
 
 ## 冻结身份
 - 策略：V2aF-Recycle，HOLD 90（挑战）/ HOLD 120（基线），scorer=12m/edge，COST=0.0015，DEDUP=60，14 标的。**24 个月内不因短期表现修改。**
-- 凭证：`launch_credential_v3.json`（文件级 SHA-256 绑定执行器+驱动器，self=ef4713c39c1e）。代码任何改动 → 哈希失配 → settle 自动拒绝 → 必须重签新版本凭证。
+- 凭证：`launch_credential_v3.json`（文件级 SHA-256 绑定执行器+驱动器，self=ba235074cc6b，approved_candidate_commit=9f35b11；签发链 ef4713c39c1e→0ff41dfa3111→8a7264214569→ef4713c39c1e→ba235074cc6b 均为运行层修正重签，策略哈希不变）。代码任何改动 → 哈希失配 → settle 自动拒绝 → 必须重签新版本凭证。
 
 ## 每日程序
 1. **T 日收盘后**：`python scripts/run_shadow.py plan` —— 由独立 NYSE 日历解析 T+1，生成并持久化冻结计划（created_at=UTC 真实时间）。
