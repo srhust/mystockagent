@@ -393,9 +393,9 @@ def plan_next_day(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, ownpos_d
     import json as _jp
     val_sig_p = {s: (px_d[s].get(sd, np.nan) if np.isfinite(px_d[s].get(sd, np.nan)) else state["stale"].get(s, np.nan)) for s in universe}
     signal_nav = float(state["cash"] + sum(state["reserve"].values()) + sum(state["shares"][s] * val_sig_p[s] for s in universe if state["shares"][s] > 0))
-    state_hash = _hlp.sha1(_jp.dumps(_enc(dict(state)), sort_keys=True, default=str).encode()).hexdigest()[:12]
+    state_hash_v = state_hash(state)
     input_hash = _hlp.sha1(_jp.dumps({"sd": str(sd), "mkey": str(mkey), "px": {s: val_sig_p[s] for s in universe}, "ma100": {s: (float(ma100_d[s].get(sd)) if np.isfinite(ma100_d[s].get(sd, np.nan)) else None) for s in universe}, "ev_pos": {s: (ownpos_d[s].get(sd, -1) in ev_d[s]) for s in universe}, "scores": {s: score_snap.get((mkey, s)) for s in universe}}, sort_keys=True, default=str).encode()).hexdigest()[:12]
-    _plan = {"date": d_next, "sd": sd, "signal_nav": signal_nav, "orders": orders, "reenters": reenters, "config_hash": state.get("config_hash"), "state_hash": state_hash, "input_hash": input_hash}
+    _plan = {"date": d_next, "sd": sd, "signal_nav": signal_nav, "orders": orders, "reenters": reenters, "config_hash": state.get("config_hash"), "state_hash": state_hash_v, "input_hash": input_hash}
     _plan["plan_hash"] = _hlp.sha1(_jp.dumps(_enc(dict(_plan)), sort_keys=True, default=str).encode()).hexdigest()[:12]
     return _plan
 
@@ -409,6 +409,13 @@ def apply_day(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d, ow
 
 # ===== 影子模式状态持久化(原子写入/版本校验/往返) =====
 _STATE_VERSION = 1
+
+
+def state_hash(st):
+    """统一完整账户状态哈希(P0: 全状态口径, 计划与日志共用) — sha1(_enc(state))[:12]。"""
+    import hashlib as _hls
+    import json as _js
+    return _hls.sha1(_js.dumps(_enc(dict(st)), sort_keys=True, default=str).encode()).hexdigest()[:12]
 
 
 def _enc(v):
