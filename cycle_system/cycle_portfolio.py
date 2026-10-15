@@ -51,6 +51,11 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
         stale = dict(init_state["stale"])
         if init_state.get("last_date") is not None:
             assert dt_index[0] > init_state["last_date"], f"重启日期必须晚于已处理日 {init_state['last_date']}"
+        cfg = init_state.get("config")
+        if cfg:
+            assert cfg.get("risk_mode") == risk_mode, f"配置不符: risk_mode {cfg.get('risk_mode')} vs {risk_mode}"
+            assert cfg.get("hold_days") == (hold_days if hold_days else HOLD), f"配置不符: hold_days"
+            assert tuple(cfg.get("universe", ())) == tuple(universe), "配置不符: universe"
     else:
         cash = float(budget)
         reserve = {s: 0.0 for s in universe}
@@ -271,8 +276,68 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
         sh_h.iloc[k] = [shares[s] for s in universe]
     if collect is not None:
         collect.update(eq=eq, sh=sh_h, cash=cash_h, funnel=funnel, rejs=rejs, halve_proceeds=halve_proceeds, fills=fills, sources_end=list(sources), collisions=collisions)
-        collect["end_state"] = dict(cash=cash, reserve=dict(reserve), sources=list(sources), state=dict(state), entry_i=dict(entry_i), entry_budget=dict(entry_budget), entry_shares=dict(entry_shares), shares=dict(shares), pending=dict(pending), stale=dict(stale), last_date=dt_index[-1], fees=fees, halve_proceeds=halve_proceeds)
+        collect["end_state"] = dict(cash=cash, reserve=dict(reserve), sources=list(sources), state=dict(state), entry_i=dict(entry_i), entry_budget=dict(entry_budget), entry_shares=dict(entry_shares), shares=dict(shares), pending=dict(pending), stale=dict(stale), last_date=dt_index[-1], fees=fees, halve_proceeds=halve_proceeds, config=dict(risk_mode=risk_mode, hold_days=hd, universe=tuple(universe)))
     return eq, shares, fees
+
+
+# ===== 影子模式T日收盘计划接口(P0: 严格as-of, 只读截至T收盘可知数据) =====
+def plan_next_day(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, ownpos_d, state, d_next, hold_days=None, reentry_after_exit=False, block=None, calendar=None):
+    """T日收盘后的T+1订单意图计划。sd=state['last_date']=T; 只读取T收盘价/MA100/T仓位/事件/月度评分, 不接触T+1行情。
+    返回 {"date": d_next, "sd": sd, "orders": {s: (act, pw, sd)}, "reenters": [(s, pw, sd)]} — 与run_contract决策阶段逐字一致。"""
+    block = block or set()
+    hd = hold_days if hold_days else HOLD
+    if hold_days is not None:
+        assert isinstance(hold_days, int) and hold_days > 0, f"hold_days须为正整数: {hold_days}"
+        hd = hold_days
+    assert state.get("last_date") is not None and d_next > state["last_date"], "计划日必须晚于状态末日"
+    if calendar is not None:  # P1漏日防护: 计划日必须是状态末日的紧邻下一交易日
+        assert d_next in calendar and state["last_date"] in calendar, "计划日/状态末日不在日历中"
+        assert calendar.get_loc(d_next) == calendar.get_loc(state["last_date"]) + 1, f"漏日: {state['last_date']} 与 {d_next} 之间存在未处理交易日"
+    sd = state["last_date"]
+    mkey = sd.to_period("M")
+    orders = {}
+    for s in list(state["pending"].keys()):
+        act, pw, sig_d = state["pending"][s]
+        if act == "V2AR_TGT":  # 方案B: 恢复时以T日状态重确认(镜像run_contract)
+            below_now = bool(px_d[s].get(sd, np.nan) < ma100_d[s].get(sd, np.nan)) if np.isfinite(ma100_d[s].get(sd, np.nan)) else False
+            new_act = fsm_decide(risk_mode, state["state"][s], state["entry_i"][s], ownpos_d[s].get(sd, -1), below_now, ownpos_d[s].get(sd, -1) in ev_d[s], hd)
+            act = new_act if new_act else act
+        orders[s] = (act, pw, sig_d)
+    cands, reenters = [], []
+    for s in universe:
+        if s in orders:
+            continue
+        px_yest = px_d[s].get(sd, np.nan)
+        if not np.isfinite(px_yest):
+            continue
+        i_own = ownpos_d[s].get(sd, -1)
+        below = bool(px_yest < ma100_d[s].get(sd, np.nan)) if np.isfinite(ma100_d[s].get(sd, np.nan)) else False
+        in_ev = i_own in ev_d[s]
+        st_s = state["state"][s]
+        if st_s == "FLAT" and in_ev:
+            sc = score_snap.get((mkey, s), np.nan)
+            if (s, sd) in block:
+                continue
+            if np.isfinite(sc):
+                cands.append((sc, s))
+            continue
+        act = fsm_decide(risk_mode, st_s, state["entry_i"][s], i_own, below, in_ev, hd)
+        if act == "EXIT" and in_ev and reentry_after_exit:
+            sc = score_snap.get((mkey, s), np.nan)
+            if (s, sd) not in block and np.isfinite(sc):
+                cands.append((sc, s))
+        if act:
+            orders[s] = (act, 0.0, sd)
+    cands.sort(reverse=True)
+    for r, (sc, s) in enumerate(cands):
+        w = (1.0 if len(cands) == 1 else (0.6 if r == 0 else 0.4)) if r <= 1 else None
+        if w is None:
+            continue
+        if state["state"][s] == "FLAT":
+            orders[s] = ("ENTER", w, sd)
+        elif reentry_after_exit:
+            reenters.append((s, w, sd))
+    return {"date": d_next, "sd": sd, "orders": orders, "reenters": reenters}
 
 
 # ===== 影子模式状态持久化(原子写入/版本校验/往返) =====
