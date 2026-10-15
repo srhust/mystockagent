@@ -1,0 +1,310 @@
+{
+ "generated_at": "2026-10-16T00:16:17.834678+08:00",
+ "calendar": {
+  "range": [
+   "2012-06-08",
+   "2026-10-13"
+  ],
+  "days": 3442,
+  "violations": []
+ },
+ "market_last_day": "2026-10-13",
+ "sectors_total": 30,
+ "stocks_total": 251,
+ "etf_proxies": [
+  {
+   "sector": "煤炭",
+   "proxy": "sh515220",
+   "name": "煤炭ETF",
+   "rows": 1602,
+   "first": "2020-03-02",
+   "latest": "2026-10-09",
+   "lag_trading_days": 2,
+   "gaps_within": 0,
+   "ok": true
+  },
+  {
+   "sector": "钢铁",
+   "proxy": "sh515210",
+   "name": "钢铁ETF",
+   "rows": 1602,
+   "first": "2020-03-02",
+   "latest": "2026-10-09",
+   "lag_trading_days": 2,
+   "gaps_within": 0,
+   "ok": true
+  },
+  {
+   "sector": "工业金属",
+   "proxy": "sh512400",
+   "name": "有色ETF",
+   "rows": 2206,
+   "first": "2017-09-01",
+   "latest": "2026-10-09",
+   "lag_trading_days": 2,
+   "gaps_within": 0,
+   "ok": true
+  },
+  {
+   "sector": "能源金属",
+   "proxy": "sh516650",
+   "name": "细分有色ETF",
+   "rows": 1285,
+   "first": "2021-06-21",
+   "latest": "2026-10-09",
+   "lag_trading_days": 2,
+   "gaps_within": 0,
+   "ok": true
+  },
+  {
+   "sector": "小金属",
+   "proxy": "sh516150",
+   "name": "稀土ETF",
+   "rows": 1348,
+   "first": "2021-03-17",
+   "latest": "2026-10-09",
+   "lag_trading_days": 2,
+   "gaps_within": 0,
+   "ok": true
+  },
+  {
+   "sector": "贵金属",
+   "proxy": "sh518880",
+   "name": "黄金ETF",
+   "rows": 3207,
+   "first": "2013-07-29",
+   "latest": "2026-10-09",
+   "lag_trading_days": 2,
+   "gaps_within": 0,
+   "ok": true
+  },
+  {
+   "sector": "油气开采",
+   "proxy": "sz162411",
+   "name": "油气LOF",
+   "rows": 3331,
+   "first": "2012-06-08",
+   "latest": "2026-10-09",
+   "lag_trading_days": 2,
+   "gaps_within": 109,
+   "ok": false
+  },
+  {
+   "sector": "石油加工",
+   "proxy": "sz161129",
+   "name": "原油LOF",
+   "rows": 2329,
+   "first": "2017-02-15",
+   "latest": "2026-10-09",
+   "lag_trading_days": 2,
+   "gaps_within": 14,
+   "ok": false
+  },
+  {
+   "sector": "化学原料",
+   "proxy": "sz159870",
+   "name": "化工ETF",
+   "rows": 1358,
+   "first": "2021-03-03",
+   "latest": "2026-10-09",
+   "lag_trading_days": 2,
+   "gaps_within": 0,
+   "ok": true
+  },
+  {
+   "sector": "农化制品",
+   "proxy": "sz159870",
+   "name": "化工ETF",
+   "rows": 1358,
+   "first": "2021-03-03",
+   "latest": "2026-10-09",
+   "lag_trading_days": 2,
+   "gaps_within": 0,
+   "ok": true
+  },
+  {
+   "sector": "水泥建材",
+   "proxy": "sz159745",
+   "name": "建材ETF",
+   "rows": 1286,
+   "first": "2021-06-18",
+   "latest": "2026-10-09",
+   "lag_trading_days": 2,
+   "gaps_within": 0,
+   "ok": true
+  },
+  {
+   "sector": "玻璃玻纤",
+   "proxy": "sz159745",
+   "name": "建材ETF",
+   "rows": 1286,
+   "first": "2021-06-18",
+   "latest": "2026-10-09",
+   "lag_trading_days": 2,
+   "gaps_within": 0,
+   "ok": true
+  },
+  {
+   "sector": "半导体",
+   "proxy": "sh512480",
+   "name": "半导体ETF",
+   "rows": 1776,
+   "first": "2019-06-12",
+   "latest": "2026-10-09",
+   "lag_trading_days": 2,
+   "gaps_within": 1,
+   "ok": false
+  },
+  {
+   "sector": "元件",
+   "proxy": "sz159997",
+   "name": "电子ETF",
+   "rows": 1588,
+   "first": "2020-03-20",
+   "latest": "2026-10-09",
+   "lag_trading_days": 2,
+   "gaps_within": 0,
+   "ok": true
+  },
+  {
+   "sector": "面板",
+   "proxy": "sz159997",
+   "name": "电子ETF",
+   "rows": 1588,
+   "first": "2020-03-20",
+   "latest": "2026-10-09",
+   "lag_trading_days": 2,
+   "gaps_within": 0,
+   "ok": true
+  },
+  {
+   "sector": "消费电子",
+   "proxy": "sz159732",
+   "name": "消费电子ETF",
+   "rows": 1240,
+   "first": "2021-08-23",
+   "latest": "2026-10-09",
+   "lag_trading_days": 2,
+   "gaps_within": 0,
+   "ok": true
+  },
+  {
+   "sector": "养殖",
+   "proxy": "sz159865",
+   "name": "畜牧养殖ETF",
+   "rows": 1355,
+   "first": "2021-03-08",
+   "latest": "2026-10-09",
+   "lag_trading_days": 2,
+   "gaps_within": 0,
+   "ok": true
+  },
+  {
+   "sector": "饲料加工",
+   "proxy": "sz159865",
+   "name": "畜牧养殖ETF",
+   "rows": 1355,
+   "first": "2021-03-08",
+   "latest": "2026-10-09",
+   "lag_trading_days": 2,
+   "gaps_within": 0,
+   "ok": true
+  },
+  {
+   "sector": "种植种业",
+   "proxy": "sz159825",
+   "name": "农业ETF",
+   "rows": 1398,
+   "first": "2020-12-29",
+   "latest": "2026-10-09",
+   "lag_trading_days": 2,
+   "gaps_within": 0,
+   "ok": true
+  },
+  {
+   "sector": "证券",
+   "proxy": "sh512000",
+   "name": "券商ETF",
+   "rows": 2440,
+   "first": "2016-09-14",
+   "latest": "2026-10-09",
+   "lag_trading_days": 2,
+   "gaps_within": 0,
+   "ok": true
+  },
+  {
+   "sector": "保险",
+   "proxy": "sh512070",
+   "name": "证券保险ETF",
+   "rows": 2713,
+   "first": "2015-08-04",
+   "latest": "2026-10-09",
+   "lag_trading_days": 2,
+   "gaps_within": 1,
+   "ok": false
+  },
+  {
+   "sector": "房地产",
+   "proxy": "sh512200",
+   "name": "房地产ETF",
+   "rows": 2190,
+   "first": "2017-09-25",
+   "latest": "2026-10-09",
+   "lag_trading_days": 2,
+   "gaps_within": 0,
+   "ok": true
+  },
+  {
+   "sector": "基建建筑",
+   "proxy": "sh516970",
+   "name": "基建工程ETF",
+   "rows": 1275,
+   "first": "2021-07-05",
+   "latest": "2026-10-09",
+   "lag_trading_days": 2,
+   "gaps_within": 0,
+   "ok": true
+  },
+  {
+   "sector": "工程机械",
+   "proxy": "sh516970",
+   "name": "基建工程ETF",
+   "rows": 1275,
+   "first": "2021-07-05",
+   "latest": "2026-10-09",
+   "lag_trading_days": 2,
+   "gaps_within": 0,
+   "ok": true
+  },
+  {
+   "sector": "汽车整车",
+   "proxy": "sh516110",
+   "name": "汽车ETF",
+   "rows": 1315,
+   "first": "2021-05-07",
+   "latest": "2026-10-09",
+   "lag_trading_days": 2,
+   "gaps_within": 0,
+   "ok": true
+  },
+  {
+   "sector": "电力",
+   "proxy": "sz159611",
+   "name": "电力ETF",
+   "rows": 1149,
+   "first": "2022-01-07",
+   "latest": "2026-10-09",
+   "lag_trading_days": 2,
+   "gaps_within": 0,
+   "ok": true
+  }
+ ],
+ "no_proxy_sectors": [
+  "化纤",
+  "造纸",
+  "航运港口",
+  "航空机场"
+ ],
+ "missing_csv_sectors": [],
+ "individual_stock_data": "ABSENT: 本地无个股CSV, ST/停复牌状态需接入个股行情源(后续)"
+}

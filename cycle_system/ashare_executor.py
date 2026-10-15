@@ -14,8 +14,13 @@ CN_HOLIDAYS = {pd.Timestamp(x).date() for x in ["2026-01-01", "2026-01-02", "202
 
 
 def is_trading_day(d) -> bool:
-    x = pd.Timestamp(d).normalize()
-    return x.weekday() < 5 and x.date() not in CN_HOLIDAYS
+    """R7: 优先使用推导交易日历(ashare_calendar, 数据源=市场成交日并集); 无缓存时回退手工表+周末(approx)。"""
+    try:
+        from ashare_calendar import is_trading_day as _cal_day
+        return _cal_day(d)
+    except Exception:
+        x = pd.Timestamp(d).normalize()
+        return x.weekday() < 5 and x.date() not in CN_HOLIDAYS
 
 
 def limit_ratio(code: str, trade_date, is_st: bool = False) -> float:
