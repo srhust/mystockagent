@@ -36,7 +36,7 @@ def v2ar_target(below, entry_budget, entry_shares, shares, p):
     return "BUY", max(0.0, min(tgt - cur, max_buy_cash))
 
 
-def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d, dt_index, ownpos_d, budget=100.0, collect=None, reserve_mode=False, hold_days=None, block=None, reentry_after_exit=False, init_state=None, return_state=False):
+def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d, dt_index, ownpos_d, budget=100.0, collect=None, reserve_mode=False, hold_days=None, block=None, reentry_after_exit=False, init_state=None, return_state=False, plan_only=False):
     block = block or set()
     if init_state is not None:
         cash = float(init_state["cash"])
@@ -66,6 +66,9 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
     sh_h = pd.DataFrame(0.0, index=dt_index, columns=universe)
     fees = 0.0
     halve_proceeds = 0.0
+    if init_state is not None:
+        fees = float(init_state.get("fees", 0.0))  # P0: 累计费用跨段恢复
+        halve_proceeds = float(init_state.get("halve_proceeds", 0.0))
     hd = hold_days if hold_days else HOLD
     if hold_days is not None:
         assert isinstance(hold_days, int) and hold_days > 0, f"hold_days须为正整数: {hold_days}"
@@ -211,6 +214,11 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
                 continue
             buys[s] = (pw * nav_sig, pw, sig_d)
         reenters_names = {s for s, _, _ in reenters}
+        if plan_only:
+            # 影子模式T日收盘计划: 只读决策, 不动状态/现金/账本 (与apply_day共用冻结决策原语)
+            if collect is not None:
+                collect["plan"] = {"date": d, "orders": {s: (a, pw, sd) for s, (a, pw, sd) in orders.items()}, "reenters": list(reenters), "funnel": dict(funnel)}
+            return eq, sh_h, fees
         need = sum(v[0] for v in buys.values())
         sc = min(1.0, cash / need) if need > 0 else 0.0
         for s, (amt, pw, sig_d) in buys.items():
@@ -247,6 +255,8 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
                 if comp.get("RISK_HALVE", 0.0) > 0.01:
                     funnel["halve_funded_n"] += 1
                     funnel["halve_funded_amt"] += comp["RISK_HALVE"]
+            elif act == "V2AR_TGT":
+                fills.append((s, sig_d, d, "V2AR_BUY", spend * (1 - COST) / p, p, fee))  # P0: V2aR补买入账本
         nav_now = cash + sum(reserve.values()) + sum(shares[s] * stale[s] for s in universe if shares[s] > 0)
         for s in universe:
             assert (state[s] == "FLAT") == (shares[s] <= 1e-12), f"状态-股数不一致 {s} {d}: state={state[s]} shares={shares[s]}"
@@ -261,7 +271,64 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
         sh_h.iloc[k] = [shares[s] for s in universe]
     if collect is not None:
         collect.update(eq=eq, sh=sh_h, cash=cash_h, funnel=funnel, rejs=rejs, halve_proceeds=halve_proceeds, fills=fills, sources_end=list(sources), collisions=collisions)
-        collect["end_state"] = dict(cash=cash, reserve=dict(reserve), sources=list(sources), state=dict(state), entry_i=dict(entry_i), entry_budget=dict(entry_budget), entry_shares=dict(entry_shares), shares=dict(shares), pending=dict(pending), stale=dict(stale), last_date=dt_index[-1], fees=fees)
+        collect["end_state"] = dict(cash=cash, reserve=dict(reserve), sources=list(sources), state=dict(state), entry_i=dict(entry_i), entry_budget=dict(entry_budget), entry_shares=dict(entry_shares), shares=dict(shares), pending=dict(pending), stale=dict(stale), last_date=dt_index[-1], fees=fees, halve_proceeds=halve_proceeds)
     return eq, shares, fees
+
+
+# ===== 影子模式状态持久化(原子写入/版本校验/往返) =====
+_STATE_VERSION = 1
+
+
+def _enc(v):
+    if isinstance(v, pd.Timestamp):
+        return {"__ts__": v.isoformat()}
+    if isinstance(v, np.bool_):
+        return bool(v)
+    if isinstance(v, np.integer):
+        return int(v)
+    if isinstance(v, np.floating):
+        return float(v)
+    if isinstance(v, (list, tuple)):
+        return [_enc(x) for x in v]
+    if isinstance(v, dict):
+        return {k: _enc(x) for k, x in v.items()}
+    return v
+
+
+def _dec(v):
+    if isinstance(v, dict):
+        if "__ts__" in v:
+            return pd.Timestamp(v["__ts__"])
+        return {k: _dec(x) for k, x in v.items()}
+    if isinstance(v, list):
+        return [_dec(x) for x in v]
+    return v
+
+
+def save_state(st, path):
+    """原子写入状态快照(JSON), 带版本号; Timestamp/元组安全往返。"""
+    import json
+    import os
+    import tempfile
+    doc = {"version": _STATE_VERSION, "saved_at": pd.Timestamp.now().isoformat(), "state": _enc(dict(st))}
+    d = os.path.dirname(os.path.abspath(path))
+    os.makedirs(d, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=d, suffix=".json")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(doc, f, allow_nan=True)
+        os.replace(tmp, path)  # 原子替换
+    except BaseException:
+        if os.path.exists(tmp):
+            os.remove(tmp)
+        raise
+
+
+def load_state(path):
+    import json
+    with open(path, encoding="utf-8") as f:
+        doc = json.load(f)
+    assert doc.get("version") == _STATE_VERSION, f"状态版本不匹配: {doc.get('version')}"
+    return _dec(doc["state"])
 
 
