@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """Ashare-Stock 统一执行引擎(阶段1 R2): FrozenPlan(T日,零T+1信息) → ExecutionResult(T+1)。
 铁律: 计划与成交两阶段分离(计划无法访问T+1行情); 涨跌停/停牌拒绝; 整手(科创板200股起); A股费用; T+1可卖约束; 账本原子性。"""
 import hashlib
@@ -120,10 +120,9 @@ def execute_plan(plan: dict, trade_date_t1, px_t1: float, prev_close: float, hal
                 "cash_delta": -round(notional + fee, 2), "signal_px": plan["signal_px"], "scoring": True}
     shares = plan["shares"]
     base, step = lot_step(code)
-    if (shares - base) % step != 0:
+    residual = allow_residual_sell and 0 < shares < base  # R6: 余额例外先于整手校验(主板50股可达豁免)
+    if not residual and (shares < base or (shares - base) % step != 0):
         return {**rej, "reason": "bad_lot"}  # B3: 完整整手规则(主板150股拒; 科创板step=1恒过)
-    if shares < base and not (allow_residual_sell and shares > 0):
-        return {**rej, "reason": "bad_lot"}  # 余额卖出: 各板块不足一手须显式开关+账本验证total==shares
     notional = shares * price
     fee = fees(code, notional, True)
     return {"plan_hash": plan["plan_hash"], "code": code, "action": "SELL", "status": "FILLED", "execution_date": str(_next_bdate(plan["trade_date"]).date()),
@@ -163,11 +162,13 @@ class Ledger:
         ph = fill.get("plan_hash")
         assert ph and ph not in getattr(self, "_executed", set()), f"A3: 重复成交拒绝: {ph}"
         assert ph in self.registered or allow_unplanned, "N2: 成交必须关联已登记冻结计划(allow_unplanned仅限测试构造, 不计分)"
+        code, shares, delta = fill["code"], fill["shares"], fill["cash_delta"]  # R6: 赋值前移(B1校验依赖shares)
         assert fill.get("fees", 0) >= 0, "N2: 费用必须非负"
         if not allow_unplanned:
             pl = self.registered[ph]  # B1: 计划—成交字段级身份绑定
-            assert pl["code"] == fill["code"] and pl["action"] == fill["action"], "B1: 成交与登记计划的股票/方向不符"
+            assert pl["code"] == code and pl["action"] == fill["action"], "B1: 成交与登记计划的股票/方向不符"
             assert fill.get("signal_px") == pl.get("signal_px"), "B1: signal_px与计划不符"
+            assert abs(fill["fees"] - fees(code, fill["notional"], fill["action"] == "SELL")) < 0.01, "B1/R6: 费用与账本独立复算不符(伪造费用)"
             if fill["action"] == "SELL":
                 assert shares == pl["shares"], "B1: 卖出股数与计划不符"
             else:
@@ -191,8 +192,8 @@ class Ledger:
         else:
             p = new_pos.get(code)
             assert p is not None and p["sellable"] >= shares, f"卖出超过可卖数量: {code} sellable={p['sellable'] if p else 0} req={shares}"
-            if shares < lot_step(code)[0] and code.startswith("68"):
-                assert p["total"] == shares, "A5: 科创板不足200股仅允许一次性卖出全部余额"
+            if shares < lot_step(code)[0]:
+                assert p["total"] == shares, "R6/B3: 不足一手余额卖出必须一次性卖出全部剩余持仓"
             p["total"] -= shares
             p["sellable"] -= shares
             if p["total"] == 0:

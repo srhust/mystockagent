@@ -1,7 +1,8 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """Ashare-Stock 阶段1 R2 负例: 计划/成交分离·分期交易制度·原子账本·T+1可卖·费用守恒。"""
 import hashlib
 import json
+import os
 import sys
 import tempfile
 
@@ -174,6 +175,63 @@ def test_b1_b2_b3_identity_and_lots():
     ledT.apply({"code": "600019", "action": "BUY", "status": "FILLED", "plan_hash": "t1", "shares": 100, "cash_delta": -1025.01, "price": 10.2, "notional": 1020.0, "fees": 5.01, "execution_date": "2026-10-16", "signal_px": 10.0, "scoring": True}, allow_unplanned=True)
     last = json.loads(open(ledT.log_p, encoding="utf-8").readlines()[-1])
     assert last["unplanned"] is True and last["scoring"] is False  # 强制不计分
+
+
+def test_c1_c2_c3_end_to_end():
+    """C1: 正式SELL端到端; C2: 伪造零费用拒绝+四项不变性; C3: 主板余额卖出闭环。"""
+    tmp = tempfile.mkdtemp()
+    # C1: register → execute_plan(SELL) → apply 成功(捕获shares赋值顺序错误)
+    led = Ledger("C1", nav0=20000.0, root=tmp, test_mode=True)
+    led.advance_day("2026-10-16")
+    led.apply({"code": "600019", "action": "BUY", "status": "FILLED", "plan_hash": "seed1", "shares": 100, "cash_delta": -1025.01, "price": 10.2, "notional": 1020.0, "fees": 5.01, "execution_date": "2026-10-16", "signal_px": 10.0}, allow_unplanned=True)
+    led.advance_day("2026-10-19")
+    sp = create_plan("600019", "SELL", "2026-10-16", px_ref=10.2, shares=100, created_at="2026-10-16T16:00:00+08:00")
+    led.register_plan(sp)
+    sf = execute_plan(sp, "2026-10-19", px_t1=10.5, prev_close=10.2)
+    assert sf["status"] == "FILLED" and sf["shares"] == 100
+    led.apply(sf)  # R6前: UnboundLocalError在此触发
+    assert "600019" not in led.pos
+    nav1 = led.nav({"600019": 10.5})
+    assert abs(nav1 - (20000.0 - 1025.01 + sf["cash_delta"])) < 0.01  # NAV守恒
+    # C2: 已登记BUY计划+伪造零费用→拒绝; cash/pos/去重/日志四项不变
+    led2 = Ledger("C2", nav0=20000.0, root=tmp, test_mode=True)
+    led2.advance_day("2026-10-16")
+    bp = create_plan("600019", "BUY", "2026-10-15", px_ref=10.0, cash_budget=20000.0)
+    led2.register_plan(bp)
+    fake = {"code": "600019", "action": "BUY", "status": "FILLED", "plan_hash": bp["plan_hash"], "execution_date": "2026-10-16", "shares": 100, "price": 10.0, "notional": 1000.0, "fees": 0.0, "cash_delta": -1000.0, "signal_px": 10.0}
+    snap_cash, snap_pos = led2.cash, json.dumps(led2.pos, sort_keys=True)
+    assert not os.path.exists(led2.log_p)  # 首笔成交前无日志文件
+    open(led2.log_p, "wb").close()  # 预建空日志以做字节级对比
+    snap_log = open(led2.log_p, "rb").read()
+    snap_exec = set(getattr(led2, "_executed", set()))
+    with pytest.raises(AssertionError, match="费用与账本独立复算不符"):
+        led2.apply(fake)  # fees=0 vs 复算5.01
+    assert led2.cash == snap_cash and json.dumps(led2.pos, sort_keys=True) == snap_pos
+    assert set(getattr(led2, "_executed", set())) == snap_exec and open(led2.log_p, "rb").read() == snap_log
+    # C3: 主板余额卖出闭环 — 100整手+50零股
+    led3 = Ledger("C3", nav0=20000.0, root=tmp, test_mode=True)
+    led3.advance_day("2026-10-16")
+    led3.apply({"code": "600019", "action": "BUY", "status": "FILLED", "plan_hash": "seed3", "shares": 150, "cash_delta": -1535.02, "price": 10.2, "notional": 1530.0, "fees": 5.02, "execution_date": "2026-10-16", "signal_px": 10.0}, allow_unplanned=True)
+    led3.advance_day("2026-10-19")
+    s100 = create_plan("600019", "SELL", "2026-10-16", px_ref=10.2, shares=100, created_at="2026-10-16T16:00:00+08:00")
+    led3.register_plan(s100)
+    f100 = execute_plan(s100, "2026-10-19", px_t1=10.5, prev_close=10.2)
+    led3.apply(f100)  # 整手100正常卖出
+    assert led3.pos["600019"] == {"total": 50, "sellable": 50}
+    s50 = create_plan("600019", "SELL", "2026-10-16", px_ref=10.5, shares=50, created_at="2026-10-16T16:00:00+08:00")
+    led3.register_plan(s50)
+    f50 = execute_plan(s50, "2026-10-19", px_t1=10.6, prev_close=10.5, allow_residual_sell=True)
+    assert f50["status"] == "FILLED"  # R6前: 主板50股被整手检查提前拦截bad_lot
+    led3.apply(f50)  # 账本: 50<100 → total==50 ✓ 全部余额
+    assert "600019" not in led3.pos
+    # C3负例: 未全部卖出→账本拒绝
+    led4 = Ledger("C4", nav0=20000.0, root=tmp, test_mode=True)
+    led4.advance_day("2026-10-16")
+    led4.apply({"code": "600019", "action": "BUY", "status": "FILLED", "plan_hash": "seed4", "shares": 250, "cash_delta": -2555.03, "price": 10.2, "notional": 2550.0, "fees": 5.03, "execution_date": "2026-10-16", "signal_px": 10.0}, allow_unplanned=True)
+    led4.advance_day("2026-10-19")
+    led4.advance_day("2026-10-20")
+    with pytest.raises(AssertionError, match="全部剩余持仓"):
+        led4.apply({"code": "600019", "action": "SELL", "status": "FILLED", "plan_hash": "r4a", "shares": 30, "cash_delta": 309.84, "price": 10.5, "notional": 315.0, "fees": 5.16, "execution_date": "2026-10-20", "signal_px": 10.5}, allow_unplanned=True)  # 30<100但非全部余额
 
 
 def test_nav_missing_price_and_fees():
