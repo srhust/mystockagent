@@ -59,10 +59,10 @@ def test_sell_reject_bad_lot():
 
 def test_ledger_no_leak_and_accounting():
     tmp = tempfile.mkdtemp()
-    led = Ledger("M", nav0=1000.0, root=tmp)
+    led = Ledger("M", nav0=20000.0, root=tmp)
     f = plan_order("600019", "BUY", cash=led.cash, px_ref=10.0, px_t1=10.20, prev_close=10.0)
     led.apply(f)
-    assert led.cash == pytest.approx(1000.0 + f["cash_delta"], abs=0.01) and led.cash > 0
+    assert led.cash == pytest.approx(20000.0 + f["cash_delta"], abs=0.01) and led.cash > 0
     assert led.pos["600019"] == f["shares"]
     s = plan_sell("600019", f["shares"], px_ref=10.2, px_t1=10.5, prev_close=10.2)
     led.apply(s)
@@ -71,5 +71,5 @@ def test_ledger_no_leak_and_accounting():
     with pytest.raises(AssertionError):
         led.apply({"code": "600019", "action": "SELL", "status": "REJECTED", "cash_delta": 0})  # 拒绝单不得入账
     with pytest.raises(AssertionError):
-        led2 = Ledger("X", nav0=1000.0, root=tmp)
+        led2 = Ledger("X", nav0=20000.0, root=tmp)
         led2.apply({"code": "600019", "action": "SELL", "status": "FILLED", "shares": 100, "cash_delta": 1000.0})  # 卖超持仓
