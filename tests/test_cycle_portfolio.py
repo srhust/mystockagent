@@ -375,8 +375,10 @@ def test_release_gate():
     run_contract(["MU"], snap, "V2aF", {"MU": px}, {"MU": ma}, {"MU": {4}}, li, dts[:5], own, collect=c1, reserve_mode=False, hold_days=120, config_extra=RS.CFGX)
     save_state(c0["end_state"], sp90)
     save_state(c1["end_state"], sp120)
+    from cycle_portfolio import state_hash
+    bh90, bh120 = state_hash(c0["end_state"]), state_hash(c1["end_state"])  # 计分起点=引导结束状态(dts[4])
     fh = {f: hashlib.sha256(open(os.path.join(r"E:\mystockagent", f), "rb").read()).hexdigest() for f in ("cycle_system/cycle_portfolio.py", "scripts/run_shadow.py")}
-    v2 = {"type": "launch_credential", "version": 2, "executor_file_hashes": fh, "config_hash_90": "f263f842f497", "config_hash_120": "6d64e83c9d33", "forward_start": "PENDING_FIRST_REAL_TRADING_DAY"}
+    v2 = {"type": "launch_credential", "version": 3, "executor_file_hashes": fh, "config_hash_90": "f263f842f497", "config_hash_120": "6d64e83c9d33", "start_state_hash_90": "BOOT90", "start_state_hash_120": "BOOT120", "forward_start": "PENDING_FIRST_REAL_TRADING_DAY"}
     body = json.dumps({k: v for k, v in v2.items() if k != "self_hash"}, sort_keys=True, ensure_ascii=False)
     v2["self_hash"] = hashlib.sha1(body.encode()).hexdigest()[:12]
     json.dump(v2, open(os.path.join(tmp, "launch_credential_v3.json"), "w", encoding="utf-8"))
@@ -398,6 +400,9 @@ def test_release_gate():
         RS.main()
     assert load_state(sp90)["last_date"] == dts[7] and load_state(sp120)["last_date"] == dts[7]
     assert os.path.exists(off_p)
+    offv = json.load(open(off_p, encoding="utf-8"))
+    assert offv["start_state_hash_90"] == bh90 and offv["start_state_hash_120"] == bh120, "正式凭证记录真实计分起点(引导结束)状态哈希"
+    assert offv["bootstrap_start_state_hash_90"] == "BOOT90" and offv["bootstrap_start_state_hash_120"] == "BOOT120", "10-13引导起点哈希保留为独立字段"
     ob = open(off_p, "rb").read()
     # 凭证一次性: 第4次settle(无下一日计划→预检查拒绝, 同样绝不覆盖)字节不变
     _sys.argv = ["run_shadow", "settle"]
@@ -406,7 +411,7 @@ def test_release_gate():
     except AssertionError:
         pass
     assert open(off_p, "rb").read() == ob
-    # 原子性(修正假阳性): 先为次日(dts[8])生成两配置计划, 再篡改120未执行计划 → dry验签失败 → 90字节级零变化
+    # 正常推进一日(dts[8] forward结算), 为后续原子性场景就位状态=dts[8]
     _sys.argv = ["run_shadow", "plan"]
     RS.main()
     for spx, lpx in ((sp90, lp90), (sp120, lp120)):
@@ -418,8 +423,24 @@ def test_release_gate():
         with open(lpx, "w", encoding="utf-8") as f:
             for r in lines:
                 f.write(json.dumps(r, default=str) + "\n")
+    _sys.argv = ["run_shadow", "settle"]
+    RS.main()
+    assert load_state(sp90)["last_date"] == dts[8] and load_state(sp120)["last_date"] == dts[8]
+
+    # 原子性(修正假阳性): 先为次日(dts[9])生成两配置计划, 再篡改120未执行计划 → dry验签失败 → 90字节级零变化
+    _sys.argv = ["run_shadow", "plan"]
+    RS.main()
+    for spx, lpx in ((sp90, lp90), (sp120, lp120)):
+        lines = [json.loads(l) for l in open(lpx, encoding="utf-8")]
+        st_last = load_state(spx)["last_date"]
+        for r in lines:
+            if r["type"] == "PLAN_CREATED" and r["date"][:10] == str(dts[9].date()):
+                r["created_at"] = (pd.Timestamp(st_last.date()).tz_localize("UTC") + pd.Timedelta(hours=22)).isoformat()
+        with open(lpx, "w", encoding="utf-8") as f:
+            for r in lines:
+                f.write(json.dumps(r, default=str) + "\n")
     lines = [json.loads(l) for l in open(lp120, encoding="utf-8")]
-    tgt = [r for r in lines if r["type"] == "PLAN_CREATED" and r["date"][:10] == str(dts[8].date())][-1]
+    tgt = [r for r in lines if r["type"] == "PLAN_CREATED" and r["date"][:10] == str(dts[9].date())][-1]
     tgt["plan"]["orders"] = {"FAKE": ("BUY", 0.0, 0.0)}  # 破坏120未执行计划 → dry阶段plan_hash验签必失败
     with open(lp120, "w", encoding="utf-8") as f:
         for r in lines:
@@ -432,15 +453,15 @@ def test_release_gate():
     # P0-1: 结算未成功不得提交事务完成 — 120返回market_not_closed → TXN_ABORTED, 无BOTH_COMMITTED
     with open(lp120, "w", encoding="utf-8") as f:
         for r in [json.loads(l) for l in open(lp120, encoding="utf-8")]:
-            if not (r["type"] == "PLAN_CREATED" and r["date"][:10] == str(dts[8].date())):
+            if not (r["type"] == "PLAN_CREATED" and r["date"][:10] == str(dts[9].date())):
                 f.write(json.dumps(r, default=str) + "\n")  # 删除被破坏计划
     _sys.argv = ["run_shadow", "plan"]
-    RS.main()  # 120重新生成dts[8]计划
+    RS.main()  # 120重新生成dts[9]计划
     for spx, lpx in ((sp90, lp90), (sp120, lp120)):
         lines2 = [json.loads(l) for l in open(lpx, encoding="utf-8")]
         st_last = load_state(spx)["last_date"]
         for r in lines2:
-            if r["type"] == "PLAN_CREATED" and r["date"][:10] == str(dts[8].date()):
+            if r["type"] == "PLAN_CREATED" and r["date"][:10] == str(dts[9].date()):
                 r["created_at"] = (pd.Timestamp(st_last.date()).tz_localize("UTC") + pd.Timedelta(hours=22)).isoformat()
         with open(lpx, "w", encoding="utf-8") as f:
             for r in lines2:
@@ -459,7 +480,7 @@ def test_release_gate():
     RS.settle_phase = orig_sp
     txn_recs = [json.loads(l) for l in open(os.path.join(tmp, "dual_txn.jsonl"), encoding="utf-8")]
     assert any(r.get("phase") == "TXN_ABORTED" for r in txn_recs)
-    assert not any(r.get("phase") == "BOTH_COMMITTED" and r["date"] == str(dts[8].date()) and not r.get("recovered") for r in txn_recs)
+    assert not any(r.get("phase") == "BOTH_COMMITTED" and r["date"] == str(dts[9].date()) and not r.get("recovered") for r in txn_recs)
     # P0-2: 凭证缺失 → 恢复不执行(120回滚状态不动)
     st120_pre = load_state(sp120)["last_date"]
     os.rename(os.path.join(tmp, "launch_credential_v3.json"), os.path.join(tmp, "v3.bak"))
@@ -470,21 +491,22 @@ def test_release_gate():
     os.rename(os.path.join(tmp, "v3.bak"), os.path.join(tmp, "launch_credential_v3.json"))
     # P0-3: 恢复遇冻结计划缺失 → 拒绝重生成
     st120_r = load_state(sp120)
-    st120_r["last_date"] = dts[6]
+    st120_r["last_date"] = dts[7]
     save_state(st120_r, sp120)
-    txn_recs.append({"phase": "BOTH_PREPARED", "date": str(dts[7].date())})
+    txn_recs.append({"phase": "BOTH_PREPARED", "date": str(dts[8].date())})
     with open(os.path.join(tmp, "dual_txn.jsonl"), "w", encoding="utf-8") as f:
         for r in txn_recs:
             f.write(json.dumps(r, default=str) + "\n")
     # 删除120在dts[7]的PLAN_CREATED(冻结计划不存在)
     with open(lp120, "w", encoding="utf-8") as f:
         for r in [json.loads(l) for l in open(lp120, encoding="utf-8")]:
-            if not (r["type"] == "PLAN_CREATED" and r["date"][:10] == str(dts[7].date())):
+            if not (r["type"] == "PLAN_CREATED" and r["date"][:10] == str(dts[8].date())):
                 f.write(json.dumps(r, default=str) + "\n")
     _sys.argv = ["run_shadow", "settle"]
     with pytest.raises(AssertionError, match="拒绝重生成"):
         RS.main()
-    assert load_state(sp120)["last_date"] == dts[6], "P0-3: 冻结计划缺失时状态不得推进"
+    assert load_state(sp120)["last_date"] == dts[7], "P0-3: 冻结计划缺失时状态不得推进"
+    # 中间缺日/NaN: 移除dts[6]原始记录 — 状态回滚到dts[5], raw缺dts[6]
     st5 = load_state(sp90)
     st5["last_date"] = dts[5]
     save_state(st5, sp90)
@@ -506,6 +528,7 @@ def test_release_gate():
     RS.load_market = lambda: mkt_nan
     assert RS.settle_phase(mkt_nan, 90, sp90, lp90) == "data_incomplete"
     assert load_state(sp90)["last_date"] == dts[5], "NaN原始价→data_incomplete不推进"
+
 
 
 def test_config_mismatch_rejected():

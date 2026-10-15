@@ -325,7 +325,7 @@ def plan_phase(mkt, hold, state_path, log_path):
     return "planned"
 
 
-def settle_phase(mkt, hold, state_path, log_path, allow_replay=False, dry=False, recovery=False):
+def settle_phase(mkt, hold, state_path, log_path, allow_replay=False, dry=False, recovery=False, force_no_score=False):
     """P0阶段二: T+1收盘数据到达后消费事前计划。dry=仅校验不写盘; recovery=仅消费冻结计划(缺失→拒绝重生成)。"""
     px_d, ma100_d, ev_d, listed_d, ownpos_d, days_all, snap = mkt["px"], mkt["ma"], mkt["ev"], mkt["listed"], mkt["own"], mkt["days"], mkt["snap"]
     st, done, created, executed_recs, _ = _load_run_ctx(hold, state_path, log_path)
@@ -393,6 +393,8 @@ def settle_phase(mkt, hold, state_path, log_path, allow_replay=False, dry=False,
         T = cal[pos0]  # T = 状态末日 = 计划基准日
         pre = plan_time_valid(ca_ts, T, d)  # P0: Close(T) <= created_at(ET) < Open(T+1)
         scoring, phase_mode = pre, ("forward" if pre else "late_created")
+        if force_no_score:  # P0: replay模式程序级不变量 — 即使遇到合格事前计划也不计分
+            scoring, phase_mode = False, "replay"
     ca = apply_day(TICKERS, snap, "V2aF", px_d, ma100_d, ev_d, listed_d, ownpos_d, st, pp, d, hold_days=hold, require_config=True)
     st = ca["end_state"]
     if pp["plan_hash"] in done:
@@ -473,9 +475,9 @@ def main():
     if mode == "plan":
         print({hold: plan_phase(mkt, hold, *paths[hold]) for hold in (90, 120)})
         return
-    if mode == "replay":  # 历史补跑: 永不计分scoring=false, 不签发凭证
+    if mode == "replay":  # 历史补跑: 永不计分scoring=false(程序级不变量), 不签发凭证
         for hold in (90, 120):
-            r = settle_phase(mkt, hold, *paths[hold], allow_replay=True)
+            r = settle_phase(mkt, hold, *paths[hold], allow_replay=True, force_no_score=True)
             print(f"replay[{hold}]: {r}(scoring=false)")
         return
     # settle: 正式路径 — fail-closed身份已在前置段校验
@@ -493,6 +495,7 @@ def main():
         pc = [json.loads(l) for l in open(paths[hold][1], encoding="utf-8") if json.loads(l)["type"] == "PLAN_CREATED" and json.loads(l).get("date", "")[:10] == str(d_next.date())]
         assert pc and plan_time_valid(pc[0]["created_at"], load_state(paths[hold][0])["last_date"], d_next), f"HOLD{hold} 预检查失败: 缺少合格事前计划({d_next.date()}), 拒绝结算"
     start_navs = {hold: round(nav_of(load_state(paths[hold][0]), mkt["px"]), 6) for hold in (90, 120)}
+    start_hashes = {hold: state_hash(load_state(paths[hold][0])) for hold in (90, 120)}  # 计分起点状态哈希(与start_nav同点, dry之前)
     assert all(v > 0 for v in start_navs.values()), f"起点NAV无效: {start_navs}"
     results_dry = {hold: settle_phase(mkt, hold, *paths[hold], dry=True) for hold in (90, 120)}  # P0: 原子性 — 两配置全部dry校验通过才进入持久化
     assert all(r == "dry_ok" for r in results_dry.values()), f"预校验失败: {results_dry}, 未写入任何账户"
@@ -528,7 +531,7 @@ def main():
                 assert exs and exs[-1]["scoring"] and exs[-1]["phase_mode"] == "forward", f"HOLD{hold}最后结算非合格事前计划, 拒绝签发"
             first_day = mkt["days"][list(mkt["days"]).index(load_state(paths[90][0])["last_date"])]
             cred2 = dict(cred)
-            cred2.update({"forward_start": str(first_day.date()), "start_nav_90": start_navs[90], "start_nav_120": start_navs[120], "verified_hashes": fh, "signed_at": pd.Timestamp.now(tz="UTC").isoformat(), "scoring": True, "price_basis": "T+1日收盘价模拟成交(非实盘可实现收益口径)", "normalization": "各配置以自身起点NAV归一化为100", "issued_once": True})
+            cred2.update({"forward_start": str(first_day.date()), "start_nav_90": start_navs[90], "start_nav_120": start_navs[120], "bootstrap_start_state_hash_90": cred.get("start_state_hash_90"), "bootstrap_start_state_hash_120": cred.get("start_state_hash_120"), "start_state_hash_90": start_hashes[90], "start_state_hash_120": start_hashes[120], "verified_hashes": fh, "signed_at": pd.Timestamp.now(tz="UTC").isoformat(), "scoring": True, "price_basis": "T+1日收盘价模拟成交(非实盘可实现收益口径)", "normalization": "各配置以自身起点NAV归一化为100", "issued_once": True})
             body = json.dumps({k: v for k, v in cred2.items() if k != "self_hash"}, sort_keys=True, ensure_ascii=False)
             cred2["self_hash"] = hashlib.sha1(body.encode()).hexdigest()[:12]
             with open(off_p, "w", encoding="utf-8") as f:
