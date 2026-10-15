@@ -1,0 +1,52 @@
+{
+ "registered_at": "2026-10-15T10:54:32.377758",
+ "configs": [
+  {
+   "name": "V2aF-Recycle-90",
+   "risk_mode": "V2aF",
+   "hold_days": 90
+  },
+  {
+   "name": "V2aF-Recycle-120",
+   "risk_mode": "V2aF",
+   "hold_days": 120
+  }
+ ],
+ "scorer": "12m/edge",
+ "universe": [
+  "MU",
+  "WDC",
+  "STX",
+  "TSM",
+  "AMAT",
+  "LRCX",
+  "KLAC",
+  "ASML",
+  "TER",
+  "FCX",
+  "CAT",
+  "QCOM",
+  "TXN",
+  "INTC"
+ ],
+ "cost_model": 0.0015,
+ "dedup": 60,
+ "forward_start": "两套配置及数据版本锁定后的首个真实交易日",
+ "normalization": "前向起点各自归一化为100(历史持仓分别继承, 不人为清仓)",
+ "primary_metrics": [
+  "前向累计净收益",
+  "最大回撤",
+  "Sharpe"
+ ],
+ "secondary_metrics": [
+  "实际成交数",
+  "换手",
+  "资金占用",
+  "手续费",
+  "订单执行偏差(计划vs成交)"
+ ],
+ "observation_window_months": 24,
+ "window_note": "24个月为预定观察窗口, 不代表两年即具统计显著性; 最终需考虑已完成交易数量与不确定区间",
+ "early_stop": "仅允许因系统安全故障停止; 不因短期收益领先提前宣布胜者",
+ "rule_freeze": "观察期内不修改任何交易规则; 不再进行HOLD参数搜索(60/90/120/180之外无新值)"
+}

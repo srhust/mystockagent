@@ -36,7 +36,7 @@ def v2ar_target(below, entry_budget, entry_shares, shares, p):
     return "BUY", max(0.0, min(tgt - cur, max_buy_cash))
 
 
-def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d, dt_index, ownpos_d, budget=100.0, collect=None, reserve_mode=False, hold_days=None, block=None, reentry_after_exit=False, init_state=None, return_state=False, plan_only=False):
+def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d, dt_index, ownpos_d, budget=100.0, collect=None, reserve_mode=False, hold_days=None, block=None, reentry_after_exit=False, init_state=None, return_state=False, plan_only=False, exec_plan=None, config_extra=None, require_config=False):
     block = block or set()
     if init_state is not None:
         cash = float(init_state["cash"])
@@ -56,6 +56,11 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
             assert cfg.get("risk_mode") == risk_mode, f"配置不符: risk_mode {cfg.get('risk_mode')} vs {risk_mode}"
             assert cfg.get("hold_days") == (hold_days if hold_days else HOLD), f"配置不符: hold_days"
             assert tuple(cfg.get("universe", ())) == tuple(universe), "配置不符: universe"
+            if config_extra is not None:
+                for k2, v2 in config_extra.items():
+                    assert cfg.get(k2) == v2, f"配置不符: {k2} {cfg.get(k2)} vs {v2}"
+        elif require_config:
+            assert False, "快照缺少配置签名, 拒绝恢复(前向模式)"
     else:
         cash = float(budget)
         reserve = {s: 0.0 for s in universe}
@@ -101,7 +106,13 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
         reserve_prev = sum(reserve.values())
         day_fee = 0.0
         orders = {}
+        if exec_plan is not None:
+            # P0: 计划驱动执行 — 消费已冻结的T日计划, 不重新决策/排名
+            assert exec_plan.get("date") == d and exec_plan.get("sd") == sd, f"计划与执行日不匹配: plan={exec_plan.get('date')}/sd={exec_plan.get('sd')} vs d={d}/sd={sd}"
+            pending.clear()  # 计划已含恢复动作; 未成交时按计划元组重新入队
         for s in list(pending.keys()):
+            if exec_plan is not None:
+                break
             act, pw, sig_d = pending[s]
             if np.isfinite(px_today[s]) and px_today[s] > 0 and listed_d[s].get(d, False):
                 if act == "V2AR_TGT":
@@ -115,7 +126,7 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
             else:
                 funnel["r_price"] += 1
         cands = []
-        for s in universe:
+        for s in (universe if exec_plan is None else []):
             if s in orders or s in pending:
                 continue
             if not np.isfinite(px_yest[s]):
@@ -156,6 +167,11 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
                 orders[s] = ("ENTER", (1.0 if len(cands) == 1 else (0.6 if r == 0 else 0.4)), sd)
             elif r <= 1 and state[s] != "FLAT" and reentry_after_exit:
                 reenters.append((s, (1.0 if len(cands) == 1 else (0.6 if r == 0 else 0.4)), sd))
+        if exec_plan is not None:
+            # P0消费计划: 以冻结计划覆盖(本日pending已清空、cands为空, 计划为唯一订单来源)
+            orders = dict(exec_plan["orders"])
+            reenters = list(exec_plan["reenters"])
+        reenters_names = {s for s, _, _ in reenters}
         for s, (act, pw, sig_d) in list(orders.items()):
             if not (np.isfinite(px_today[s]) and px_today[s] > 0 and listed_d[s].get(d, False)):
                 pending[s] = (act, pw, sig_d)
@@ -218,8 +234,8 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
             if not (np.isfinite(px_today[s]) and px_today[s] > 0 and listed_d[s].get(d, False)):
                 continue
             buys[s] = (pw * nav_sig, pw, sig_d)
-        reenters_names = {s for s, _, _ in reenters}
         if plan_only:
+            assert exec_plan is None, "plan_only与exec_plan互斥"
             # 影子模式T日收盘计划: 只读决策, 不动状态/现金/账本 (与apply_day共用冻结决策原语)
             if collect is not None:
                 collect["plan"] = {"date": d, "orders": {s: (a, pw, sd) for s, (a, pw, sd) in orders.items()}, "reenters": list(reenters), "funnel": dict(funnel)}
@@ -276,7 +292,11 @@ def run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d,
         sh_h.iloc[k] = [shares[s] for s in universe]
     if collect is not None:
         collect.update(eq=eq, sh=sh_h, cash=cash_h, funnel=funnel, rejs=rejs, halve_proceeds=halve_proceeds, fills=fills, sources_end=list(sources), collisions=collisions)
-        collect["end_state"] = dict(cash=cash, reserve=dict(reserve), sources=list(sources), state=dict(state), entry_i=dict(entry_i), entry_budget=dict(entry_budget), entry_shares=dict(entry_shares), shares=dict(shares), pending=dict(pending), stale=dict(stale), last_date=dt_index[-1], fees=fees, halve_proceeds=halve_proceeds, config=dict(risk_mode=risk_mode, hold_days=hd, universe=tuple(universe)))
+        import hashlib as _hl
+        import json as _json
+        cfg_full = dict(risk_mode=risk_mode, hold_days=hd, universe=tuple(universe), **(config_extra or {}))
+        cfg_hash = _hl.sha1(_json.dumps(cfg_full, sort_keys=True, default=str).encode()).hexdigest()[:12]
+        collect["end_state"] = dict(cash=cash, reserve=dict(reserve), sources=list(sources), state=dict(state), entry_i=dict(entry_i), entry_budget=dict(entry_budget), entry_shares=dict(entry_shares), shares=dict(shares), pending=dict(pending), stale=dict(stale), last_date=dt_index[-1], fees=fees, halve_proceeds=halve_proceeds, config=cfg_full, config_hash=cfg_hash)
     return eq, shares, fees
 
 
@@ -338,6 +358,13 @@ def plan_next_day(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, ownpos_d
         elif reentry_after_exit:
             reenters.append((s, w, sd))
     return {"date": d_next, "sd": sd, "orders": orders, "reenters": reenters}
+
+
+def apply_day(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d, ownpos_d, state, plan, d_next, hold_days=None, budget=100.0, reserve_mode=False, collect=None, config_extra=None, require_config=False):
+    """T+1执行已冻结的T日计划: 复用run_contract结算原语, 不重新选股/排名。返回collect(dict: eq/sh/cash/fills/end_state)。"""
+    collect = {} if collect is None else collect
+    run_contract(universe, score_snap, risk_mode, px_d, ma100_d, ev_d, listed_d, [d_next], ownpos_d, budget=budget, collect=collect, reserve_mode=reserve_mode, hold_days=hold_days, init_state=state, exec_plan=plan, config_extra=config_extra, require_config=require_config)
+    return collect
 
 
 # ===== 影子模式状态持久化(原子写入/版本校验/往返) =====

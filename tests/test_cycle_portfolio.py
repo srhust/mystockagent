@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(
 import numpy as np
 import pandas as pd
 
-from cycle_portfolio import fsm_decide, v2ar_target, run_contract, COST, HOLD, save_state, load_state
+from cycle_portfolio import fsm_decide, v2ar_target, run_contract, COST, HOLD, save_state, load_state, plan_next_day, apply_day
 from bottom_nowcaster import build_features
 
 
@@ -172,3 +172,64 @@ def test_plan_apply_persistence():
     save_state(st, path)
     st2 = load_state(path)
     assert st2["last_date"] == st["last_date"] and st2["shares"] == st["shares"] and abs(st2["fees"] - st["fees"]) < 1e-12
+
+
+def test_config_mismatch_rejected():
+    """P1负例: 90日状态按120日恢复必须被拒绝(pytest.raises区分真实拒绝与测试自造异常)。"""
+    import pytest
+    n = 8
+    dts = pd.date_range("2022-01-03", periods=n, freq="B")
+    px = pd.Series([10.0] * 4 + [12.0] * 4, index=dts)
+    ma = pd.Series([1000.0] * 4 + [5.0] * 4, index=dts)
+    snap = {(d.to_period("M"), "MU"): 1.0 for d in dts}
+    own = {"MU": pd.Series(np.arange(n), index=dts)}
+    ev = {"MU": {1}}
+    li = {"MU": pd.Series(True, index=dts)}
+    c1 = {}
+    run_contract(["MU"], snap, "V2aF", {"MU": px}, {"MU": ma}, ev, li, dts[:5], own, collect=c1, reserve_mode=False, hold_days=90, config_extra={"scorer": "12m/edge"})
+    with pytest.raises(AssertionError, match="配置不符"):
+        run_contract(["MU"], snap, "V2aF", {"MU": px}, {"MU": ma}, ev, li, [dts[5]], own, reserve_mode=False, hold_days=120, init_state=c1["end_state"])
+
+
+def test_gap_day_rejected():
+    """P1负例: 漏日(跳过交易日)的计划必须被拒绝。"""
+    import pytest
+    from cycle_portfolio import plan_next_day
+    n = 8
+    dts = pd.date_range("2022-01-03", periods=n, freq="B")
+    px = pd.Series([10.0] * 4 + [12.0] * 4, index=dts)
+    ma = pd.Series([1000.0] * 4 + [5.0] * 4, index=dts)
+    snap = {(d.to_period("M"), "MU"): 1.0 for d in dts}
+    own = {"MU": pd.Series(np.arange(n), index=dts)}
+    ev = {"MU": {1}}
+    li = {"MU": pd.Series(True, index=dts)}
+    c1 = {}
+    run_contract(["MU"], snap, "V2aF", {"MU": px}, {"MU": ma}, ev, li, dts[:4], own, collect=c1, reserve_mode=False, hold_days=90)
+    with pytest.raises(AssertionError, match="漏日"):
+        plan_next_day(["MU"], snap, "V2aF", {"MU": px}, {"MU": ma}, ev, own, c1["end_state"], dts[5], hold_days=90, calendar=dts)
+
+
+def test_plan_driven_execution():
+    """P0: apply_day消费冻结计划 — 计划与执行分离, 逐笔与批量一致。"""
+    n = 10
+    dts = pd.date_range("2022-01-03", periods=n, freq="B")
+    px = pd.Series([10, 10, 10, 10, 10, 12, 12, 12, 12, 12], index=dts, dtype=float)
+    ma = pd.Series([1000.0] * 5 + [5.0] * 5, index=dts)
+    snap = {(d.to_period("M"), "MU"): 1.0 for d in dts}
+    own = {"MU": pd.Series(np.arange(n), index=dts)}
+    ev = {"MU": {1}}
+    li = {"MU": pd.Series(True, index=dts)}
+    cF = {}
+    eqF, _, _ = run_contract(["MU"], snap, "V2aF", {"MU": px}, {"MU": ma}, ev, li, dts, own, collect=cF, reserve_mode=False, hold_days=5)
+    c0 = {}
+    run_contract(["MU"], snap, "V2aF", {"MU": px}, {"MU": ma}, ev, li, dts[:1], own, collect=c0, reserve_mode=False, hold_days=5)
+    st = c0["end_state"]
+    eqs, fills = [c0["eq"].iloc[0]], []
+    for d in dts[1:]:
+        plan = plan_next_day(["MU"], snap, "V2aF", {"MU": px}, {"MU": ma}, ev, own, st, d, hold_days=5, calendar=dts)
+        ca = apply_day(["MU"], snap, "V2aF", {"MU": px}, {"MU": ma}, ev, li, own, st, plan, d, hold_days=5)
+        st = ca["end_state"]
+        eqs.append(ca["eq"].iloc[0])
+        fills.extend(ca["fills"])
+    np.testing.assert_allclose(np.array(eqs), eqF.values, rtol=0, atol=1e-9)
+    assert fills == cF["fills"]
