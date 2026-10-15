@@ -54,7 +54,7 @@ print(f"settle_phase: T+1收盘数据未到达→data_incomplete, 状态未推�
 assert st_after["last_date"] == days_T[-1]
 # 注入事前计划时间戳(模拟真实时序: 计划在T日生成) → 补T+1数据 → forward计分
 pc0 = pc[0]
-pc0["created_at"] = pd.Timestamp(days_T[-1].date()).tz_localize("UTC").isoformat()  # T日收盘后生成
+pc0["created_at"] = (pd.Timestamp(days_T[-1].date()).tz_localize("UTC") + pd.Timedelta(hours=22)).isoformat()  # T日22:00UTC=17:00ET收盘后(事前窗口内)
 lines = [json.loads(l) for l in open(f"{base}_log.jsonl", encoding="utf-8")]
 with open(f"{base}_log.jsonl", "w", encoding="utf-8") as f:
     for r in lines:

@@ -119,20 +119,98 @@ def serialize_fills(fills):
     return [[s, str(sig), str(fd), act, round(q, 6), round(p, 4), round(fee, 6)] for s, sig, fd, act, q, p, fee in fills]
 
 
+def _easter(y):
+    """匿名格里高利算法: 复活节周日。"""
+    import datetime as _dt
+    a = y % 19
+    b, c = y // 100, y % 100
+    d, e = b // 4, b % 4
+    f = (b + 8) // 25
+    g = (b - f + 1) // 3
+    h = (19 * a + b - d - g + 15) % 30
+    i, k = c // 4, c % 4
+    l = (32 + 2 * e + 2 * i - h - k) % 7
+    m = (a + 11 * h + 22 * l) // 451
+    mo = (h + l - 7 * m + 114) // 31
+    da = ((h + l - 7 * m + 114) % 31) + 1
+    return _dt.date(y, mo, da)
+
+
+def nx_closed_days(y0, y1):
+    """P0: NYSE/XNYS 规则休市日(非联邦假日近似)。规则: 周六假日→前周五休市; 周日假日→后周一休市。"""
+    import datetime as _dt
+    closed = set()
+    for y in range(y0, y1 + 1):
+        E = _easter(y)
+        fixed = [_dt.date(y, 1, 1), _dt.date(y, 6, 19), _dt.date(y, 7, 4), _dt.date(y, 12, 25), E - _dt.timedelta(days=2)]
+        for h in fixed:
+            wd = h.weekday()
+            if wd == 5:  # 周六 → 前周五
+                closed.add(h - _dt.timedelta(days=1))
+            elif wd == 6:  # 周日 → 后周一
+                closed.add(h + _dt.timedelta(days=1))
+            else:
+                closed.add(h)
+        mon1 = lambda m: next(_dt.date(y, m, 1) + _dt.timedelta(days=i) for i in range(7) if (_dt.date(y, m, 1) + _dt.timedelta(days=i)).weekday() == 0)
+        closed.add(mon1(1) + _dt.timedelta(weeks=2))  # MLK 3rd Mon
+        closed.add(mon1(2) + _dt.timedelta(weeks=2))  # Washington 3rd Mon
+        closed.add(max(_dt.date(y, 5, i) for i in range(25, 32) if _dt.date(y, 5, i).weekday() == 0))  # Memorial last Mon
+        sep1 = mon1(9)
+        closed.add(sep1)  # Labor 1st Mon
+        nov1 = _dt.date(y, 11, 1)
+        thank = nov1 + _dt.timedelta(days=(3 - nov1.weekday()) % 7 + 21)
+        closed.add(thank)  # Thanksgiving 4th Thu
+    return closed
+
+
+def nx_early_close(y0, y1):
+    """提前收盘(13:00 ET): 7/3(工作日), 黑色星期五(感恩节次日), 12/24(工作日)。"""
+    import datetime as _dt
+    early = set()
+    for y in range(y0, y1 + 1):
+        thu = [d for d in (_dt.date(y, 11, i) for i in range(1, 31)) if d.weekday() == 3]
+        bf = thu[3] + _dt.timedelta(days=1)  # 4th Thu 的次日
+        if bf.weekday() < 5:
+            early.add(bf)
+        if _dt.date(y, 7, 3).weekday() < 5:
+            early.add(_dt.date(y, 7, 3))
+        if _dt.date(y, 12, 24).weekday() < 5:
+            early.add(_dt.date(y, 12, 24))
+    return early
+
+
 def us_calendar(start, end):
-    """P0: 独立美股交易日历(工作日-联邦假日, 近似NYSE), 不依赖行情CSV; 带生成时间缓存。"""
-    cp = os.path.join(FWD, "calendar_us.json")
+    """P0: 独立NYSE/XNYS交易日历(规则休市集), 不依赖行情CSV; 带生成时间缓存。"""
+    import datetime as _dt
+    cp = os.path.join(FWD, "calendar_nyse.json")
     if os.path.exists(cp):
         doc = json.load(open(cp, encoding="utf-8"))
         if doc["start"] == str(start.date()) and doc["end"] == str(end.date()):
             return pd.DatetimeIndex(pd.to_datetime(doc["days"]))
-    from pandas.tseries.holiday import USFederalHolidayCalendar
-    cal = USFederalHolidayCalendar()
-    holidays = cal.holidays(start=start, end=end)
-    days = pd.bdate_range(start, end).difference(pd.DatetimeIndex(holidays))
+    closed = nx_closed_days(start.year - 1, end.year + 1)
+    days = pd.DatetimeIndex([d for d in pd.bdate_range(start, end) if d.date() not in closed])
     with open(cp, "w", encoding="utf-8") as f:
-        json.dump({"start": str(start.date()), "end": str(end.date()), "generated_at": pd.Timestamp.now(tz="UTC").isoformat(), "days": [str(d.date()) for d in days]}, f)
+        json.dump({"start": str(start.date()), "end": str(end.date()), "generated_at": pd.Timestamp.now(tz="UTC").isoformat(), "closed_sample": sorted(str(c) for c in list(closed)[:5]), "days": [str(d.date()) for d in days]}, f)
     return days
+
+
+def session_close_et(d):
+    """P0: T日NYSE收盘时刻(ET, naive): 常规16:00, 提前收盘日13:00。"""
+    import datetime as _dt
+    ec = nx_early_close(d.year - 1, d.year + 1)
+    return _dt.datetime.combine(d.date(), _dt.time(13, 0) if d.date() in ec else _dt.time(16, 0))
+
+
+def plan_time_valid(created_at, T, Tp1):
+    """P0: 事前窗口 Close(T) <= created_at(ET) < Open(T+1)=09:30 ET。"""
+    import datetime as _dt
+    ts = pd.Timestamp(created_at)
+    if ts.tzinfo is None:
+        ts = ts.tz_localize("UTC")
+    et = ts.tz_convert("America/New_York").replace(tzinfo=None)
+    lo = session_close_et(T)
+    hi = _dt.datetime.combine(Tp1.date(), _dt.time(9, 30))
+    return lo <= et < hi
 
 
 def nav_of(state, px_d):
@@ -248,6 +326,19 @@ def settle_phase(mkt, hold, state_path, log_path, allow_replay=False):
     d = cal[pos0 + 1]
     if d > days_all[-1]:
         return "data_incomplete"  # P0: T+1收盘数据未到达, 等待
+    missing_px = [s for s in TICKERS if not np.isfinite(px_d[s].get(d, np.nan))]  # P1: 14股完成性(部分更新→拒绝计分)
+    if missing_px:
+        with open(log_path, "a", encoding="utf-8") as f:
+            f.write(json.dumps({"type": "DATA_INCOMPLETE", "date": d.isoformat(), "missing": missing_px, "scoring": False}, default=str) + "\n")
+        return "data_incomplete_partial"
+    fp = content_fingerprint(mkt, cal[pos0])  # P1: 行情内容指纹仅锚定已验收历史(<=T); T+1价格冲突由成交序列化+状态哈希检测
+    fp_p = os.path.join(FWD, "_data_fp.json")
+    prev = json.load(open(fp_p, encoding="utf-8")) if os.path.exists(fp_p) else None
+    asof = str(cal[pos0].date())
+    if prev is not None and prev.get("asof") == asof and fp != prev["fp"]:  # 同一验收时点比较(推进/回放不误报)
+        raise AssertionError(f"行情内容指纹变化(疑似历史价格修订): 拒绝计分, 人工裁决")
+    with open(fp_p, "w", encoding="utf-8") as f:
+        json.dump({"fp": fp, "asof": asof}, f)
     plan_rec = None
     if os.path.exists(log_path):
         for l in open(log_path, encoding="utf-8"):
@@ -268,8 +359,9 @@ def settle_phase(mkt, hold, state_path, log_path, allow_replay=False):
         pp = _dec(plan_rec["plan"])  # P0: 消费事前计划
         body = {k: v for k, v in pp.items() if k != "plan_hash"}
         assert hashlib.sha1(json.dumps(_enc(body), sort_keys=True, default=str).encode()).hexdigest()[:12] == pp["plan_hash"], "事前计划验签失败"
-        ca_ts = pd.Timestamp(plan_rec.get("created_at", "1970-01-01"))
-        pre = ca_ts.date() < d.date()  # P0: 事前窗口 = 计划生成日严格早于成交日
+        ca_ts = plan_rec.get("created_at", "1970-01-01")
+        T = cal[pos0]  # T = 状态末日 = 计划基准日
+        pre = plan_time_valid(ca_ts, T, d)  # P0: Close(T) <= created_at(ET) < Open(T+1)
         scoring, phase_mode = pre, ("forward" if pre else "late_created")
     ca = apply_day(TICKERS, snap, "V2aF", px_d, ma100_d, ev_d, listed_d, ownpos_d, st, pp, d, hold_days=hold, require_config=True)
     st = ca["end_state"]
@@ -282,6 +374,17 @@ def settle_phase(mkt, hold, state_path, log_path, allow_replay=False):
             f.write(json.dumps({"type": "PLAN_EXECUTED", "plan_id": pp["plan_hash"], "date": d.isoformat(), "phase_mode": phase_mode, "scoring": bool(scoring), "data_fingerprint": hashlib.sha1("".join(str(x.date()) for x in days_all).encode()).hexdigest()[:12], "fills": serialize_fills(ca["fills"]), "eq": round(float(ca["eq"].iloc[0]), 6), "fees_cum": round(st["fees"], 4), "new_state_hash": state_hash(st)}, default=str) + "\n")
     save_state(st, state_path)
     return "settled"
+
+
+def content_fingerprint(mkt, upto):
+    """P1: 行情内容指纹(日期+各股收盘价), 价格修订可检测(非仅日期序列)。"""
+    h = hashlib.sha1()
+    px_d = mkt["px"]
+    for s in TICKERS:
+        ser = px_d[s][px_d[s].index <= upto]
+        for dt, v in ser.items():
+            h.update(f"{dt.date()}|{s}|{float(v):.6f};".encode())
+    return h.hexdigest()[:16]
 
 
 def dual_sync_check(p90, p120):
@@ -313,31 +416,40 @@ def main():
             r = settle_phase(mkt, hold, *paths[hold], allow_replay=True)
             print(f"replay[{hold}]: {r}(scoring=false)")
         return
-    # settle: 正式路径
+    # settle: 正式路径 — 身份校验前移到任何账户写入之前(P0)
+    cred_p = os.path.join(FWD, "launch_credential_v2.json")
+    if os.path.exists(cred_p):
+        cred0 = json.load(open(cred_p, encoding="utf-8"))
+        fh0 = {f: hashlib.sha256(open(os.path.join(r"E:\mystockagent", f), "rb").read()).hexdigest()[:16] for f in ("cycle_system/cycle_portfolio.py", "scripts/run_shadow.py")}
+        miss0 = [f for f in fh0 if f not in cred0.get("executor_file_hashes", {})]
+        mism0 = [f for f in fh0 if f in cred0.get("executor_file_hashes", {}) and cred0["executor_file_hashes"][f] != fh0[f]]
+        assert not mism0 and not miss0, f"凭证身份不完整或不符: mismatch={mism0} missing={miss0}, 拒绝结算"
+    off_p = os.path.join(FWD, "launch_credential_official.json")
+    if os.path.exists(off_p):  # P0: 正式凭证只签发一次 — 已存在仅验证自哈希并原样保留, 绝不覆盖
+        off = json.load(open(off_p, encoding="utf-8"))
+        body = json.dumps({k: v for k, v in off.items() if k != "self_hash"}, sort_keys=True, ensure_ascii=False)
+        assert hashlib.sha1(body.encode()).hexdigest()[:12] == off["self_hash"], "正式凭证自哈希校验失败"
+        print(f"正式凭证已存在(forward_start={off['forward_start']} NAV90={off['start_nav_90']} NAV120={off['start_nav_120']}), 校验通过, 不覆盖")
+        return
     start_navs = {hold: round(nav_of(load_state(paths[hold][0]), mkt["px"]), 6) for hold in (90, 120)}
     assert all(v > 0 for v in start_navs.values()), f"起点NAV无效: {start_navs}"
     results = {hold: settle_phase(mkt, hold, *paths[hold]) for hold in (90, 120)}
     print(f"settle: {results} | 起点NAV(处理前冻结): {start_navs} | 数据截止: {data_cutoff}")
-    cred_p = os.path.join(FWD, "launch_credential_v2.json")
     if os.path.exists(cred_p) and results[90] == results[120] == "settled":
         cred = json.load(open(cred_p, encoding="utf-8"))
         fh = {f: hashlib.sha256(open(os.path.join(r"E:\mystockagent", f), "rb").read()).hexdigest()[:16] for f in ("cycle_system/cycle_portfolio.py", "scripts/run_shadow.py")}
-        missing = [f for f in fh if f not in cred.get("executor_file_hashes", {})]
-        mismatch = [f for f in fh if f in cred.get("executor_file_hashes", {}) and cred["executor_file_hashes"][f] != fh[f]]
         if cred.get("forward_start") == "PENDING_FIRST_REAL_TRADING_DAY":
-            assert not mismatch and not missing, f"凭证身份不完整或不符: mismatch={mismatch} missing={missing}, 拒绝签发"  # P0: 缺任一预期身份即拒绝
-            # P0: 双配置均须为合格事前计划(forward)且计分日期一致
             for hold in (90, 120):
                 exs = [json.loads(l) for l in open(paths[hold][1], encoding="utf-8") if json.loads(l)["type"] == "PLAN_EXECUTED"]
                 assert exs and exs[-1]["scoring"] and exs[-1]["phase_mode"] == "forward", f"HOLD{hold}最后结算非合格事前计划, 拒绝签发"
             first_day = mkt["days"][list(mkt["days"]).index(load_state(paths[90][0])["last_date"])]
             cred2 = dict(cred)
-            cred2.update({"forward_start": str(first_day.date()), "start_nav_90": start_navs[90], "start_nav_120": start_navs[120], "verified_hashes": fh, "signed_at": pd.Timestamp.now(tz="UTC").isoformat(), "scoring": True, "price_basis": "T+1日收盘价模拟成交(非实盘可实现收益口径)", "normalization": "各配置以自身起点NAV归一化为100"})
+            cred2.update({"forward_start": str(first_day.date()), "start_nav_90": start_navs[90], "start_nav_120": start_navs[120], "verified_hashes": fh, "signed_at": pd.Timestamp.now(tz="UTC").isoformat(), "scoring": True, "price_basis": "T+1日收盘价模拟成交(非实盘可实现收益口径)", "normalization": "各配置以自身起点NAV归一化为100", "issued_once": True})
             body = json.dumps({k: v for k, v in cred2.items() if k != "self_hash"}, sort_keys=True, ensure_ascii=False)
             cred2["self_hash"] = hashlib.sha1(body.encode()).hexdigest()[:12]
-            with open(os.path.join(FWD, "launch_credential_official.json"), "w", encoding="utf-8") as f:
+            with open(off_p, "w", encoding="utf-8") as f:
                 json.dump(cred2, f, ensure_ascii=False, indent=1)
-            print(f"正式启动凭证已签发: forward_start={cred2['forward_start']} NAV90={start_navs[90]} NAV120={start_navs[120]}")
+            print(f"正式启动凭证已签发(一次性): forward_start={cred2['forward_start']} NAV90={start_navs[90]} NAV120={start_navs[120]}")
 
 
 if __name__ == "__main__":

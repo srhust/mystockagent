@@ -237,6 +237,9 @@ def test_recover_with_fills():
     import json
     import run_shadow as RS
     RS.TICKERS = ["MU"]  # 合成单标的场景(模块函数按全局TICKERS迭代)
+    import tempfile as _tf
+    tmp0 = _tf.mkdtemp()
+    RS.FWD = tmp0  # 隔离日历缓存与指纹文件
     n = 10
     dts = pd.date_range("2022-01-03", periods=n, freq="B")
     px = pd.Series([10, 10, 10, 10, 10, 12, 12, 12, 12, 12], index=dts, dtype=float)
@@ -269,7 +272,7 @@ def test_recover_with_fills():
     # T+1价格修订 → 拒绝
     save_state(st_d5, sp)
     px_rev = px.copy()
-    px_rev.iloc[6] = 99.0
+    px_rev.iloc[6] = px_rev.iloc[6] * 8.25  # 仅修订结算日d6(≤T指纹域不变, 由成交序列化+状态哈希检测)
     mkt_rev = dict(mkt)
     mkt_rev["px"] = {"MU": px_rev}
     with pytest.raises(AssertionError, match="数据修订冲突"):
@@ -291,6 +294,8 @@ def test_time_boundary():
     import tempfile
     import run_shadow as RS
     RS.TICKERS = ["MU"]
+    tmp = tempfile.mkdtemp()
+    RS.FWD = tmp  # 隔离日历缓存与指纹文件(monkeypatch模块常量)
     n = 10
     dts = pd.date_range("2022-01-03", periods=n, freq="B")
     px = pd.Series([10] * 5 + [12, 12, 12, 12, 12], index=dts, dtype=float)
@@ -315,7 +320,7 @@ def test_time_boundary():
     lines = [json.loads(l) for l in open(lp, encoding="utf-8")]
     for r in lines:
         if r["type"] == "PLAN_CREATED":
-            r["created_at"] = pd.Timestamp(st_T["last_date"].date()).tz_localize("UTC").isoformat()
+            r["created_at"] = pd.Timestamp(st_T["last_date"].date()).tz_localize("UTC") + pd.Timedelta(hours=22)  # T日22:00UTC=17:00ET收盘后
     with open(lp, "w", encoding="utf-8") as f:
         for r in lines:
             f.write(json.dumps(r, default=str) + "\n")
