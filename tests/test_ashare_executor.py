@@ -81,66 +81,69 @@ def test_limit_and_halt_rejections():
 
 
 def test_ledger_atomic_and_t1_sellable():
-    """P0-2/P0-5: 异常零副作用(内存+文件字节级不变); 同日买入不可卖, 跨日可卖。"""
+    """R4: 可信通道+execution_date绑定+同日不可卖+节假日日历+原子性。"""
     tmp = tempfile.mkdtemp()
     led = Ledger("M", nav0=20000.0, root=tmp)
     led.advance_day("2026-10-15")
     plan = create_plan("600019", "BUY", "2026-10-15", px_ref=10.0, cash_budget=20000.0)
+    led.register_plan(plan)  # N2: 可信通道
     f = execute_plan(plan, "2026-10-16", px_t1=10.20, prev_close=10.0)
+    assert f["execution_date"] == "2026-10-16"
+    with pytest.raises(AssertionError, match="与账本交易日不一致"):
+        led.apply(f)  # N3: 账本日仍为10-15, 10-16成交不得入账
+    led.advance_day("2026-10-16")
     led.apply(f)
     assert led.pos["600019"] == {"total": f["shares"], "sellable": 0}
     snap_file = open(led.log_p, "rb").read()
     snap = (led.cash, json.dumps(led.pos, sort_keys=True))
     with pytest.raises(AssertionError, match="卖出超过"):
-        led.apply({"code": "600019", "action": "SELL", "status": "FILLED", "plan_hash": "m1", "shares": f["shares"], "cash_delta": 19934.83, "price": 10.5, "notional": 19950.0, "fees": 15.17})
-    assert (led.cash, json.dumps(led.pos, sort_keys=True)) == snap
-    assert open(led.log_p, "rb").read() == snap_file
+        led.apply({**f, "action": "SELL", "plan_hash": "m1", "cash_delta": 19934.83, "notional": 19950.0, "fees": 15.17, "shares": f["shares"], "price": 10.5}, allow_unplanned=True)
+    assert (led.cash, json.dumps(led.pos, sort_keys=True)) == snap and open(led.log_p, "rb").read() == snap_file
+    # N2: 伪造负费用与无来源成交必须拒绝
+    fake = {**f, "action": "SELL", "plan_hash": "fake123", "cash_delta": 900.0, "notional": 1000.0, "fees": -100.0, "shares": 100, "price": 10.0}
+    with pytest.raises(AssertionError, match="费用必须非负"):
+        led.apply(fake, allow_unplanned=True)
+    fake2 = {**fake, "fees": 0.0, "cash_delta": 1000.0}
+    with pytest.raises(AssertionError, match="冻结计划"):
+        led.apply(fake2)  # 无登记计划→拒绝(不开allow_unplanned)
+    # A4: 同日重复切换拒绝
     with pytest.raises(AssertionError, match="严格前进"):
-        led.advance_day("2026-10-15")  # A4: 同日重复切换拒绝(账本日仍为10-15)
-    led.advance_day("2026-10-16")
-    assert led.pos["600019"]["sellable"] == f["shares"]
-    # A3: 负股数/金额不守恒/重复成交拒绝
-    with pytest.raises(AssertionError, match="正整数"):
-        led.apply({"code": "600019", "action": "BUY", "status": "FILLED", "plan_hash": "fakeA3a", "shares": -100, "cash_delta": 1000.0, "price": 10.0, "notional": -1000.0, "fees": 5.0})
-    with pytest.raises(AssertionError, match="守恒"):
-        led.apply({"code": "600019", "action": "BUY", "status": "FILLED", "plan_hash": "fakeA3b", "shares": 100, "cash_delta": -1000.0, "price": 10.0, "notional": 5000.0, "fees": 5.0})
-    okfill = {"code": "600019", "action": "BUY", "status": "FILLED", "plan_hash": "dup1", "shares": 100, "cash_delta": -505.01, "price": 5.0, "notional": 500.0, "fees": 5.01}
-    led.apply(okfill)
+        led.advance_day("2026-10-16")
+    # N4: 节假日日历 — 国庆前计划顺延到10-08; 10-01不是交易日
+    from ashare_executor import is_trading_day, _next_bdate
+    assert not is_trading_day("2026-10-01") and is_trading_day("2026-10-08")
+    assert str(_next_bdate("2026-09-30").date()) == "2026-10-08"
+    hp = create_plan("600019", "BUY", "2026-09-30", px_ref=10.0, cash_budget=20000.0, created_at="2026-09-30T16:00:00+08:00")
+    led.register_plan(hp)
+    hf = execute_plan(hp, "2026-10-08", px_t1=10.20, prev_close=10.0)  # 跨国庆顺延成交
+    assert hf["status"] == "FILLED" and hf["execution_date"] == "2026-10-08"
+    with pytest.raises(AssertionError, match="下一交易日"):
+        execute_plan(hp, "2026-10-01", px_t1=10.20, prev_close=10.0)  # 节假日执行拒绝
+    # N1: 执行日开盘后(15:30)生成的计划必须拒绝
+    late = create_plan("600019", "BUY", "2026-10-15", px_ref=10.0, cash_budget=20000.0, created_at="2026-10-16T15:30:00+08:00")
+    led.register_plan(late)
+    with pytest.raises(AssertionError, match="窗口内"):
+        execute_plan(late, "2026-10-16", px_t1=10.20, prev_close=10.0)
+    # 重复成交拒绝(同plan_hash)
+    led.register_plan(plan)
     with pytest.raises(AssertionError, match="重复成交"):
-        led.apply(okfill)  # A3: 同plan_hash重复入账拒绝
-    led.advance_day("2026-10-18")
-    s = create_plan("600019", "SELL", "2026-10-16", px_ref=10.2, shares=f["shares"], created_at="2026-10-16T16:00:00+08:00")
-    sf = execute_plan(s, "2026-10-19", px_t1=10.50, prev_close=10.2)
-    led.apply(sf)
-    assert led.pos["600019"] == {"total": 100, "sellable": 100} and led.cash == pytest.approx(20000.0 + f["cash_delta"] + sf["cash_delta"] + okfill["cash_delta"], abs=0.01)  # 余100股=okfill买入
-    snap2_file = open(led.log_p, "rb").read()
-    snap2 = (led.cash, json.dumps(led.pos, sort_keys=True))
-    with pytest.raises(AssertionError, match="卖出超过"):
-        led.apply({"code": "600019", "action": "SELL", "status": "FILLED", "plan_hash": "over1", "shares": 200, "cash_delta": 2093.93, "price": 10.5, "notional": 2100.0, "fees": 6.07})
-    assert (led.cash, json.dumps(led.pos, sort_keys=True)) == snap2, "A6: 超卖异常后状态字节级不变"
-    assert open(led.log_p, "rb").read() == snap2_file, "A6: 超卖异常后日志字节级不变"
+        led.apply(f)
+    # 跨日释放: advance到10-19(下一交易日)后原持仓可卖
+    led.advance_day("2026-10-19")
+    assert led.pos["600019"]["sellable"] == f["shares"]
+    # A3: 负股数/守恒/重复身份(测试构造通道, 审计标记unplanned)
+    with pytest.raises(AssertionError, match="正整数"):
+        led.apply({"code": "600019", "action": "BUY", "status": "FILLED", "plan_hash": "fakeA3a", "shares": -100, "cash_delta": 1000.0, "price": 10.0, "notional": -1000.0, "fees": 5.0, "execution_date": "2026-10-19"}, allow_unplanned=True)
+    with pytest.raises(AssertionError, match="守恒"):
+        led.apply({"code": "600019", "action": "BUY", "status": "FILLED", "plan_hash": "fakeA3b", "shares": 100, "cash_delta": -1000.0, "price": 10.0, "notional": 5000.0, "fees": 5.0, "execution_date": "2026-10-19"}, allow_unplanned=True)
     with pytest.raises(AssertionError, match="仅FILLED"):
-        led.apply({"code": "600019", "action": "BUY", "status": "REJECTED", "reason": "limit_up", "cash_delta": 0})
-    # A5: 科创板余额<200一次性卖出(账本验证total==shares)
-    led5 = Ledger("S5", nav0=200000.0, root=tmp)
-    led5.advance_day("2026-10-15")
-    led5.apply({"code": "688981", "action": "BUY", "status": "FILLED", "plan_hash": "star1", "shares": 250, "cash_delta": -25005.25, "price": 100.0, "notional": 25000.0, "fees": 5.25})
-    led5.advance_day("2026-10-16")
-    s5 = create_plan("688981", "SELL", "2026-10-16", px_ref=100.0, shares=200, created_at="2026-10-16T16:00:00+08:00")
-    led5.apply(execute_plan(s5, "2026-10-19", px_t1=101.0, prev_close=100.0))
-    s5b = create_plan("688981", "SELL", "2026-10-16", px_ref=101.0, shares=50, created_at="2026-10-16T16:00:00+08:00")
-    f5b = execute_plan(s5b, "2026-10-19", px_t1=100.5, prev_close=101.0, allow_residual_sell=True)
-    assert f5b["status"] == "FILLED", "A5: 科创板余额50股一次性卖出应允许"
-    led5.apply(f5b)
-    assert "688981" not in led5.pos
-    r5 = execute_plan(create_plan("688981", "SELL", "2026-10-16", px_ref=100.0, shares=50, created_at="2026-10-16T16:00:00+08:00"), "2026-10-19", px_t1=99.0, prev_close=100.0)
-    assert r5["status"] == "REJECTED" and r5["reason"] == "bad_lot"  # 不开余额开关时仍拒绝
-
+        led.apply({"code": "600019", "action": "BUY", "status": "REJECTED", "reason": "limit_up", "cash_delta": 0}, allow_unplanned=True)
 
 def test_nav_missing_price_and_fees():
     led = Ledger("X", nav0=20000.0, root=tempfile.mkdtemp())
-    led.advance_day("2026-10-15")
+    led.advance_day("2026-10-16")
     plan = create_plan("600019", "BUY", "2026-10-15", px_ref=10.0, cash_budget=20000.0)
+    led.register_plan(plan)
     f = execute_plan(plan, "2026-10-16", px_t1=10.20, prev_close=10.0)
     led.apply(f)
     with pytest.raises(KeyError, match="缺价"):

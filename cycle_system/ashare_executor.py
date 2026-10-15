@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """Ashare-Stock 统一执行引擎(阶段1 R2): FrozenPlan(T日,零T+1信息) → ExecutionResult(T+1)。
 铁律: 计划与成交两阶段分离(计划无法访问T+1行情); 涨跌停/停牌拒绝; 整手(科创板200股起); A股费用; T+1可卖约束; 账本原子性。"""
 import hashlib
@@ -9,6 +9,13 @@ import pandas as pd
 
 ST_RULE_NEW = pd.Timestamp("2026-07-06")  # 仅主板ST 5%→10%
 GEM_REG = pd.Timestamp("2020-08-24")  # 创业板注册制: 普通股10%→20%, ST恒20%
+# A股节假日(已核实项; 完整官方日历随数据管道接入, Release Gate前必须补全)
+CN_HOLIDAYS = {pd.Timestamp(x).date() for x in ["2026-01-01", "2026-01-02", "2026-10-01", "2026-10-02", "2026-10-05", "2026-10-06", "2026-10-07"]}
+
+
+def is_trading_day(d) -> bool:
+    x = pd.Timestamp(d).normalize()
+    return x.weekday() < 5 and x.date() not in CN_HOLIDAYS
 
 
 def limit_ratio(code: str, trade_date, is_st: bool = False) -> float:
@@ -75,9 +82,9 @@ def create_plan(code: str, action: str, trade_date, px_ref: float, cash_budget: 
 
 def _next_bdate(d):
     x = pd.Timestamp(d).normalize() + pd.Timedelta(days=1)
-    while x.weekday() >= 5:
+    while not is_trading_day(x):
         x += pd.Timedelta(days=1)
-    return x  # 简化A股日历(仅周末), 法定节假日接入待数据管道(P1)
+    return x
 
 
 def execute_plan(plan: dict, trade_date_t1, px_t1: float, prev_close: float, halted: bool = False, is_st: bool = False, allow_residual_sell: bool = False) -> dict:
@@ -85,8 +92,9 @@ def execute_plan(plan: dict, trade_date_t1, px_t1: float, prev_close: float, hal
     body = json.dumps({k: v for k, v in plan.items() if k != "plan_hash"}, sort_keys=True, ensure_ascii=False)
     assert hashlib.sha1(body.encode()).hexdigest()[:12] == plan["plan_hash"], "计划哈希校验失败: 计划被篡改"
     assert pd.Timestamp(trade_date_t1).normalize() == _next_bdate(plan["trade_date"]), "A2: 执行日必须为计划日的下一交易日, 禁止同日成交"
-    ca = pd.Timestamp(plan["created_at"]).tz_convert("Asia/Shanghai").tz_localize(None)  # A2窗口: 北京时间[计划日15:00, 执行日开盘)
-    assert ca >= pd.Timestamp(plan["trade_date"]) + pd.Timedelta(hours=15) and ca.date() <= pd.Timestamp(trade_date_t1).date(), "A2: 计划生成时间必须于计划日收盘后、执行日开盘前窗口内"
+    ca = pd.Timestamp(plan["created_at"]).tz_convert("Asia/Shanghai").tz_localize(None)  # A2窗口: 北京时间[计划日15:00, 下一交易日09:30开盘)
+    hi = _next_bdate(plan["trade_date"]) + pd.Timedelta(hours=9, minutes=30)
+    assert ca >= pd.Timestamp(plan["trade_date"]) + pd.Timedelta(hours=15) and ca < hi, "A2: 计划生成时间必须于[计划日15:00, 下一交易日09:30)窗口内"
     code, action = plan["code"], plan["action"]
     ok, reason = tradable(code, px_t1, prev_close, trade_date_t1, halted, is_st)
     rej = {"plan_hash": plan["plan_hash"], "code": code, "action": action, "status": "REJECTED",
@@ -107,7 +115,7 @@ def execute_plan(plan: dict, trade_date_t1, px_t1: float, prev_close: float, hal
             return {**rej, "reason": "insufficient_cash_after_fees"}
         notional = shares * price
         fee = fees(code, notional, False)
-        return {"plan_hash": plan["plan_hash"], "code": code, "action": "BUY", "status": "FILLED",
+        return {"plan_hash": plan["plan_hash"], "code": code, "action": "BUY", "status": "FILLED", "execution_date": str(_next_bdate(plan["trade_date"]).date()),
                 "shares": shares, "price": price, "notional": round(notional, 2), "fees": fee,
                 "cash_delta": -round(notional + fee, 2), "signal_px": plan["signal_px"], "scoring": True}
     shares = plan["shares"]
@@ -116,7 +124,7 @@ def execute_plan(plan: dict, trade_date_t1, px_t1: float, prev_close: float, hal
         return {**rej, "reason": "bad_lot"}  # A5: 科创板余额<200一次性卖出由账本验证total==shares
     notional = shares * price
     fee = fees(code, notional, True)
-    return {"plan_hash": plan["plan_hash"], "code": code, "action": "SELL", "status": "FILLED",
+    return {"plan_hash": plan["plan_hash"], "code": code, "action": "SELL", "status": "FILLED", "execution_date": str(_next_bdate(plan["trade_date"]).date()),
             "shares": shares, "price": price, "notional": round(notional, 2), "fees": fee,
             "cash_delta": round(notional - fee, 2), "signal_px": plan["signal_px"], "scoring": True}
 
@@ -129,22 +137,31 @@ class Ledger:
         self.cash = float(nav0)
         self.pos = {}  # code -> {"total": int, "sellable": int}  (sellable=当日可卖, 买入当日不增)
         self.trading_day = None
+        self.registered = {}  # plan_hash -> plan (可信通道: 仅接受已登记冻结计划的ExecutionResult)
         os.makedirs(root, exist_ok=True)
         self.log_p = os.path.join(root, f"ledger_{name}.jsonl")
+
+    def register_plan(self, plan: dict):
+        """登记冻结计划(可信通道): 后续ExecutionResult必须关联已登记计划。"""
+        self.registered[plan["plan_hash"]] = plan
 
     def advance_day(self, day):
         """交易日切换(严格前进, A4): 全部持仓转为可卖(完成T+1)。同日重复调用或倒退拒绝。"""
         d = str(pd.Timestamp(day).date())
         assert self.trading_day is None or d > self.trading_day, "A4: 交易日必须严格前进, 禁止同日重复切换或倒退"
+        assert is_trading_day(d), f"A4/日历: 非A股交易日(节假日或周末): {d}"
         self.trading_day = d
         for c in self.pos:
             self.pos[c]["sellable"] = self.pos[c]["total"]
 
-    def apply(self, fill: dict):
-        """原子入账(A3): 独立不变量——正股数/金额守恒/唯一成交身份(plan_hash)/可卖约束→写审计→提交。"""
+    def apply(self, fill: dict, allow_unplanned: bool = False):
+        """原子入账(A3/N2): fees非负+execution_date绑定交易日+计划关联(allow_unplanned仅测试构造, 审计标记)→验证→写审计→提交。"""
         assert fill.get("status") == "FILLED" and fill.get("action") in ("BUY", "SELL"), f"仅FILLED可入账: {fill}"
         ph = fill.get("plan_hash")
         assert ph and ph not in getattr(self, "_executed", set()), f"A3: 重复成交拒绝: {ph}"
+        assert ph in self.registered or allow_unplanned, "N2: 成交必须关联已登记冻结计划(allow_unplanned仅限测试构造, 不计分)"
+        assert fill.get("fees", 0) >= 0, "N2: 费用必须非负"
+        assert fill.get("execution_date") == self.trading_day, f"N3: 成交日与账本交易日不一致: fill={fill.get('execution_date')} ledger={self.trading_day}"
         code, shares, delta = fill["code"], fill["shares"], fill["cash_delta"]
         assert isinstance(shares, int) and not isinstance(shares, bool) and shares > 0, f"A3: 股数必须为正整数: {shares}"
         assert fill.get("price", 0) > 0 and fill.get("notional") is not None and fill.get("fees") is not None, "A3: 成交记录不完整"
@@ -167,7 +184,7 @@ class Ledger:
             if p["total"] == 0:
                 del new_pos[code]
         with open(self.log_p, "a", encoding="utf-8") as f:  # 验证全过后才持久化
-            f.write(json.dumps(fill, ensure_ascii=False, default=str) + "\n")
+            f.write(json.dumps({**fill, "unplanned": bool(allow_unplanned)}, ensure_ascii=False, default=str) + "\n")
         self.cash, self.pos = new_cash, new_pos
         self._executed = getattr(self, "_executed", set()) | {ph}
 
