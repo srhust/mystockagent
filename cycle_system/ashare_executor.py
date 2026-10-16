@@ -13,14 +13,19 @@ GEM_REG = pd.Timestamp("2020-08-24")  # 创业板注册制: 普通股10%→20%, 
 CN_HOLIDAYS = {pd.Timestamp(x).date() for x in ["2026-01-01", "2026-01-02", "2026-10-01", "2026-10-02", "2026-10-05", "2026-10-06", "2026-10-07"]}
 
 
-def is_trading_day(d) -> bool:
-    """R7: 优先使用推导交易日历(ashare_calendar, 数据源=市场成交日并集); 无缓存时回退手工表+周末(approx)。"""
+def _calendar():
+    """D1: 正常包导入链(相对→包名), 全部失败raise——绝不静默回退近似日历。"""
     try:
-        from ashare_calendar import is_trading_day as _cal_day
-        return _cal_day(d)
-    except Exception:
-        x = pd.Timestamp(d).normalize()
-        return x.weekday() < 5 and x.date() not in CN_HOLIDAYS
+        from . import ashare_calendar
+        return ashare_calendar
+    except ImportError:
+        from cycle_system import ashare_calendar
+        return ashare_calendar
+
+
+def is_trading_day(d) -> bool:
+    """D1/D2: 委托推导日历; UNKNOWN/导入失败/缓存损坏一律raise(fail-closed), 无近似回退。"""
+    return _calendar().is_trading_day(d)
 
 
 def limit_ratio(code: str, trade_date, is_st: bool = False) -> float:
@@ -86,10 +91,7 @@ def create_plan(code: str, action: str, trade_date, px_ref: float, cash_budget: 
 
 
 def _next_bdate(d):
-    x = pd.Timestamp(d).normalize() + pd.Timedelta(days=1)
-    while not is_trading_day(x):
-        x += pd.Timedelta(days=1)
-    return x
+    return _calendar()._next_bdate(d)
 
 
 def execute_plan(plan: dict, trade_date_t1, px_t1: float, prev_close: float, halted: bool = False, is_st: bool = False, allow_residual_sell: bool = False) -> dict:

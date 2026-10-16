@@ -17,3 +17,4 @@ __pycache__/
 *.7z
 env/
 .venv/
+data/stocks/
