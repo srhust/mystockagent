@@ -1,0 +1,33 @@
+{
+ "strategy": "bh",
+ "caveats": {
+  "survivorship": "仅当前配置池",
+  "st_history": "UNAVAILABLE",
+  "suspension": "行情近似",
+  "industry": "当前快照非历史时点",
+  "oos": "样本外验证未完成, 探索性不构成正式业绩",
+  "executor": "统一执行器+账本(raw价/涨跌停/停牌/整手/T+1/真实费用)"
+ },
+ "stats": {
+  "return": -0.7725,
+  "ann": -0.196,
+  "max_dd": -0.7725,
+  "calmar": -0.25,
+  "sharpe": -0.39,
+  "trades": {
+   "BUY": 0,
+   "SELL": 0
+  },
+  "rejects": {
+   "halted": 0,
+   "limit": 0,
+   "lot": 10,
+   "no_px": 0,
+   "pool": 0,
+   "other": 10
+  },
+  "cash_pct": 1.0,
+  "avg_hold_days": null,
+  "n_days": 1643
+ }
+}
