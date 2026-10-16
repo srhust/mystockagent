@@ -134,8 +134,8 @@ def run(strategy: str = "m1", n_hold: int = 5) -> dict:
                 halted = px_day.get(code, np.nan) != px_day.get(code, np.nan) or raw_day.get(code, np.nan) != raw_day.get(code, np.nan)
                 pc = last_px.get(code, px)
                 fill = ex.execute_plan(plan, trade_date_t1=day_str, px_t1=px, prev_close=pc, halted=halted, is_st=False)
-                ledger.apply(fill, allow_unplanned=True)
-                if fill["status"] == "FILLED":
+                if fill["status"] == "FILLED":  # R14b根因2: 仅FILLED入账, REJECTED直接记拒单
+                    ledger.apply(fill, allow_unplanned=True)
                     cash = ledger.cash
                     if action == "BUY":
                         pos[code] = pos.get(code, 0) + fill["shares"]
@@ -148,7 +148,8 @@ def run(strategy: str = "m1", n_hold: int = 5) -> dict:
                         trades["SELL"] += 1
                 else:
                     rej["limit"] += 1
-            except Exception:
+            except Exception as _e:
+                rej.setdefault("other_msgs", []).append(str(_e)[:70])
                 rej["other"] += 1
         pending = []
         # ── 2) 收盘估值+新信号(I1: 信号冻结至明日) ──
@@ -180,7 +181,7 @@ def run(strategy: str = "m1", n_hold: int = 5) -> dict:
                 if strategy == "m1":  # 趋势破坏退出: close_adj跌破行业门禁或MA20(收盘信号, T+1执行)
                     for c in list(pos):
                         s = close_adj[c].loc[:day].tail(20)
-                        if len(s) >= 20 and close_adj[c].get(day, np.nan) < s.mean():
+                        if len(s) >= 20 and close_adj[c].get(day, np.nan) < s.mean() * 0.97:  # 3%破位缓冲, 减边缘翻转
                             pending.append((c, "SELL", day_str))
         elif strategy == "trend":
             si = idx.mean(axis=1)

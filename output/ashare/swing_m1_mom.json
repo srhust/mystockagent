@@ -20,11 +20,11 @@
   },
   "rejects": {
    "halted": 0,
-   "limit": 0,
+   "limit": 17,
    "lot": 151,
    "no_px": 0,
    "pool": 0,
-   "other": 17
+   "other": 0
   },
   "cash_pct": 0.213,
   "avg_hold_days": null,

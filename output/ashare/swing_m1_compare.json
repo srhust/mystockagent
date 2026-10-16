@@ -9,24 +9,24 @@
  },
  "compare": {
   "m1": {
-   "return": -0.2256,
-   "ann": -0.037,
-   "max_dd": -0.3472,
-   "calmar": -0.11,
-   "sharpe": -0.38,
+   "return": 0.2974,
+   "ann": 0.0391,
+   "max_dd": -0.2684,
+   "calmar": 0.15,
+   "sharpe": 0.38,
    "trades": {
-    "BUY": 98,
-    "SELL": 98
+    "BUY": 75,
+    "SELL": 72
    },
    "rejects": {
     "halted": 0,
-    "limit": 0,
-    "lot": 112,
+    "limit": 70,
+    "lot": 127,
     "no_px": 0,
     "pool": 0,
-    "other": 87
+    "other": 0
    },
-   "cash_pct": 0.753,
+   "cash_pct": 0.54,
    "avg_hold_days": 1,
    "n_days": 1643
   },
@@ -42,11 +42,11 @@
    },
    "rejects": {
     "halted": 0,
-    "limit": 0,
+    "limit": 2,
     "lot": 10,
     "no_px": 0,
     "pool": 0,
-    "other": 2
+    "other": 0
    },
    "cash_pct": 0.228,
    "avg_hold_days": null,
@@ -64,11 +64,11 @@
    },
    "rejects": {
     "halted": 0,
-    "limit": 0,
+    "limit": 65,
     "lot": 99,
     "no_px": 0,
     "pool": 0,
-    "other": 65
+    "other": 0
    },
    "cash_pct": 0.748,
    "avg_hold_days": 1,
@@ -86,11 +86,11 @@
    },
    "rejects": {
     "halted": 0,
-    "limit": 0,
+    "limit": 17,
     "lot": 151,
     "no_px": 0,
     "pool": 0,
-    "other": 17
+    "other": 0
    },
    "cash_pct": 0.213,
    "avg_hold_days": null,
