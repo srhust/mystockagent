@@ -118,3 +118,15 @@ def test_h1_h3_identity_and_report():
     r = tp.pool_at("2026-09-28")
     assert r["buckets"]["DELISTED_CONFIRMED"] == ["000961"]  # 交易所公告口径
 
+
+def test_limit_up_buy_rejected():
+    """L2负例: 主板前收盘10元, 次日涨停开盘11元, BUY必须拒绝且账本不变。"""
+    import tempfile
+    import ashare_executor as ex
+    L = ex.Ledger("t_lu", nav0=20000.0, root=tempfile.gettempdir() + "/m1_lu", test_mode=False)
+    plan = ex.create_plan("000001", "BUY", "2026-09-28", px_ref=10.0, cash_budget=5500.0, created_at="2026-09-28T15:30:00+08:00")
+    fill = ex.execute_plan(plan, trade_date_t1="2026-09-29", px_t1=11.0, prev_close=10.0, halted=False, is_st=False)
+    assert fill["status"] == "REJECTED", f"涨停开盘BUY必须拒绝: {fill}"
+    with pytest.raises(AssertionError):
+        L.apply(fill)  # REJECTED不得入账
+    assert L.cash == 20000.0  # 账本零变化

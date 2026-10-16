@@ -66,7 +66,7 @@ def cycle_stage(idx: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(out)
 
 
-def stock_rank(panel: pd.DataFrame, day) -> list:
+def stock_rank(panel: pd.DataFrame, day, kind: str = "3f") -> list:
     """三因子等权(复权口径): 20日动量+趋势稳定+流动性。仅用T日之前数据。"""
     d0 = pd.Timestamp(day)
     hist = panel[panel["date"] < d0]
@@ -82,7 +82,8 @@ def stock_rank(panel: pd.DataFrame, day) -> list:
     if f.empty:
         return []
     z = (f.rank(pct=True) - 0.5) * 2
-    return list((z.sum(axis=1)).sort_values(ascending=False).index)
+    col = "mom" if kind == "mom" else ["mom", "stab", "liq"]  # L3: 消融排序口径(纯动量 vs 三因子)
+    return list((z[col].sum(axis=1)).sort_values(ascending=False).index)
 
 
 def run(strategy: str = "m1", n_hold: int = 5) -> dict:
@@ -113,12 +114,12 @@ def run(strategy: str = "m1", n_hold: int = 5) -> dict:
         # ── 1) 开盘执行T-1收盘冻结的完整计划(J1: 信号日已create+register, T日只execute) ──
         for plan in list(pending):
             code, action, sig_day = plan["code"], plan["action"], plan["trade_date"]
+            if action == "BUY":
+                reserved[0] -= float(plan["cash_budget"])  # L1: 进入处理即释放(成交/拒单/缺价/异常四路径统一终态)
             px = px_day.get(code, np.nan)
             if px != px:
                 rej["no_px"] += 1
                 continue
-            if action == "BUY":
-                reserved[0] -= float(plan["cash_budget"])  # K2: 执行日释放预算(无论成交与否)
             try:
                 halted = raw_day.get(code, np.nan) != raw_day.get(code, np.nan)
                 pc = last_px.get(code)  # J2: 全市场前收盘(非当日开盘)
@@ -137,14 +138,17 @@ def run(strategy: str = "m1", n_hold: int = 5) -> dict:
                             hold_days.append(dix[day] - buy_day.pop(code, dix[day]))  # J4: 交易日计数
                         trades["SELL"] += 1
                 else:
-                    r = str(fill.get("reason", ""))  # K3: 按执行器真实reason分类
-                    key = "limit" if ("涨停" in r or "跌停" in r or "limit" in r) else ("halted" if "停" in r else "reject_other")
+                    r = str(fill.get("reason", "unknown"))  # L2: reason原样逐笔归因
+                    rej.setdefault("reason_detail", {}).setdefault(r, 0)
+                    rej["reason_detail"][r] += 1
+                    key = "limit" if ("涨停" in r or "跌停" in r) else ("halted" if "停" in r else "reject_other")
                     rej[key] = rej.get(key, 0) + 1
             except Exception as _e:
                 msg = str(_e)[:70]
                 key = "insufficient_cash" if "现金透支" in msg else "other"  # K3: 现金透支独立分类
                 rej[key] = rej.get(key, 0) + 1
                 rej.setdefault("other_msgs", []).append(msg)
+        assert abs(reserved[0]) < 1e-6, f"L1: 日终预留未清零 {reserved[0]}"  # 预算预留日终恒等
         pending = []
         # ── 2) 收盘估值+新信号(I1: 信号冻结至明日) ──
         for c, v in raw_day.dropna().items():  # J2: 全市场前收盘维护(非仅持仓)
@@ -186,19 +190,20 @@ def run(strategy: str = "m1", n_hold: int = 5) -> dict:
             if i == 65 and not pos and not pending:
                 for c in stock_rank(panel, day)[:20]:
                     freeze(c, "BUY")
-        elif strategy in ("m1", "mom"):
+        elif strategy in ("m1", "nogate3f", "gatemom", "nogatemom"):  # L3: 2x2消融
             if new_month and day in stages.index:
-                good = set(stages.columns) if strategy == "mom" else {c for c in stages.columns if stages.loc[day, c] in ("recover", "expand")}
+                gate = strategy in ("m1", "gatemom")  # L3: 行业门禁开关
+                good = {c for c in stages.columns if stages.loc[day, c] in ("recover", "expand")} if gate else set(stages.columns)
                 try:
                     prev_tradeable = set(pool_at(day_str)["buckets"]["TRADEABLE"])
                 except RuntimeError:
                     prev_tradeable = prev_tradeable  # 日历未知→沿用(fail-closed不猜)
-                rank = [c for c in stock_rank(panel, day) if sector_of.get(c) in good and c in prev_tradeable]
+                rank = [c for c in stock_rank(panel, day, "mom" if strategy in ("gatemom", "nogatemom") else "3f") if sector_of.get(c) in good and c in prev_tradeable]
                 for c in rank[:n_hold]:
                     s20 = close_adj[c].loc[:day].tail(20)
                     if c not in pos and len(s20) >= 20 and close_adj[c].get(day, np.nan) > s20.mean():  # 趋势确认入场(收盘>MA20), 否则次日即破位翻转
                         freeze(c, "BUY")
-        if strategy == "m1":  # K1: 趋势破坏退出每日检查(月度只控入场), 收盘信号T+1执行
+        if strategy in ("m1", "nogate3f", "gatemom", "nogatemom"):  # K1: 每日退出(四版本统一)
             for c in list(pos):
                 s = close_adj[c].loc[:day].tail(20)
                 if len(s) >= 20 and close_adj[c].get(day, np.nan) < s.mean() * 0.97:  # 3%破位缓冲
@@ -236,6 +241,10 @@ def run(strategy: str = "m1", n_hold: int = 5) -> dict:
                      "trades": trades, "rejects": rej,
                      "cash_pct": round(np.mean([x["cash"] / x["nav"] for x in nav_log if x["nav"] > 0]), 3),
                      "avg_hold_days": int(np.mean(hold_days)) if hold_days else None,
+                      "flat_days": sum(1 for x in nav_log if x["n_pos"] == 0),
+                      "avg_pos": round(np.mean([x["n_pos"] for x in nav_log]), 2),
+                      "hold_buckets": {"1-5": sum(1 for h in hold_days if h <= 5), "6-20": sum(1 for h in hold_days if 6 <= h <= 20), "21-60": sum(1 for h in hold_days if 21 <= h <= 60), "61-90": sum(1 for h in hold_days if 61 <= h <= 90), ">90": sum(1 for h in hold_days if h > 90)},
+                      "open_pos_tdays": {c: dix[nav.index[-1]] - i for c, i in buy_day.items()},
                      "n_days": len(nav)}}
     os.makedirs(r"E:\mystockagent\output\ashare", exist_ok=True)
     seg = {}  # 滚动样本外近似: 前段构建参考/后段更晚数据(非严格OOS, 如实标注)
