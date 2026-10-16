@@ -9,35 +9,35 @@
   "executor": "统一执行器+账本(raw价/涨跌停/停牌/整手/T+1/真实费用)"
  },
  "stats": {
-  "return": 0.2974,
-  "ann": 0.0391,
-  "max_dd": -0.2684,
-  "calmar": 0.15,
-  "sharpe": 0.38,
+  "return": -0.0177,
+  "ann": -0.0026,
+  "max_dd": -0.3503,
+  "calmar": -0.01,
+  "sharpe": 0.04,
   "trades": {
-   "BUY": 75,
-   "SELL": 72
+   "BUY": 91,
+   "SELL": 86
   },
   "rejects": {
    "halted": 0,
-   "limit": 70,
-   "lot": 127,
+   "limit": 19,
+   "lot": 149,
    "no_px": 0,
    "pool": 0,
    "other": 0
   },
-  "cash_pct": 0.54,
-  "avg_hold_days": 170,
+  "cash_pct": 0.502,
+  "avg_hold_days": 110,
   "n_days": 1643
  },
  "segments": {
   "seg_2020_2022": {
-   "return": 0.0696,
-   "max_dd": -0.2684
+   "return": -0.0318,
+   "max_dd": -0.3208
   },
   "seg_2023_2026": {
-   "return": 0.2204,
-   "max_dd": -0.212
+   "return": 0.0183,
+   "max_dd": -0.1764
   }
  }
 }

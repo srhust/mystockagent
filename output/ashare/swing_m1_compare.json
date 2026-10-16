@@ -9,90 +9,100 @@
  },
  "compare": {
   "m1": {
-   "return": 0.2974,
-   "ann": 0.0391,
-   "max_dd": -0.2684,
-   "calmar": 0.15,
-   "sharpe": 0.38,
+   "return": -0.0177,
+   "ann": -0.0026,
+   "max_dd": -0.3503,
+   "calmar": -0.01,
+   "sharpe": 0.04,
    "trades": {
-    "BUY": 75,
-    "SELL": 72
+    "BUY": 91,
+    "SELL": 86
    },
    "rejects": {
     "halted": 0,
-    "limit": 70,
-    "lot": 127,
+    "limit": 19,
+    "lot": 149,
     "no_px": 0,
     "pool": 0,
     "other": 0
    },
-   "cash_pct": 0.54,
-   "avg_hold_days": 170,
+   "cash_pct": 0.502,
+   "avg_hold_days": 110,
    "n_days": 1643
   },
   "bh": {
-   "return": 0.2857,
-   "ann": 0.0377,
-   "max_dd": -0.2308,
-   "calmar": 0.16,
-   "sharpe": 0.33,
+   "return": 0.2931,
+   "ann": 0.0386,
+   "max_dd": -0.2277,
+   "calmar": 0.17,
+   "sharpe": 0.3,
    "trades": {
-    "BUY": 8,
+    "BUY": 7,
     "SELL": 0
    },
    "rejects": {
     "halted": 0,
     "limit": 2,
-    "lot": 10,
+    "lot": 3,
     "no_px": 0,
     "pool": 0,
-    "other": 0
+    "other": 8,
+    "other_msgs": [
+     "现金透支: -1276.22",
+     "现金透支: -668.21",
+     "现金透支: -932.22",
+     "现金透支: -809.21",
+     "现金透支: -62.21",
+     "现金透支: -1072.22",
+     "现金透支: -826.21",
+     "现金透支: -3668.25"
+    ]
    },
-   "cash_pct": 0.228,
+   "cash_pct": 0.04,
    "avg_hold_days": null,
    "n_days": 1643
   },
   "trend": {
-   "return": -0.1771,
-   "ann": -0.0283,
-   "max_dd": -0.3549,
-   "calmar": -0.08,
-   "sharpe": -0.23,
+   "return": -0.2241,
+   "ann": -0.0367,
+   "max_dd": -0.4007,
+   "calmar": -0.09,
+   "sharpe": -0.21,
    "trades": {
-    "BUY": 63,
-    "SELL": 63
+    "BUY": 96,
+    "SELL": 96
    },
    "rejects": {
     "halted": 0,
-    "limit": 65,
-    "lot": 99,
+    "limit": 14,
+    "lot": 110,
     "no_px": 0,
     "pool": 0,
     "other": 0
    },
-   "cash_pct": 0.748,
-   "avg_hold_days": 80,
+   "cash_pct": 0.608,
+   "avg_hold_days": 51,
    "n_days": 1643
   },
   "mom": {
-   "return": 0.4278,
-   "ann": 0.0539,
-   "max_dd": -0.3603,
-   "calmar": 0.15,
-   "sharpe": 0.37,
+   "return": 0.1869,
+   "ann": 0.0256,
+   "max_dd": -0.364,
+   "calmar": 0.07,
+   "sharpe": 0.23,
    "trades": {
     "BUY": 10,
     "SELL": 0
    },
    "rejects": {
     "halted": 0,
-    "limit": 17,
-    "lot": 151,
+    "limit": 9,
+    "lot": 167,
     "no_px": 0,
     "pool": 0,
     "other": 0
    },
-   "cash_pct": 0.213,
+   "cash_pct": 0.185,
    "avg_hold_days": null,
    "n_days": 1643
   }

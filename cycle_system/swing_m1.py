@@ -92,6 +92,7 @@ def run(strategy: str = "m1", n_hold: int = 5) -> dict:
     stages = cycle_stage(idx)
     sector_of = panel.drop_duplicates("code").set_index("code")["sector"].to_dict()
     dates = [pd.Timestamp(x) for x in sorted(panel["date"].unique())]
+    dix = {d: i for i, d in enumerate(dates)}  # J4: 交易日索引
     close_adj = panel.pivot(index="date", columns="code", values="close_adj")
     close_raw = panel.pivot(index="date", columns="code", values="close")
     open_raw = panel.pivot(index="date", columns="code", values="open_raw")
@@ -108,44 +109,29 @@ def run(strategy: str = "m1", n_hold: int = 5) -> dict:
         ledger.advance_day(day_str)  # N3: 账本严格前向推进(先于apply)
         px_day = open_raw.loc[day] if day in open_raw.index else pd.Series(dtype=float)
         raw_day = close_raw.loc[day] if day in close_raw.index else pd.Series(dtype=float)
-        # ── 1) 开盘执行T-1收盘冻结的订单(I1) ──
-        for code, action, sig_day in list(pending):
+        # ── 1) 开盘执行T-1收盘冻结的完整计划(J1: 信号日已create+register, T日只execute) ──
+        for plan in list(pending):
+            code, action, sig_day = plan["code"], plan["action"], plan["trade_date"]
             px = px_day.get(code, np.nan)
             if px != px:
                 rej["no_px"] += 1
                 continue
-            if action == "BUY":
-                if prev_tradeable and code not in prev_tradeable:
-                    rej["pool"] += 1
-                    continue
-                base = 200 if code.startswith("68") else 100
-                alloc = min(cash / max(1, n_hold), cash)
-                sh = int(alloc * 0.998 / px / base) * base
-                if sh < base:
-                    rej["lot"] += 1
-                    continue
-                plan = ex.create_plan(code, "BUY", sig_day, px_ref=last_px.get(code, px), cash_budget=round(sh * px * 1.005, 2), created_at=sig_day + "T15:30:00+08:00")  # px_ref=T-1收盘(无未来信息)
-            else:
-                sh = pos.get(code, 0)
-                if sh <= 0:
-                    continue
-                plan = ex.create_plan(code, "SELL", sig_day, px_ref=px, shares=sh, created_at=sig_day + "T15:30:00+08:00")
             try:
-                halted = px_day.get(code, np.nan) != px_day.get(code, np.nan) or raw_day.get(code, np.nan) != raw_day.get(code, np.nan)
-                pc = last_px.get(code, px)
+                halted = raw_day.get(code, np.nan) != raw_day.get(code, np.nan)
+                pc = last_px.get(code)  # J2: 全市场前收盘(非当日开盘)
                 fill = ex.execute_plan(plan, trade_date_t1=day_str, px_t1=px, prev_close=pc, halted=halted, is_st=False)
-                if fill["status"] == "FILLED":  # R14b根因2: 仅FILLED入账, REJECTED直接记拒单
-                    ledger.apply(fill, allow_unplanned=True)
+                if fill["status"] == "FILLED":
+                    ledger.apply(fill)  # J3: 正式通道(register_plan已登记, 无allow_unplanned)
                     cash = ledger.cash
                     if action == "BUY":
                         pos[code] = pos.get(code, 0) + fill["shares"]
-                        buy_day.setdefault(code, day)
+                        buy_day.setdefault(code, dix[day])
                         trades["BUY"] += 1
                     else:
                         pos[code] = pos.get(code, 0) - fill["shares"]
                         if pos[code] <= 0:
                             pos.pop(code)
-                            hold_days.append((pd.Timestamp(day) - pd.Timestamp(buy_day.pop(code, day))).days)  # 真实持有: 买入执行日→卖出执行日
+                            hold_days.append(dix[day] - buy_day.pop(code, dix[day]))  # J4: 交易日计数
                         trades["SELL"] += 1
                 else:
                     rej["limit"] += 1
@@ -154,19 +140,41 @@ def run(strategy: str = "m1", n_hold: int = 5) -> dict:
                 rej["other"] += 1
         pending = []
         # ── 2) 收盘估值+新信号(I1: 信号冻结至明日) ──
-        for c in pos:
+        for c, v in raw_day.dropna().items():  # J2: 全市场前收盘维护(非仅持仓)
+            last_px[c] = float(v)
+        for c in pos:  # 持仓以raw close为准
             v = raw_day.get(c, np.nan)
             if v == v:
-                last_px[c] = v
+                last_px[c] = float(v)
         nav = cash + sum(sh * last_px.get(c, 0.0) for c, sh in pos.items())
         nav_log.append({"date": day_str, "nav": round(nav, 2), "cash": round(cash, 2), "n_pos": len(pos)})
-        # ── 3) 收盘信号→冻结pending(明日开盘执行) ──
+        # ── 3) 收盘信号→冻结完整计划(J1: 信号日create+register, T+1只execute; px_ref/股数/预算全用信号日收盘) ──
+        def freeze(code, action, sig=day_str, sig_close=None):
+            sigc = float(sig_close) if sig_close is not None else last_px.get(code)
+            if sigc != sigc:
+                rej["no_px"] += 1
+                return
+            if action == "BUY":
+                base = 200 if code.startswith("68") else 100
+                alloc = min(cash / max(1, n_hold), cash)
+                sh = int(alloc * 0.99 / sigc / base) * base
+                if sh < base:
+                    rej["lot"] += 1
+                    return
+                plan = ex.create_plan(code, "BUY", sig, px_ref=sigc, cash_budget=round(sh * sigc * 1.005, 2), created_at=sig + "T15:30:00+08:00")
+            else:
+                sh = pos.get(code, 0)
+                if sh <= 0:
+                    return
+                plan = ex.create_plan(code, "SELL", sig, px_ref=sigc, shares=sh, created_at=sig + "T15:30:00+08:00")
+            ledger.register_plan(plan)  # J3: 正式登记(计划身份校验启用)
+            pending.append(plan)
         new_month = day.month != month_seen
         month_seen = day.month
         if strategy == "bh":
             if i == 65 and not pos and not pending:
                 for c in stock_rank(panel, day)[:20]:
-                    pending.append((c, "BUY", day_str))
+                    freeze(c, "BUY")
         elif strategy in ("m1", "mom"):
             if new_month and day in stages.index:
                 good = set(stages.columns) if strategy == "mom" else {c for c in stages.columns if stages.loc[day, c] in ("recover", "expand")}
@@ -178,12 +186,12 @@ def run(strategy: str = "m1", n_hold: int = 5) -> dict:
                 for c in rank[:n_hold]:
                     s20 = close_adj[c].loc[:day].tail(20)
                     if c not in pos and len(s20) >= 20 and close_adj[c].get(day, np.nan) > s20.mean():  # 趋势确认入场(收盘>MA20), 否则次日即破位翻转
-                        pending.append((c, "BUY", day_str))
+                        freeze(c, "BUY")
                 if strategy == "m1":  # 趋势破坏退出: close_adj跌破行业门禁或MA20(收盘信号, T+1执行)
                     for c in list(pos):
                         s = close_adj[c].loc[:day].tail(20)
                         if len(s) >= 20 and close_adj[c].get(day, np.nan) < s.mean() * 0.97:  # 3%破位缓冲, 减边缘翻转
-                            pending.append((c, "SELL", day_str))
+                            freeze(c, "SELL")
         elif strategy == "trend":
             si = idx.mean(axis=1)
             ma20 = si.loc[:day].tail(20).mean()
@@ -197,10 +205,10 @@ def run(strategy: str = "m1", n_hold: int = 5) -> dict:
                 if up:
                     for c in rank[:n_hold]:
                         if c not in pos:
-                            pending.append((c, "BUY", day_str))
+                            freeze(c, "BUY")
                 else:
                     for c in list(pos):
-                        pending.append((c, "SELL", day_str))
+                        freeze(c, "SELL")
     nav = pd.Series([x["nav"] for x in nav_log], index=[pd.Timestamp(x["date"]) for x in nav_log])
     ret = nav.iloc[-1] / 20000 - 1
     dd = (nav / nav.cummax() - 1).min()
