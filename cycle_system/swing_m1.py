@@ -86,7 +86,7 @@ def stock_rank(panel: pd.DataFrame, day, kind: str = "3f") -> list:
     return list((z[col].sum(axis=1)).sort_values(ascending=False).index)
 
 
-def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: str = "auto", rank_kind: str = "auto") -> dict:
+def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: str = "auto", rank_kind: str = "auto", entry_mode: str = "auto") -> dict:
     """R18: gate/exit_mode/rank_kind显式参数(auto=按strategy推导); E系列=expt+显式三参。
     exit_mode: daily(每日MA20x0.97)/monthly(月末信号, 新月首日执行)/none(无趋势退出, 持有至期末按最近价估值)。"""
     """统一回测状态机。strategy: m1(周期门禁+三因子) / bh(买入持有) / trend(行业MA20) / mom(纯动量)。"""
@@ -100,6 +100,8 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
     close_raw = panel.pivot(index="date", columns="code", values="close")
     open_raw = panel.pivot(index="date", columns="code", values="open_raw")
     last_px = {}  # 最近有效价(NAV估值, 缺行情不蒸发)
+    if entry_mode == "auto":
+        entry_mode = "daily" if strategy in ("r2", "r4") else "monthly"
     if gate == "auto":
         gate = strategy in ("m1", "gatemom")
     if rank_kind == "auto":
@@ -111,6 +113,7 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
     nav_log, trades, rej = [], {"BUY": 0, "SELL": 0}, {"halted": 0, "limit": 0, "lot": 0, "no_px": 0, "pool": 0, "other": 0}
     month_seen = None
     hold_days, buy_day = [], {}
+    reentry_block = {}  # R19: 冷却期(卖出执行日起5个交易日内禁重入, 预设统一)
     reserved = [0.0]  # K2: 冻结中BUY预算(执行日释放)
     prev_tradeable = set()
 
@@ -144,13 +147,14 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
                         if pos[code] <= 0:
                             pos.pop(code)
                             hold_days.append(dix[day] - buy_day.pop(code, dix[day]))  # J4: 交易日计数
+                            reentry_block[code] = dix[day] + 5  # R19: 冷却
                         trades["SELL"] += 1
                 else:
                     r = str(fill.get("reason", "unknown"))  # L2: reason原样逐笔归因
                     rej.setdefault("reason_detail", {}).setdefault(r, 0)
                     rej["reason_detail"][r] += 1
-                    if "现金" in r:
-                        key = "execution_cash_reject"  # P1: T+1跳空费用后现金不足
+                    if r == "insufficient_cash_after_fees" or "现金" in r:  # P1: 英文枚举优先
+                        key = "execution_cash_reject"  # T+1跳空费用后现金不足
                     elif "涨停" in r or "跌停" in r or "停" in r:
                         key = "market_reject"  # P1: 涨跌停/停牌
                     else:
@@ -181,6 +185,9 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
                 rej["no_px"] += 1
                 return
             if action == "BUY":
+                if any(p["code"] == code for p in pending) or dix.get(pd.Timestamp(sig), -1) < reentry_block.get(code, -1):  # R19: 队列去重+冷却期
+                    rej["cooldown"] = rej.get("cooldown", 0) + 1
+                    return
                 base = 200 if code.startswith("68") else 100
                 alloc = min((cash - reserved[0]) / max(1, n_hold), cash - reserved[0])  # K2: 扣除冻结中预算
                 if alloc < sigc * base:  # K2: 预算不足不再超额申报
@@ -205,8 +212,8 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
             if i == 65 and not pos and not pending:
                 for c in stock_rank(panel, day)[:20]:
                     freeze(c, "BUY")
-        elif strategy in ("m1", "nogate3f", "gatemom", "nogatemom", "expt"):  # L3+E系列
-            if new_month and day in stages.index:
+        elif strategy in ("m1", "nogate3f", "gatemom", "nogatemom", "expt", "r2", "r4"):  # L3+E+R系列
+            if (entry_mode == "daily" or (new_month and day in stages.index)) and day in stages.index:  # R19: 重入消融
                 gate = bool(gate)  # L3/R18: 门禁开关(显式参数)
                 good = {c for c in stages.columns if stages.loc[day, c] in ("recover", "expand")} if gate else set(stages.columns)
                 try:
@@ -277,7 +284,8 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
             seg[tag] = {"return": round(s2.iloc[-1] / s2.iloc[0] - 1, 4),
                         "max_dd": round((s2 / s2.cummax() - 1).min(), 4)}
     out["segments"] = seg
-    json.dump(out, open(rf"E:\mystockagent\output\ashare\swing_m1_{strategy}.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    fid = f"{strategy}_{gate}_{exit_mode}_{rank_kind}_{entry_mode}"  # R19/P0: 唯一实验ID防覆盖
+    json.dump(out, open(rf"E:\mystockagent\output\ashare\swing_m1_{fid}.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     return out
 
 
