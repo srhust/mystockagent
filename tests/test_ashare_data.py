@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """R7: 交易日历推导 + 数据管道审计 + executor接入。"""
 import json
 import os
@@ -100,4 +100,20 @@ def test_e3_tradeable_pool():
     assert r2["stats"]["TRADEABLE"] < r["stats"]["TRADEABLE"]
     with pytest.raises(RuntimeError, match="非确认交易日"):
         tp.pool_at("2026-10-03")  # 国庆fail-closed
+
+
+def test_h1_h3_identity_and_report():
+    """H1: 603603不得再是禾丰股份/603609对应禾丰; H2退市表; H3 report新状态适配。"""
+    import config
+    import ashare_stock_pipeline as sp
+    feed = config.CYCLE_SECTORS["饲料加工"]["stocks"]
+    assert ("603609", "禾丰股份") in feed
+    assert all(c != "603603" for c, _ in feed)
+    assert sp.DELISTED_CONFIRMED["000961"] == "2024-06-24"  # 深交所公告真实退市日
+    rep = sp.availability_report()
+    assert rep["tradeable_pool"], "H3: 新状态体系下不得误报空池"
+    assert "000961" not in rep["tradeable_pool"]  # 退市股不入可交易池
+    import ashare_tradeable_pool as tp
+    r = tp.pool_at("2026-09-28")
+    assert r["buckets"]["DELISTED_CONFIRMED"] == ["000961"]  # 交易所公告口径
 

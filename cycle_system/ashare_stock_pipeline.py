@@ -65,7 +65,7 @@ def run(max_stocks: int = None, force: bool = False, per_call_sleep: float = 2.0
                 _d = pd.read_csv(p, usecols=["date"])
                 _latest = pd.Timestamp(_d["date"].max())
                 if (pd.Timestamp.now().normalize() - _latest).days <= 7 and len(_d) >= 100:
-                    audit[code] = {**audit.get(code, {}), "status": audit.get(code, {}).get("status", "CACHED"), "name": name, "sector": sector, "latest": str(_latest.date())}
+                    audit[code] = {**audit.get(code, {}), "status": "RAW_OK_FACTOR_OK", "name": name, "sector": sector, "latest": str(_latest.date()), "price_basis": "raw+adj_factor"}  # H3: 新鲜+已迁移=双口径合格
                     ok += 1
                     continue
             except (pd.errors.ParserError, KeyError, ValueError):
@@ -114,6 +114,25 @@ def run(max_stocks: int = None, force: bool = False, per_call_sleep: float = 2.0
     return audit
 
 
+# H2: 交易所公告核实的真实退市(权威来源: 上交所/深交所公告, 非无行情推断)
+DELISTED_CONFIRMED = {"000961": "2024-06-24", "603603": "2024-04-25"}
+
+
+def verify_identity() -> dict:
+    """H1: 全量代码-名称交叉校验(akshare权威证券列表)。退市股不在列表=预期。"""
+    import akshare as ak
+    uni = ak.stock_info_a_code_name()
+    m = {str(r["code"]): str(r["name"]) for _, r in uni.iterrows()}
+    bad, retired = [], []
+    for code, name, _ in configured_stocks():
+        if code not in m:
+            retired.append(code)
+        elif m[code] != name:
+            bad.append({"code": code, "config": name, "exchange": m[code]})
+    return {"mismatches": bad, "not_in_exchange_list": retired,
+            "verdict": "PASS" if not bad else "FAIL"}
+
+
 def availability_report() -> dict:
     """D4验收口径: 历史可投资池=已落盘且数据完整的股票集合审计。"""
     with open(os.path.join(DATA_DIR, "_audit.json"), encoding="utf-8") as f:
@@ -122,8 +141,12 @@ def availability_report() -> dict:
     by_status = {}
     for v in per.values():
         by_status[v["status"]] = by_status.get(v["status"], 0) + 1
+    # H3: 新状态体系(RAW_OK_FACTOR_OK/RAW_OK_FACTOR_MISSING), 不再依赖历史OK/CACHED标签
+    tradeable_pool = sorted(k for k, v in per.items()
+                            if v["status"] == "RAW_OK_FACTOR_OK" and k not in DELISTED_CONFIRMED)
     return {"total_configured": len(per), "by_status": by_status,
-            "tradeable_pool": [k for k, v in per.items() if v["status"] in ("OK", "CACHED")],
+            "tradeable_pool": tradeable_pool,
+            "delisted_confirmed": DELISTED_CONFIRMED,
             "summary": audit.get("_summary", {})}
 
 

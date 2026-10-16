@@ -24,7 +24,7 @@ def pool_at(day: str, require_history_days: int = 0) -> dict:
     if not cal.is_trading_day(day):  # fail-closed: 非交易日/UNKNOWN拒绝
         raise RuntimeError(f"非确认交易日: {day}")
     T = pd.Timestamp(day).normalize()
-    buckets = {k: [] for k in ("TRADEABLE", "SUSPENDED_CONFIRMED", "DATA_MISSING", "NOT_YET_LISTED", "INACTIVE_UNVERIFIED", "INSUFFICIENT_HISTORY")}
+    buckets = {k: [] for k in ("TRADEABLE", "SUSPENDED_CONFIRMED", "DATA_MISSING", "NOT_YET_LISTED", "INACTIVE_UNVERIFIED", "INSUFFICIENT_HISTORY", "DELISTED_CONFIRMED")}
     seen, sector_membership = set(), []
     for code, name, sector in sp.configured_stocks():  # F4: 249唯一代码去重, 251条行业关联单列
         sector_membership.append({"code": code, "sector": sector})
@@ -40,8 +40,10 @@ def pool_at(day: str, require_history_days: int = 0) -> dict:
         first, last = d.min(), d.max()
         if T < first:
             buckets["NOT_YET_LISTED"].append(code)  # 仅首行情晚于T(首行情近似上市日)
+        elif code in sp.DELISTED_CONFIRMED and T >= pd.Timestamp(sp.DELISTED_CONFIRMED[code]):
+            buckets["DELISTED_CONFIRMED"].append(code)  # H2: 交易所公告真实退市日
         elif T > last + pd.Timedelta(days=60):
-            buckets["INACTIVE_UNVERIFIED"].append(code)  # G2: 无权威退市记录, 不称CONFIRMED
+            buckets["INACTIVE_UNVERIFIED"].append(code)  # 无权威记录不称CONFIRMED
         elif (T > first) and ((T - first).days < require_history_days):
             buckets["INSUFFICIENT_HISTORY"].append(code)  # G2: 已上市但数据不足, 与上市状态分离
         elif T not in set(d):
