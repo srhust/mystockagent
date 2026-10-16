@@ -1,12 +1,17 @@
 {
- "generated_at": "2026-10-16T09:18:43.266099+08:00",
+ "generated_at": "2026-10-16T10:23:07.102105+08:00",
  "calendar": {
   "range": [
    "2012-06-08",
    "2026-10-13"
   ],
   "days": 3442,
-  "violations": []
+  "violations": [],
+  "forward_range": [
+   "1990-12-19",
+   "2026-12-31"
+  ],
+  "forward_days": 8797
  },
  "market_last_day": "2026-10-13",
  "sectors_total": 30,

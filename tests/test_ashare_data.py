@@ -35,11 +35,12 @@ def test_d1_d2_d3_failclosed():
     mod = importlib.import_module("cycle_system.ashare_executor")
     assert mod.is_trading_day("2026-09-28") is True
     with pytest.raises(RuntimeError, match="fail-closed|未确认|不可用|日历"):
-        mod.is_trading_day("2026-10-20")  # 范围外→拒绝而非猜测
+        mod.is_trading_day("2027-06-01")  # 历史+官方日程皆不可及→拒绝而非猜测
+    assert mod.is_trading_day("2026-10-20") is True  # E2: 官方日程确认前向交易日
     # D2: 三态 + etfdiv不参与来源 + 周末污染门禁
     assert cal.calendar_status("2026-09-29") == cal.CONFIRMED_OPEN
     assert cal.calendar_status("2026-10-01") == cal.CONFIRMED_CLOSED
-    assert cal.calendar_status("2026-10-20") == cal.UNKNOWN
+    assert cal.calendar_status("2026-10-20") == cal.CONFIRMED_OPEN  # E2: 官方日程前向确认(原UNKNOWN已修复)
     assert all("etfdiv" not in os.path.basename(s) for s in cal._sources())
     # D3: 缓存身份(meta sha256)+损坏自动重建+force失效内存
     with open(cal.META_P, encoding="utf-8") as f:
@@ -86,3 +87,17 @@ def test_pipeline_audit_structure():
     assert "个股CSV" in o["individual_stock_data"] or "ABSENT" in o["individual_stock_data"]  # 如实披露个股级缺位
     for p in ("data_audit.md", "data_audit.json"):
         assert os.path.exists(os.path.join(dp.OUT_DIR, p))
+
+
+def test_e3_tradeable_pool():
+    """E3: 历史可投资池 — 上市/停牌近似/交易日fail-closed/诚实边界。"""
+    import ashare_tradeable_pool as tp
+    r = tp.pool_at("2026-09-28")
+    assert 200 <= r["stats"]["tradeable"] <= 249
+    assert r["caveats"]["st_history"] == "UNAVAILABLE"  # ST历史不猜测
+    r2 = tp.pool_at("2022-06-15")
+    assert r2["stats"]["not_yet_listed"] > 0  # 2022年仍有后来上市股
+    assert r2["stats"]["tradeable"] < r["stats"]["tradeable"]
+    with pytest.raises(RuntimeError, match="非确认交易日"):
+        tp.pool_at("2026-10-03")  # 国庆fail-closed
+
