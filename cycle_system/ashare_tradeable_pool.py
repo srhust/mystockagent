@@ -24,7 +24,7 @@ def pool_at(day: str, require_history_days: int = 0) -> dict:
     if not cal.is_trading_day(day):  # fail-closed: 非交易日/UNKNOWN拒绝
         raise RuntimeError(f"非确认交易日: {day}")
     T = pd.Timestamp(day).normalize()
-    buckets = {k: [] for k in ("TRADEABLE", "SUSPENDED_CONFIRMED", "DATA_MISSING", "NOT_YET_LISTED", "DELISTED_CONFIRMED")}
+    buckets = {k: [] for k in ("TRADEABLE", "SUSPENDED_CONFIRMED", "DATA_MISSING", "NOT_YET_LISTED", "INACTIVE_UNVERIFIED", "INSUFFICIENT_HISTORY")}
     seen, sector_membership = set(), []
     for code, name, sector in sp.configured_stocks():  # F4: 249唯一代码去重, 251条行业关联单列
         sector_membership.append({"code": code, "sector": sector})
@@ -39,11 +39,11 @@ def pool_at(day: str, require_history_days: int = 0) -> dict:
         d = pd.to_datetime(df["date"]).dt.normalize()
         first, last = d.min(), d.max()
         if T < first:
-            buckets["NOT_YET_LISTED"].append(code)  # 首行情近似上市日
+            buckets["NOT_YET_LISTED"].append(code)  # 仅首行情晚于T(首行情近似上市日)
         elif T > last + pd.Timedelta(days=60):
-            buckets["DELISTED_CONFIRMED"].append(code)  # 长期无行情(近似退市, 保守排除)
+            buckets["INACTIVE_UNVERIFIED"].append(code)  # G2: 无权威退市记录, 不称CONFIRMED
         elif (T > first) and ((T - first).days < require_history_days):
-            buckets["NOT_YET_LISTED"].append(code)  # 上市历史不足
+            buckets["INSUFFICIENT_HISTORY"].append(code)  # G2: 已上市但数据不足, 与上市状态分离
         elif T not in set(d):
             buckets["DATA_MISSING"].append(code)  # 当日无K线: 数据未到/漏行/停牌不可区分→不作停牌确认
         else:
@@ -54,4 +54,6 @@ def pool_at(day: str, require_history_days: int = 0) -> dict:
             "universe": len(seen), "sector_membership": len(sector_membership),
             "caveats": {"st_history": "UNAVAILABLE", "industry": "当前快照非历史时点",
                         "suspension": "无权威停复牌数据, 当日无K线一律DATA_MISSING不作SUSPENDED_CONFIRMED",
-                        "survivorship": "仅当前配置池, 历史已退市/被替换股不在内"}}
+                        "survivorship": "仅当前配置池, 历史已退市/被替换股不在内",
+                        "inactive": "INACTIVE_UNVERIFIED=长期无行情待权威退市记录核实(603603/000961类)",
+                        "fetch_start": "行情抓取默认2020起, 更早日期的上市判定不可靠"}}

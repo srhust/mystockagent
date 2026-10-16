@@ -7,6 +7,7 @@
 - 审计: data/stocks/_audit.json 每股状态(OK/EMPTY/FAILED/UNAVAILABLE)
 - 诚实边界: ST历史状态与停复牌逐日记录需专门接口, 当前以ST标记快照+缺失审计披露
 """
+import io
 import json
 import os
 import sys
@@ -58,6 +59,9 @@ def run(max_stocks: int = None, force: bool = False, per_call_sleep: float = 2.0
         p = os.path.join(DATA_DIR, f"{code}.csv")
         if not force and os.path.exists(p):
             try:  # F3: 断点续传必须校验新鲜度, 不得只看文件存在
+                _head = io.open(p, encoding="utf-8").readline()
+                if "adj_factor" not in _head:
+                    raise ValueError("legacy-hfq-format")  # P0-1: 旧后复权CSV不算有效缓存, 强制迁移raw+factor
                 _d = pd.read_csv(p, usecols=["date"])
                 _latest = pd.Timestamp(_d["date"].max())
                 if (pd.Timestamp.now().normalize() - _latest).days <= 7 and len(_d) >= 100:
@@ -88,17 +92,23 @@ def run(max_stocks: int = None, force: bool = False, per_call_sleep: float = 2.0
                     df["adj_factor"] = (df["hfq_close"] / df["close"]).round(6)
                     df = df.drop(columns=["hfq_close"])
                 except Exception:
-                    df["adj_factor"] = float("nan")  # 复权因子缺失如实留空
+                    df["adj_factor"] = float("nan")  # P0-2: 缺失留空但状态降级, 不冒充双口径
                 df.to_csv(p, index=False)
-                audit[code] = {"status": "OK", "name": name, "sector": sector, "rows": len(df),
-                               "latest": str(df["date"].max()), "price_basis": "raw+adj_factor"}
+                import math
+                f_ok = df["adj_factor"].notna().sum() >= max(1, len(df) - 2)  # P0-2: 因子覆盖率门禁
+                audit[code] = {"status": "RAW_OK_FACTOR_OK" if f_ok else "RAW_OK_FACTOR_MISSING",
+                               "name": name, "sector": sector, "rows": len(df),
+                               "latest": str(df["date"].max()), "price_basis": "raw+adj_factor",
+                               "factor_coverage": round(float(df["adj_factor"].notna().mean()), 4)}
                 ok += 1
         except Exception as e:  # 如实记录失败, 不静默
             audit[code] = {"status": "FAILED", "name": name, "sector": sector, "error": str(e)[:200]}
             fail += 1
         time.sleep(per_call_sleep)
-    audit["_summary"] = {"ok": ok, "fail_empty": fail, "total": len(stocks),
-                         "generated_at": pd.Timestamp.now(tz="Asia/Shanghai").isoformat()}
+    # G3: 冒烟(max_stocks子集)不覆写全量_summary——全量摘要只由全量run产生
+    if max_stocks is None:
+        audit["_summary"] = {"ok": ok, "fail_empty": fail, "total": len(stocks),
+                             "generated_at": pd.Timestamp.now(tz="Asia/Shanghai").isoformat()}
     with open(audit_path, "w", encoding="utf-8") as f:
         json.dump(audit, f, ensure_ascii=False, indent=1)
     return audit

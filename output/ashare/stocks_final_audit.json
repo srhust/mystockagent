@@ -1,0 +1,3004 @@
+{
+ "summary": {
+  "total": 249,
+  "raw_ok": 249,
+  "factor_full": 249,
+  "stale_2024": [
+   "000961",
+   "603603"
+  ],
+  "generated_at": "2026-10-16T10:57:20.709815+08:00"
+ },
+ "stocks": {
+  "601088": {
+   "name": "中国神华",
+   "sectors": [
+    "煤炭"
+   ],
+   "rows": 1633,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "6ae1947692c0"
+  },
+  "601225": {
+   "name": "陕西煤业",
+   "sectors": [
+    "煤炭"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "2d5dd1fb1154"
+  },
+  "600188": {
+   "name": "兖矿能源",
+   "sectors": [
+    "煤炭"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "9545fbc9b011"
+  },
+  "000983": {
+   "name": "山西焦煤",
+   "sectors": [
+    "煤炭"
+   ],
+   "rows": 1633,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "92da3d04ae99"
+  },
+  "601666": {
+   "name": "平煤股份",
+   "sectors": [
+    "煤炭"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "b277b7ae760b"
+  },
+  "601699": {
+   "name": "潞安环能",
+   "sectors": [
+    "煤炭"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "1bb9c8f9c863"
+  },
+  "600985": {
+   "name": "淮北矿业",
+   "sectors": [
+    "煤炭"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "9d9ab5b83832"
+  },
+  "600546": {
+   "name": "山煤国际",
+   "sectors": [
+    "煤炭"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "30fa5a482033"
+  },
+  "600348": {
+   "name": "华阳股份",
+   "sectors": [
+    "煤炭"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "f28b2e38252c"
+  },
+  "601898": {
+   "name": "中煤能源",
+   "sectors": [
+    "煤炭"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "834ff3b5ef4e"
+  },
+  "600019": {
+   "name": "宝钢股份",
+   "sectors": [
+    "钢铁"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "86af574e4826"
+  },
+  "000932": {
+   "name": "华菱钢铁",
+   "sectors": [
+    "钢铁"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "ad854354aafe"
+  },
+  "000959": {
+   "name": "首钢股份",
+   "sectors": [
+    "钢铁"
+   ],
+   "rows": 1611,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "cbb32eba493d"
+  },
+  "000825": {
+   "name": "太钢不锈",
+   "sectors": [
+    "钢铁"
+   ],
+   "rows": 1642,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "d7d1596a35e2"
+  },
+  "000898": {
+   "name": "鞍钢股份",
+   "sectors": [
+    "钢铁"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "e50b38e925dc"
+  },
+  "600808": {
+   "name": "马钢股份",
+   "sectors": [
+    "钢铁"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "207846341e6d"
+  },
+  "600782": {
+   "name": "新钢股份",
+   "sectors": [
+    "钢铁"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "9b17e8fd8146"
+  },
+  "002110": {
+   "name": "三钢闽光",
+   "sectors": [
+    "钢铁"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "28969a1fe714"
+  },
+  "000708": {
+   "name": "中信特钢",
+   "sectors": [
+    "钢铁"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "7dae989fe290"
+  },
+  "002318": {
+   "name": "久立特材",
+   "sectors": [
+    "钢铁"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "cfbfac904086"
+  },
+  "601899": {
+   "name": "紫金矿业",
+   "sectors": [
+    "工业金属"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "0b5e2ced641d"
+  },
+  "600362": {
+   "name": "江西铜业",
+   "sectors": [
+    "工业金属"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "08f588fe2818"
+  },
+  "000630": {
+   "name": "铜陵有色",
+   "sectors": [
+    "工业金属"
+   ],
+   "rows": 1633,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "685eb7abebf7"
+  },
+  "000878": {
+   "name": "云南铜业",
+   "sectors": [
+    "工业金属"
+   ],
+   "rows": 1634,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "d9d56f93254d"
+  },
+  "603993": {
+   "name": "洛阳钼业",
+   "sectors": [
+    "工业金属"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "fa6e71256721"
+  },
+  "601600": {
+   "name": "中国铝业",
+   "sectors": [
+    "工业金属"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "0e4e9eb6950d"
+  },
+  "000807": {
+   "name": "云铝股份",
+   "sectors": [
+    "工业金属"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "084f84d31989"
+  },
+  "000933": {
+   "name": "神火股份",
+   "sectors": [
+    "工业金属"
+   ],
+   "rows": 1633,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "a1e84cb80cf0"
+  },
+  "002532": {
+   "name": "天山铝业",
+   "sectors": [
+    "工业金属"
+   ],
+   "rows": 1642,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "8bbbc7c26d93"
+  },
+  "000060": {
+   "name": "中金岭南",
+   "sectors": [
+    "工业金属"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "c6c549893d5c"
+  },
+  "000960": {
+   "name": "锡业股份",
+   "sectors": [
+    "工业金属"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "04ea4219d47e"
+  },
+  "002460": {
+   "name": "赣锋锂业",
+   "sectors": [
+    "能源金属"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "6e388efb7aa3"
+  },
+  "002466": {
+   "name": "天齐锂业",
+   "sectors": [
+    "能源金属"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "790cf332da49"
+  },
+  "603799": {
+   "name": "华友钴业",
+   "sectors": [
+    "能源金属"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "2b70e978d264"
+  },
+  "300618": {
+   "name": "寒锐钴业",
+   "sectors": [
+    "能源金属"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "98dee8575572"
+  },
+  "600711": {
+   "name": "盛屯矿业",
+   "sectors": [
+    "能源金属"
+   ],
+   "rows": 1641,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "2292e997c063"
+  },
+  "000408": {
+   "name": "藏格矿业",
+   "sectors": [
+    "能源金属"
+   ],
+   "rows": 1636,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "b774309f9303"
+  },
+  "000792": {
+   "name": "盐湖股份",
+   "sectors": [
+    "能源金属"
+   ],
+   "rows": 1331,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "007872bdca84"
+  },
+  "002738": {
+   "name": "中矿资源",
+   "sectors": [
+    "能源金属"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "7e75160ac6b2"
+  },
+  "002756": {
+   "name": "永兴材料",
+   "sectors": [
+    "能源金属"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "0cb9b35dde3c"
+  },
+  "600111": {
+   "name": "北方稀土",
+   "sectors": [
+    "小金属"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "ad015bd1203c"
+  },
+  "000831": {
+   "name": "中国稀土",
+   "sectors": [
+    "小金属"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "62b64c0f4f0e"
+  },
+  "600010": {
+   "name": "包钢股份",
+   "sectors": [
+    "小金属"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "fc4ac735d252"
+  },
+  "600549": {
+   "name": "厦门钨业",
+   "sectors": [
+    "小金属"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "e59f7ac2f81a"
+  },
+  "601958": {
+   "name": "金钼股份",
+   "sectors": [
+    "小金属"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "e62d6b26427d"
+  },
+  "000970": {
+   "name": "中科三环",
+   "sectors": [
+    "小金属"
+   ],
+   "rows": 1637,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "79aa41f3740b"
+  },
+  "600366": {
+   "name": "宁波韵升",
+   "sectors": [
+    "小金属"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "ae19880108b0"
+  },
+  "300224": {
+   "name": "正海磁材",
+   "sectors": [
+    "小金属"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "e0dd05321347"
+  },
+  "002378": {
+   "name": "章源钨业",
+   "sectors": [
+    "小金属"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "9186f9770597"
+  },
+  "600547": {
+   "name": "山东黄金",
+   "sectors": [
+    "贵金属"
+   ],
+   "rows": 1642,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "1b4639f30e4e"
+  },
+  "600489": {
+   "name": "中金黄金",
+   "sectors": [
+    "贵金属"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "5c4ae8aaadad"
+  },
+  "600988": {
+   "name": "赤峰黄金",
+   "sectors": [
+    "贵金属"
+   ],
+   "rows": 1641,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "7b666ba3deca"
+  },
+  "002155": {
+   "name": "湖南黄金",
+   "sectors": [
+    "贵金属"
+   ],
+   "rows": 1628,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "be24a1a92c08"
+  },
+  "601069": {
+   "name": "西部黄金",
+   "sectors": [
+    "贵金属"
+   ],
+   "rows": 1632,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "d22e65d7289a"
+  },
+  "601857": {
+   "name": "中国石油",
+   "sectors": [
+    "油气开采"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "3ee485b670d6"
+  },
+  "600028": {
+   "name": "中国石化",
+   "sectors": [
+    "油气开采"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "7cdecab1c9f5"
+  },
+  "601808": {
+   "name": "中海油服",
+   "sectors": [
+    "油气开采"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "4b262e818a02"
+  },
+  "600583": {
+   "name": "海油工程",
+   "sectors": [
+    "油气开采"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "110100b8f260"
+  },
+  "002353": {
+   "name": "杰瑞股份",
+   "sectors": [
+    "油气开采"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "9a5368cab002"
+  },
+  "300164": {
+   "name": "通源石油",
+   "sectors": [
+    "油气开采"
+   ],
+   "rows": 1633,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "f8ae1a14b83b"
+  },
+  "002207": {
+   "name": "准油股份",
+   "sectors": [
+    "油气开采"
+   ],
+   "rows": 1639,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "064377a6462f"
+  },
+  "300191": {
+   "name": "潜能恒信",
+   "sectors": [
+    "油气开采"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "aefe409a1109"
+  },
+  "002493": {
+   "name": "荣盛石化",
+   "sectors": [
+    "石油加工"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "176fee30ce23"
+  },
+  "600346": {
+   "name": "恒力石化",
+   "sectors": [
+    "石油加工"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "f3f8b1dcdc0a"
+  },
+  "000703": {
+   "name": "恒逸石化",
+   "sectors": [
+    "石油加工",
+    "化纤"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "2f0c70a86483"
+  },
+  "000301": {
+   "name": "东方盛虹",
+   "sectors": [
+    "石油加工"
+   ],
+   "rows": 1632,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "c1783f7dfe87"
+  },
+  "600688": {
+   "name": "上海石化",
+   "sectors": [
+    "石油加工"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "3575b5b7b1f0"
+  },
+  "000059": {
+   "name": "华锦股份",
+   "sectors": [
+    "石油加工"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "7e7f82f1d62e"
+  },
+  "002408": {
+   "name": "齐翔腾达",
+   "sectors": [
+    "石油加工"
+   ],
+   "rows": 1634,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "61998d2e525e"
+  },
+  "002648": {
+   "name": "卫星化学",
+   "sectors": [
+    "石油加工"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "969078226d9d"
+  },
+  "601233": {
+   "name": "桐昆股份",
+   "sectors": [
+    "化纤"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "f72fd2fc6712"
+  },
+  "603225": {
+   "name": "新凤鸣",
+   "sectors": [
+    "化纤"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "1833d4b68ef8"
+  },
+  "002064": {
+   "name": "华峰化学",
+   "sectors": [
+    "化纤"
+   ],
+   "rows": 1639,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "e5eb3eb7bb8a"
+  },
+  "002254": {
+   "name": "泰和新材",
+   "sectors": [
+    "化纤"
+   ],
+   "rows": 1631,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "115de232dc9a"
+  },
+  "000949": {
+   "name": "新乡化纤",
+   "sectors": [
+    "化纤"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "fe31fbb77d99"
+  },
+  "000420": {
+   "name": "吉林化纤",
+   "sectors": [
+    "化纤"
+   ],
+   "rows": 1626,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "4ee47ef125b1"
+  },
+  "600096": {
+   "name": "云天化",
+   "sectors": [
+    "农化制品"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "c70e2ea3cfe0"
+  },
+  "600141": {
+   "name": "兴发集团",
+   "sectors": [
+    "农化制品"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "9b770f9d7a2a"
+  },
+  "600426": {
+   "name": "华鲁恒升",
+   "sectors": [
+    "农化制品",
+    "化学原料"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "f4fef250a4ca"
+  },
+  "600486": {
+   "name": "扬农化工",
+   "sectors": [
+    "农化制品"
+   ],
+   "rows": 1638,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "e68f8da3345d"
+  },
+  "000902": {
+   "name": "新洋丰",
+   "sectors": [
+    "农化制品"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "8e51f57a598d"
+  },
+  "002539": {
+   "name": "云图控股",
+   "sectors": [
+    "农化制品"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "45c6f2f7212a"
+  },
+  "002895": {
+   "name": "川恒股份",
+   "sectors": [
+    "农化制品"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "3194d426bee8"
+  },
+  "000422": {
+   "name": "湖北宜化",
+   "sectors": [
+    "农化制品"
+   ],
+   "rows": 1642,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "c54a07b6043c"
+  },
+  "600470": {
+   "name": "六国化工",
+   "sectors": [
+    "农化制品"
+   ],
+   "rows": 1639,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "88b899cbbb60"
+  },
+  "600309": {
+   "name": "万华化学",
+   "sectors": [
+    "化学原料"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "dab6958153cf"
+  },
+  "600989": {
+   "name": "宝丰能源",
+   "sectors": [
+    "化学原料"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "1716a5540726"
+  },
+  "000683": {
+   "name": "远兴能源",
+   "sectors": [
+    "化学原料"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "8349a3102e8e"
+  },
+  "002092": {
+   "name": "中泰化学",
+   "sectors": [
+    "化学原料"
+   ],
+   "rows": 1631,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "96a1df9cd4ab"
+  },
+  "600409": {
+   "name": "三友化工",
+   "sectors": [
+    "化学原料"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "9dba539513da"
+  },
+  "600618": {
+   "name": "氯碱化工",
+   "sectors": [
+    "化学原料"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "0372b20a3812"
+  },
+  "600075": {
+   "name": "新疆天业",
+   "sectors": [
+    "化学原料"
+   ],
+   "rows": 1642,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "1fb900c6d8f4"
+  },
+  "600585": {
+   "name": "海螺水泥",
+   "sectors": [
+    "水泥建材"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "29e2facc5683"
+  },
+  "600801": {
+   "name": "华新水泥",
+   "sectors": [
+    "水泥建材"
+   ],
+   "rows": 1641,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "cbe2e5e460b5"
+  },
+  "000672": {
+   "name": "上峰水泥",
+   "sectors": [
+    "水泥建材"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "22f4bcc80a24"
+  },
+  "002233": {
+   "name": "塔牌集团",
+   "sectors": [
+    "水泥建材"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "7c5d597771b6"
+  },
+  "000877": {
+   "name": "天山股份",
+   "sectors": [
+    "水泥建材"
+   ],
+   "rows": 1632,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "6d134e0d185a"
+  },
+  "000401": {
+   "name": "冀东水泥",
+   "sectors": [
+    "水泥建材"
+   ],
+   "rows": 1621,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "7b2e474d5ff6"
+  },
+  "000789": {
+   "name": "万年青",
+   "sectors": [
+    "水泥建材"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "60b90305a9a9"
+  },
+  "600449": {
+   "name": "宁夏建材",
+   "sectors": [
+    "水泥建材"
+   ],
+   "rows": 1632,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "247e3a702893"
+  },
+  "601636": {
+   "name": "旗滨集团",
+   "sectors": [
+    "玻璃玻纤"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "f2dbf3550161"
+  },
+  "000012": {
+   "name": "南玻A",
+   "sectors": [
+    "玻璃玻纤"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "50f4cc21a2b9"
+  },
+  "600660": {
+   "name": "福耀玻璃",
+   "sectors": [
+    "玻璃玻纤"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "7089603b6d87"
+  },
+  "600176": {
+   "name": "中国巨石",
+   "sectors": [
+    "玻璃玻纤"
+   ],
+   "rows": 1633,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "ddcab573757c"
+  },
+  "002080": {
+   "name": "中材科技",
+   "sectors": [
+    "玻璃玻纤"
+   ],
+   "rows": 1633,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "9c0781bb9db3"
+  },
+  "300196": {
+   "name": "长海股份",
+   "sectors": [
+    "玻璃玻纤"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "d83ebd75ae66"
+  },
+  "600529": {
+   "name": "山东药玻",
+   "sectors": [
+    "玻璃玻纤"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "e8b33e500f5f"
+  },
+  "600876": {
+   "name": "洛阳玻璃",
+   "sectors": [
+    "玻璃玻纤"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "8c0ed737e27c"
+  },
+  "002078": {
+   "name": "太阳纸业",
+   "sectors": [
+    "造纸"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "ea3530003918"
+  },
+  "000488": {
+   "name": "晨鸣纸业",
+   "sectors": [
+    "造纸"
+   ],
+   "rows": 1642,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "d0bb9693bd19"
+  },
+  "600966": {
+   "name": "博汇纸业",
+   "sectors": [
+    "造纸"
+   ],
+   "rows": 1642,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "685ef9e2141f"
+  },
+  "600308": {
+   "name": "华泰股份",
+   "sectors": [
+    "造纸"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "5d8450e8af91"
+  },
+  "600567": {
+   "name": "山鹰国际",
+   "sectors": [
+    "造纸"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "efaddbeab305"
+  },
+  "603733": {
+   "name": "仙鹤股份",
+   "sectors": [
+    "造纸"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "3d2d0cd410c8"
+  },
+  "605007": {
+   "name": "五洲特纸",
+   "sectors": [
+    "造纸"
+   ],
+   "rows": 1438,
+   "first": "2020-11-10",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "6537ef4f731f"
+  },
+  "600356": {
+   "name": "恒丰纸业",
+   "sectors": [
+    "造纸"
+   ],
+   "rows": 1634,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "2be96f9ab0e9"
+  },
+  "603986": {
+   "name": "兆易创新",
+   "sectors": [
+    "半导体"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "7434d8959b89"
+  },
+  "688008": {
+   "name": "澜起科技",
+   "sectors": [
+    "半导体"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "a6791908d309"
+  },
+  "300223": {
+   "name": "北京君正",
+   "sectors": [
+    "半导体"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "ec2bd680787b"
+  },
+  "301308": {
+   "name": "江波龙",
+   "sectors": [
+    "半导体"
+   ],
+   "rows": 1015,
+   "first": "2022-08-05",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "6abdf462c392"
+  },
+  "688525": {
+   "name": "佰维存储",
+   "sectors": [
+    "半导体"
+   ],
+   "rows": 916,
+   "first": "2022-12-30",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "de52276a1114"
+  },
+  "300475": {
+   "name": "香农芯创",
+   "sectors": [
+    "半导体"
+   ],
+   "rows": 1635,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "9e865ab85d03"
+  },
+  "001309": {
+   "name": "德明利",
+   "sectors": [
+    "半导体"
+   ],
+   "rows": 1040,
+   "first": "2022-07-01",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "5cd9aef4a3c4"
+  },
+  "688981": {
+   "name": "中芯国际",
+   "sectors": [
+    "半导体"
+   ],
+   "rows": 1509,
+   "first": "2020-07-16",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "3840c4c51158"
+  },
+  "600584": {
+   "name": "长电科技",
+   "sectors": [
+    "半导体"
+   ],
+   "rows": 1638,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "2a3a311d701d"
+  },
+  "002409": {
+   "name": "雅克科技",
+   "sectors": [
+    "半导体"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "c6d8f8ccf7a1"
+  },
+  "300666": {
+   "name": "江丰电子",
+   "sectors": [
+    "半导体"
+   ],
+   "rows": 1637,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "db8da7777999"
+  },
+  "688012": {
+   "name": "中微公司",
+   "sectors": [
+    "半导体"
+   ],
+   "rows": 1634,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "cfa3a4c7ba8d"
+  },
+  "300408": {
+   "name": "三环集团",
+   "sectors": [
+    "元件"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "25c20997b7ac"
+  },
+  "000636": {
+   "name": "风华高科",
+   "sectors": [
+    "元件"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "7724b9576ae9"
+  },
+  "002138": {
+   "name": "顺络电子",
+   "sectors": [
+    "元件"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "116fb12db923"
+  },
+  "002859": {
+   "name": "洁美科技",
+   "sectors": [
+    "元件"
+   ],
+   "rows": 1633,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "bc4553eee18e"
+  },
+  "603678": {
+   "name": "火炬电子",
+   "sectors": [
+    "元件"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "5b0476e45800"
+  },
+  "000733": {
+   "name": "振华科技",
+   "sectors": [
+    "元件"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "689d6c98e0c8"
+  },
+  "600183": {
+   "name": "生益科技",
+   "sectors": [
+    "元件"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "b692e13b6545"
+  },
+  "002463": {
+   "name": "沪电股份",
+   "sectors": [
+    "元件"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "185339bc36ec"
+  },
+  "002916": {
+   "name": "深南电路",
+   "sectors": [
+    "元件"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "b952c343d71f"
+  },
+  "002384": {
+   "name": "东山精密",
+   "sectors": [
+    "元件"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "8476710acc1f"
+  },
+  "000725": {
+   "name": "京东方A",
+   "sectors": [
+    "面板"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "8a89c2d33b23"
+  },
+  "000100": {
+   "name": "TCL科技",
+   "sectors": [
+    "面板"
+   ],
+   "rows": 1642,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "6a5f25c866f2"
+  },
+  "600707": {
+   "name": "彩虹股份",
+   "sectors": [
+    "面板"
+   ],
+   "rows": 1642,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "90b530b4636f"
+  },
+  "002387": {
+   "name": "维信诺",
+   "sectors": [
+    "面板"
+   ],
+   "rows": 1623,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "0212198de19b"
+  },
+  "000050": {
+   "name": "深天马A",
+   "sectors": [
+    "面板"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "b365506abb98"
+  },
+  "688051": {
+   "name": "龙腾光电",
+   "sectors": [
+    "面板"
+   ],
+   "rows": 1583,
+   "first": "2020-03-20",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "1aec4b96cc54"
+  },
+  "600703": {
+   "name": "三安光电",
+   "sectors": [
+    "面板"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "b8eda2ccf91f"
+  },
+  "300303": {
+   "name": "聚飞光电",
+   "sectors": [
+    "面板"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "827a7ca1b1a9"
+  },
+  "002475": {
+   "name": "立讯精密",
+   "sectors": [
+    "消费电子"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "f09e4cd756f9"
+  },
+  "002241": {
+   "name": "歌尔股份",
+   "sectors": [
+    "消费电子"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "79b1c2967bdb"
+  },
+  "601138": {
+   "name": "工业富联",
+   "sectors": [
+    "消费电子"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "a4c7ad42eac0"
+  },
+  "300433": {
+   "name": "蓝思科技",
+   "sectors": [
+    "消费电子"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "63e17217315f"
+  },
+  "002600": {
+   "name": "领益智造",
+   "sectors": [
+    "消费电子"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "067eccf70380"
+  },
+  "688036": {
+   "name": "传音控股",
+   "sectors": [
+    "消费电子"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "b564579589c9"
+  },
+  "600745": {
+   "name": "闻泰科技",
+   "sectors": [
+    "消费电子"
+   ],
+   "rows": 1629,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "eb7fb6475886"
+  },
+  "300866": {
+   "name": "安克创新",
+   "sectors": [
+    "消费电子"
+   ],
+   "rows": 1488,
+   "first": "2020-08-24",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "85997eb5b9e1"
+  },
+  "002714": {
+   "name": "牧原股份",
+   "sectors": [
+    "养殖"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "eea4e3d0e3ab"
+  },
+  "300498": {
+   "name": "温氏股份",
+   "sectors": [
+    "养殖"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "cdd686232733"
+  },
+  "000876": {
+   "name": "新希望",
+   "sectors": [
+    "养殖"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "bd436c9fb471"
+  },
+  "002157": {
+   "name": "正邦科技",
+   "sectors": [
+    "养殖"
+   ],
+   "rows": 1640,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "876237bcbc70"
+  },
+  "002124": {
+   "name": "天邦食品",
+   "sectors": [
+    "养殖"
+   ],
+   "rows": 1641,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "19ccc5be6b3e"
+  },
+  "603363": {
+   "name": "傲农生物",
+   "sectors": [
+    "养殖"
+   ],
+   "rows": 1641,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "d752c6c949e8"
+  },
+  "002567": {
+   "name": "唐人神",
+   "sectors": [
+    "养殖"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "e883efd26d5e"
+  },
+  "002385": {
+   "name": "大北农",
+   "sectors": [
+    "养殖"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "a197694bda29"
+  },
+  "603477": {
+   "name": "巨星农牧",
+   "sectors": [
+    "养殖"
+   ],
+   "rows": 1642,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "be887a70723e"
+  },
+  "600975": {
+   "name": "新五丰",
+   "sectors": [
+    "养殖"
+   ],
+   "rows": 1633,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "0ed4eb6cd301"
+  },
+  "002299": {
+   "name": "圣农发展",
+   "sectors": [
+    "养殖"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "e9a74df6c2dc"
+  },
+  "002458": {
+   "name": "益生股份",
+   "sectors": [
+    "养殖"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "578bc0d3e52d"
+  },
+  "002234": {
+   "name": "民和股份",
+   "sectors": [
+    "养殖"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "ad0549b6ee1e"
+  },
+  "300761": {
+   "name": "立华股份",
+   "sectors": [
+    "养殖"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "c16336930544"
+  },
+  "002311": {
+   "name": "海大集团",
+   "sectors": [
+    "饲料加工"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "4f603f8c6942"
+  },
+  "600438": {
+   "name": "通威股份",
+   "sectors": [
+    "饲料加工"
+   ],
+   "rows": 1633,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "0e96335be494"
+  },
+  "603603": {
+   "name": "禾丰股份",
+   "sectors": [
+    "饲料加工"
+   ],
+   "rows": 993,
+   "first": "2020-01-02",
+   "latest": "2024-04-18",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "d0b2ffa8b756"
+  },
+  "002548": {
+   "name": "金新农",
+   "sectors": [
+    "饲料加工"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "ca9782da5b8f"
+  },
+  "603668": {
+   "name": "天马科技",
+   "sectors": [
+    "饲料加工"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "5c236a6f7c6e"
+  },
+  "000998": {
+   "name": "隆平高科",
+   "sectors": [
+    "种植种业"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "af11053a5583"
+  },
+  "002041": {
+   "name": "登海种业",
+   "sectors": [
+    "种植种业"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "47071b618748"
+  },
+  "601952": {
+   "name": "苏垦农发",
+   "sectors": [
+    "种植种业"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "1a9754fee203"
+  },
+  "600598": {
+   "name": "北大荒",
+   "sectors": [
+    "种植种业"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "1438bd36a4f6"
+  },
+  "601118": {
+   "name": "海南橡胶",
+   "sectors": [
+    "种植种业"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "398a1d614eef"
+  },
+  "600540": {
+   "name": "新赛股份",
+   "sectors": [
+    "种植种业"
+   ],
+   "rows": 1641,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "4857bd691925"
+  },
+  "601919": {
+   "name": "中远海控",
+   "sectors": [
+    "航运港口"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "df4d871dc824"
+  },
+  "600026": {
+   "name": "中远海能",
+   "sectors": [
+    "航运港口"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "0cecd818bd99"
+  },
+  "601872": {
+   "name": "招商轮船",
+   "sectors": [
+    "航运港口"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "6c858110a3a7"
+  },
+  "601975": {
+   "name": "招商南油",
+   "sectors": [
+    "航运港口"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "65cdb4841d08"
+  },
+  "600428": {
+   "name": "中远海特",
+   "sectors": [
+    "航运港口"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "af57f8069997"
+  },
+  "603565": {
+   "name": "中谷物流",
+   "sectors": [
+    "航运港口"
+   ],
+   "rows": 1464,
+   "first": "2020-09-25",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "9ddad5dee235"
+  },
+  "601022": {
+   "name": "宁波远洋",
+   "sectors": [
+    "航运港口"
+   ],
+   "rows": 932,
+   "first": "2022-12-08",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "f12017d4b3aa"
+  },
+  "000520": {
+   "name": "长航凤凰",
+   "sectors": [
+    "航运港口"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "63327add0c38"
+  },
+  "601111": {
+   "name": "中国国航",
+   "sectors": [
+    "航空机场"
+   ],
+   "rows": 1642,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "8f2b6cafaefe"
+  },
+  "600029": {
+   "name": "南方航空",
+   "sectors": [
+    "航空机场"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "7f2f9f7b0177"
+  },
+  "600115": {
+   "name": "中国东航",
+   "sectors": [
+    "航空机场"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "9948436bfeee"
+  },
+  "601021": {
+   "name": "春秋航空",
+   "sectors": [
+    "航空机场"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "ff3b8c11bdfc"
+  },
+  "603885": {
+   "name": "吉祥航空",
+   "sectors": [
+    "航空机场"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "983868de453c"
+  },
+  "600009": {
+   "name": "上海机场",
+   "sectors": [
+    "航空机场"
+   ],
+   "rows": 1632,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "b556c0086277"
+  },
+  "600004": {
+   "name": "白云机场",
+   "sectors": [
+    "航空机场"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "ff85093c2f26"
+  },
+  "600030": {
+   "name": "中信证券",
+   "sectors": [
+    "证券"
+   ],
+   "rows": 1637,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "954bf46e8451"
+  },
+  "300059": {
+   "name": "东方财富",
+   "sectors": [
+    "证券"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "75ec799f2aad"
+  },
+  "601688": {
+   "name": "华泰证券",
+   "sectors": [
+    "证券"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "ff61df9ed387"
+  },
+  "601211": {
+   "name": "国泰君安",
+   "sectors": [
+    "证券"
+   ],
+   "rows": 1624,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "06afe83242a2"
+  },
+  "600999": {
+   "name": "招商证券",
+   "sectors": [
+    "证券"
+   ],
+   "rows": 1637,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "02836eea9515"
+  },
+  "000776": {
+   "name": "广发证券",
+   "sectors": [
+    "证券"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "1fbbc0079da7"
+  },
+  "600958": {
+   "name": "东方证券",
+   "sectors": [
+    "证券"
+   ],
+   "rows": 1627,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "59ebea5006e7"
+  },
+  "601377": {
+   "name": "兴业证券",
+   "sectors": [
+    "证券"
+   ],
+   "rows": 1637,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "e52af611b79a"
+  },
+  "601788": {
+   "name": "光大证券",
+   "sectors": [
+    "证券"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "df6d8e640734"
+  },
+  "601901": {
+   "name": "方正证券",
+   "sectors": [
+    "证券"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "e66b5c4e5a9a"
+  },
+  "601318": {
+   "name": "中国平安",
+   "sectors": [
+    "保险"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "7e1cb2b14e42"
+  },
+  "601628": {
+   "name": "中国人寿",
+   "sectors": [
+    "保险"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "0f8f407a1e04"
+  },
+  "601601": {
+   "name": "中国太保",
+   "sectors": [
+    "保险"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "90f6b156b5f9"
+  },
+  "601336": {
+   "name": "新华保险",
+   "sectors": [
+    "保险"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "a577003b09cc"
+  },
+  "601319": {
+   "name": "中国人保",
+   "sectors": [
+    "保险"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "b0dcfb6ef648"
+  },
+  "000002": {
+   "name": "万科A",
+   "sectors": [
+    "房地产"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "d704d02ab15f"
+  },
+  "600048": {
+   "name": "保利发展",
+   "sectors": [
+    "房地产"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "58a2c7c026a2"
+  },
+  "001979": {
+   "name": "招商蛇口",
+   "sectors": [
+    "房地产"
+   ],
+   "rows": 1627,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "a84cb96d5834"
+  },
+  "600383": {
+   "name": "金地集团",
+   "sectors": [
+    "房地产"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "34910b341d7c"
+  },
+  "601155": {
+   "name": "新城控股",
+   "sectors": [
+    "房地产"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "7b0b4d33eedd"
+  },
+  "000961": {
+   "name": "中南建设",
+   "sectors": [
+    "房地产"
+   ],
+   "rows": 1050,
+   "first": "2020-01-02",
+   "latest": "2024-05-08",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "58568d519604"
+  },
+  "000069": {
+   "name": "华侨城A",
+   "sectors": [
+    "房地产"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "43df3e21fe8c"
+  },
+  "002244": {
+   "name": "滨江集团",
+   "sectors": [
+    "房地产"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "6437d2b7461f"
+  },
+  "600325": {
+   "name": "华发股份",
+   "sectors": [
+    "房地产"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "7ee7039177d1"
+  },
+  "601668": {
+   "name": "中国建筑",
+   "sectors": [
+    "基建建筑"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "c6a9871f0dac"
+  },
+  "601390": {
+   "name": "中国中铁",
+   "sectors": [
+    "基建建筑"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "25e95fd37393"
+  },
+  "601186": {
+   "name": "中国铁建",
+   "sectors": [
+    "基建建筑"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "8671d7dcff31"
+  },
+  "601800": {
+   "name": "中国交建",
+   "sectors": [
+    "基建建筑"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "89a4df0e4660"
+  },
+  "601669": {
+   "name": "中国电建",
+   "sectors": [
+    "基建建筑"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "e3017c3f76be"
+  },
+  "601868": {
+   "name": "中国能建",
+   "sectors": [
+    "基建建筑"
+   ],
+   "rows": 1221,
+   "first": "2021-09-28",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "7f5572ccd23d"
+  },
+  "600039": {
+   "name": "四川路桥",
+   "sectors": [
+    "基建建筑"
+   ],
+   "rows": 1631,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "9cc983b1b4ba"
+  },
+  "600170": {
+   "name": "上海建工",
+   "sectors": [
+    "基建建筑"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "26c62dc6bdfc"
+  },
+  "600031": {
+   "name": "三一重工",
+   "sectors": [
+    "工程机械"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "d87624b1208c"
+  },
+  "000425": {
+   "name": "徐工机械",
+   "sectors": [
+    "工程机械"
+   ],
+   "rows": 1620,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "2eb8e50d0fd4"
+  },
+  "000157": {
+   "name": "中联重科",
+   "sectors": [
+    "工程机械"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "888e437c0534"
+  },
+  "000528": {
+   "name": "柳工",
+   "sectors": [
+    "工程机械"
+   ],
+   "rows": 1622,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "2e1ac079dad5"
+  },
+  "601100": {
+   "name": "恒立液压",
+   "sectors": [
+    "工程机械"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "ccb49c826289"
+  },
+  "600761": {
+   "name": "安徽合力",
+   "sectors": [
+    "工程机械"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "72b83e8aa2ef"
+  },
+  "000680": {
+   "name": "山推股份",
+   "sectors": [
+    "工程机械"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "ff1f429802e4"
+  },
+  "603298": {
+   "name": "杭叉集团",
+   "sectors": [
+    "工程机械"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "115f3163d41e"
+  },
+  "603338": {
+   "name": "浙江鼎力",
+   "sectors": [
+    "工程机械"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "aa3169dfa0ec"
+  },
+  "600104": {
+   "name": "上汽集团",
+   "sectors": [
+    "汽车整车"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "9f1ebfe6a86a"
+  },
+  "601633": {
+   "name": "长城汽车",
+   "sectors": [
+    "汽车整车"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "5a1bb9d8b193"
+  },
+  "000625": {
+   "name": "长安汽车",
+   "sectors": [
+    "汽车整车"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "307de83cdf7b"
+  },
+  "601238": {
+   "name": "广汽集团",
+   "sectors": [
+    "汽车整车"
+   ],
+   "rows": 1633,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "59ffabc0ce88"
+  },
+  "002594": {
+   "name": "比亚迪",
+   "sectors": [
+    "汽车整车"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "fb750ad9a032"
+  },
+  "601127": {
+   "name": "赛力斯",
+   "sectors": [
+    "汽车整车"
+   ],
+   "rows": 1642,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "400dfa7e1cd0"
+  },
+  "600418": {
+   "name": "江淮汽车",
+   "sectors": [
+    "汽车整车"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "0addc4300444"
+  },
+  "000951": {
+   "name": "中国重汽",
+   "sectors": [
+    "汽车整车"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "f49060a5daa1"
+  },
+  "600066": {
+   "name": "宇通客车",
+   "sectors": [
+    "汽车整车"
+   ],
+   "rows": 1642,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "498d46c1e4ce"
+  },
+  "600011": {
+   "name": "华能国际",
+   "sectors": [
+    "电力"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "0ecce945da5c"
+  },
+  "600027": {
+   "name": "华电国际",
+   "sectors": [
+    "电力"
+   ],
+   "rows": 1632,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "6cd6ef4bf6ab"
+  },
+  "601991": {
+   "name": "大唐发电",
+   "sectors": [
+    "电力"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "2956ba560ce5"
+  },
+  "600795": {
+   "name": "国电电力",
+   "sectors": [
+    "电力"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "122cecdb8387"
+  },
+  "600023": {
+   "name": "浙能电力",
+   "sectors": [
+    "电力"
+   ],
+   "rows": 1643,
+   "first": "2020-01-02",
+   "latest": "2026-10-16",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "b58ddb7ac7a4"
+  }
+ }
+}
