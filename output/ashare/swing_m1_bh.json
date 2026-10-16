@@ -9,13 +9,13 @@
   "executor": "统一执行器+账本(raw价/涨跌停/停牌/整手/T+1/真实费用)"
  },
  "stats": {
-  "return": -0.7725,
-  "ann": -0.196,
-  "max_dd": -0.7725,
-  "calmar": -0.25,
-  "sharpe": -0.39,
+  "return": 0.2857,
+  "ann": 0.0377,
+  "max_dd": -0.2308,
+  "calmar": 0.16,
+  "sharpe": 0.33,
   "trades": {
-   "BUY": 0,
+   "BUY": 8,
    "SELL": 0
   },
   "rejects": {
@@ -24,9 +24,9 @@
    "lot": 10,
    "no_px": 0,
    "pool": 0,
-   "other": 10
+   "other": 2
   },
-  "cash_pct": 1.0,
+  "cash_pct": 0.228,
   "avg_hold_days": null,
   "n_days": 1643
  }

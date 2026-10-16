@@ -9,35 +9,35 @@
  },
  "compare": {
   "m1": {
-   "return": -0.8352,
-   "ann": -0.2333,
-   "max_dd": -0.8352,
-   "calmar": -0.28,
-   "sharpe": -0.95,
+   "return": -0.2256,
+   "ann": -0.037,
+   "max_dd": -0.3472,
+   "calmar": -0.11,
+   "sharpe": -0.38,
    "trades": {
-    "BUY": 0,
-    "SELL": 0
+    "BUY": 98,
+    "SELL": 98
    },
    "rejects": {
     "halted": 0,
     "limit": 0,
-    "lot": 309,
+    "lot": 112,
     "no_px": 0,
     "pool": 0,
-    "other": 81
+    "other": 87
    },
-   "cash_pct": 1.0,
-   "avg_hold_days": null,
+   "cash_pct": 0.753,
+   "avg_hold_days": 1,
    "n_days": 1643
   },
   "bh": {
-   "return": -0.7725,
-   "ann": -0.196,
-   "max_dd": -0.7725,
-   "calmar": -0.25,
-   "sharpe": -0.39,
+   "return": 0.2857,
+   "ann": 0.0377,
+   "max_dd": -0.2308,
+   "calmar": 0.16,
+   "sharpe": 0.33,
    "trades": {
-    "BUY": 0,
+    "BUY": 8,
     "SELL": 0
    },
    "rejects": {
@@ -46,53 +46,53 @@
     "lot": 10,
     "no_px": 0,
     "pool": 0,
-    "other": 10
+    "other": 2
    },
-   "cash_pct": 1.0,
+   "cash_pct": 0.228,
    "avg_hold_days": null,
    "n_days": 1643
   },
   "trend": {
-   "return": -0.8157,
-   "ann": -0.2206,
-   "max_dd": -0.8157,
-   "calmar": -0.27,
-   "sharpe": -0.83,
+   "return": -0.1771,
+   "ann": -0.0283,
+   "max_dd": -0.3549,
+   "calmar": -0.08,
+   "sharpe": -0.23,
    "trades": {
-    "BUY": 0,
-    "SELL": 0
+    "BUY": 63,
+    "SELL": 63
    },
    "rejects": {
     "halted": 0,
     "limit": 0,
-    "lot": 181,
+    "lot": 99,
     "no_px": 0,
     "pool": 0,
-    "other": 59
+    "other": 65
    },
-   "cash_pct": 1.0,
-   "avg_hold_days": null,
+   "cash_pct": 0.748,
+   "avg_hold_days": 1,
    "n_days": 1643
   },
   "mom": {
-   "return": -0.8311,
-   "ann": -0.2305,
-   "max_dd": -0.8311,
-   "calmar": -0.28,
-   "sharpe": -0.87,
+   "return": 0.4278,
+   "ann": 0.0539,
+   "max_dd": -0.3603,
+   "calmar": 0.15,
+   "sharpe": 0.37,
    "trades": {
-    "BUY": 0,
+    "BUY": 10,
     "SELL": 0
    },
    "rejects": {
     "halted": 0,
     "limit": 0,
-    "lot": 296,
+    "lot": 151,
     "no_px": 0,
     "pool": 0,
-    "other": 94
+    "other": 17
    },
-   "cash_pct": 1.0,
+   "cash_pct": 0.213,
    "avg_hold_days": null,
    "n_days": 1643
   }

@@ -124,7 +124,7 @@ def run(strategy: str = "m1", n_hold: int = 5) -> dict:
                 if sh < base:
                     rej["lot"] += 1
                     continue
-                plan = ex.create_plan(code, "BUY", sig_day, px_ref=px, cash_budget=round(sh * px * 1.005, 2), created_at=sig_day + "T15:30:00+08:00")
+                plan = ex.create_plan(code, "BUY", sig_day, px_ref=last_px.get(code, px), cash_budget=round(sh * px * 1.005, 2), created_at=sig_day + "T15:30:00+08:00")  # px_ref=T-1收盘(无未来信息)
             else:
                 sh = pos.get(code, 0)
                 if sh <= 0:
@@ -138,10 +138,10 @@ def run(strategy: str = "m1", n_hold: int = 5) -> dict:
                 if fill["status"] == "FILLED":
                     cash = ledger.cash
                     if action == "BUY":
-                        pos[code] = pos.get(code, 0) + plan["shares"]
+                        pos[code] = pos.get(code, 0) + fill["shares"]
                         trades["BUY"] += 1
                     else:
-                        pos[code] = pos.get(code, 0) - plan["shares"]
+                        pos[code] = pos.get(code, 0) - fill["shares"]
                         if pos[code] <= 0:
                             pos.pop(code)
                             hold_days.append((pd.Timestamp(day) - pd.Timestamp(sig_day)).days)
@@ -174,7 +174,8 @@ def run(strategy: str = "m1", n_hold: int = 5) -> dict:
                     prev_tradeable = prev_tradeable  # 日历未知→沿用(fail-closed不猜)
                 rank = [c for c in stock_rank(panel, day) if sector_of.get(c) in good and c in prev_tradeable]
                 for c in rank[:n_hold]:
-                    if c not in pos:
+                    s20 = close_adj[c].loc[:day].tail(20)
+                    if c not in pos and len(s20) >= 20 and close_adj[c].get(day, np.nan) > s20.mean():  # 趋势确认入场(收盘>MA20), 否则次日即破位翻转
                         pending.append((c, "BUY", day_str))
                 if strategy == "m1":  # 趋势破坏退出: close_adj跌破行业门禁或MA20(收盘信号, T+1执行)
                     for c in list(pos):
