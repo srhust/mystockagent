@@ -9,6 +9,7 @@
 - 行业归属: 当前config快照(非历史时点行业, 如实标注)
 """
 import json
+import io
 import os
 import sys
 
@@ -24,7 +25,7 @@ def pool_at(day: str, require_history_days: int = 0) -> dict:
     if not cal.is_trading_day(day):  # fail-closed: 非交易日/UNKNOWN拒绝
         raise RuntimeError(f"非确认交易日: {day}")
     T = pd.Timestamp(day).normalize()
-    buckets = {k: [] for k in ("TRADEABLE", "SUSPENDED_CONFIRMED", "DATA_MISSING", "NOT_YET_LISTED", "INACTIVE_UNVERIFIED", "INSUFFICIENT_HISTORY", "DELISTED_CONFIRMED")}
+    buckets = {k: [] for k in ("TRADEABLE", "SUSPENDED_CONFIRMED", "DATA_MISSING", "NOT_YET_LISTED", "INACTIVE_UNVERIFIED", "INSUFFICIENT_HISTORY", "DELISTED_CONFIRMED", "DATA_UNVERIFIED")}
     seen, sector_membership = set(), []
     for code, name, sector in sp.configured_stocks():  # F4: 249唯一代码去重, 251条行业关联单列
         sector_membership.append({"code": code, "sector": sector})
@@ -35,13 +36,17 @@ def pool_at(day: str, require_history_days: int = 0) -> dict:
         if not os.path.exists(p):
             buckets["DATA_MISSING"].append(code)  # 文件缺失≠可交易名单, 保守排除
             continue
-        df = pd.read_csv(p, usecols=["date"])
+        head = io.open(p, encoding="utf-8").readline()  # H3b: 数据质量门禁——未过raw/factor迁移不进TRADEABLE
+        if "adj_factor" not in head:
+            buckets["DATA_UNVERIFIED"].append(code)
+            continue
+        df = pd.read_csv(p, usecols=["date", "adj_factor"])
         d = pd.to_datetime(df["date"]).dt.normalize()
         first, last = d.min(), d.max()
         if T < first:
             buckets["NOT_YET_LISTED"].append(code)  # 仅首行情晚于T(首行情近似上市日)
-        elif code in sp.DELISTED_CONFIRMED and T >= pd.Timestamp(sp.DELISTED_CONFIRMED[code]):
-            buckets["DELISTED_CONFIRMED"].append(code)  # H2: 交易所公告真实退市日
+        elif code in sp.DELISTED_CONFIRMED and T >= pd.Timestamp(sp.DELISTED_CONFIRMED[code]["last_trade_date"] if isinstance(sp.DELISTED_CONFIRMED[code], dict) else sp.DELISTED_CONFIRMED[code]):
+            buckets["DELISTED_CONFIRMED"].append(code)  # H2: 按最后交易日(可交易性终点)
         elif T > last + pd.Timedelta(days=60):
             buckets["INACTIVE_UNVERIFIED"].append(code)  # 无权威记录不称CONFIRMED
         elif (T > first) and ((T - first).days < require_history_days):

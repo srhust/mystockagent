@@ -62,10 +62,15 @@ def run(max_stocks: int = None, force: bool = False, per_call_sleep: float = 2.0
                 _head = io.open(p, encoding="utf-8").readline()
                 if "adj_factor" not in _head:
                     raise ValueError("legacy-hfq-format")  # P0-1: 旧后复权CSV不算有效缓存, 强制迁移raw+factor
-                _d = pd.read_csv(p, usecols=["date"])
+                _d = pd.read_csv(p, usecols=["date", "adj_factor"])  # H3b: 缓存命中也验因子实际覆盖率
                 _latest = pd.Timestamp(_d["date"].max())
+                _fcov = float(_d["adj_factor"].notna().mean()) if len(_d) else 0.0
                 if (pd.Timestamp.now().normalize() - _latest).days <= 7 and len(_d) >= 100:
-                    audit[code] = {**audit.get(code, {}), "status": "RAW_OK_FACTOR_OK", "name": name, "sector": sector, "latest": str(_latest.date()), "price_basis": "raw+adj_factor"}  # H3: 新鲜+已迁移=双口径合格
+                    _ok = _fcov >= 0.999
+                    audit[code] = {**audit.get(code, {}),
+                                   "status": "RAW_OK_FACTOR_OK" if _ok else "RAW_OK_FACTOR_MISSING",
+                                   "name": name, "sector": sector, "latest": str(_latest.date()),
+                                   "price_basis": "raw+adj_factor", "factor_coverage": round(_fcov, 4)}
                     ok += 1
                     continue
             except (pd.errors.ParserError, KeyError, ValueError):
@@ -114,8 +119,11 @@ def run(max_stocks: int = None, force: bool = False, per_call_sleep: float = 2.0
     return audit
 
 
-# H2: 交易所公告核实的真实退市(权威来源: 上交所/深交所公告, 非无行情推断)
-DELISTED_CONFIRMED = {"000961": "2024-06-24", "603603": "2024-04-25"}
+# H2: 交易所公告核实的真实退市(权威来源: 深交所2024-07公告/上交所公告, 三日期语义分立)
+DELISTED_CONFIRMED = {
+    "000961": {"decision_date": "2024-06-24", "last_trade_date": "2024-07-11", "delist_date": "2024-07-11"},
+    "603603": {"decision_date": "2024-03-19", "last_trade_date": "2024-04-18", "delist_date": "2024-04-25"},
+}
 
 
 def verify_identity() -> dict:
@@ -123,14 +131,21 @@ def verify_identity() -> dict:
     import akshare as ak
     uni = ak.stock_info_a_code_name()
     m = {str(r["code"]): str(r["name"]) for _, r in uni.iterrows()}
-    bad, retired = [], []
+    counts = {"MATCHED": 0, "MISMATCH": 0, "EXPECTED_DELISTED": 0, "UNVERIFIED": 0}
+    detail = {"MISMATCH": [], "UNVERIFIED": []}
     for code, name, _ in configured_stocks():
-        if code not in m:
-            retired.append(code)
+        if code in DELISTED_CONFIRMED:
+            counts["EXPECTED_DELISTED"] += 1  # 有权威退市记录, 不计UNVERIFIED
+        elif code not in m:
+            counts["UNVERIFIED"] += 1
+            detail["UNVERIFIED"].append(code)  # 未找到≠退市, 不得自行推断
         elif m[code] != name:
-            bad.append({"code": code, "config": name, "exchange": m[code]})
-    return {"mismatches": bad, "not_in_exchange_list": retired,
-            "verdict": "PASS" if not bad else "FAIL"}
+            counts["MISMATCH"] += 1
+            detail["MISMATCH"].append({"code": code, "config": name, "exchange": m[code]})
+        else:
+            counts["MATCHED"] += 1
+    verdict = "PASS" if counts["MISMATCH"] == 0 and counts["UNVERIFIED"] == 0 else "FAIL"
+    return {"counts": counts, "detail": detail, "verdict": verdict}
 
 
 def availability_report() -> dict:

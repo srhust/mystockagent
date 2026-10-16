@@ -1,14 +1,22 @@
 {
  "summary": {
   "total": 249,
-  "raw_ok": 248,
-  "factor_full": 248,
-  "delisted_confirmed": [
-   "000961",
-   "603603"
-  ],
+  "raw_ok": 249,
+  "factor_full": 249,
+  "delisted_confirmed": {
+   "000961": {
+    "decision_date": "2024-06-24",
+    "last_trade_date": "2024-07-11",
+    "delist_date": "2024-07-11"
+   },
+   "603603": {
+    "decision_date": "2024-03-19",
+    "last_trade_date": "2024-04-18",
+    "delist_date": "2024-04-25"
+   }
+  },
   "identity_check": "UNAVAILABLE(限频), verify_identity()待重跑",
-  "generated_at": "2026-10-16T11:12:28.175753+08:00"
+  "generated_at": "2026-10-16T11:32:48.432467+08:00"
  },
  "stocks": {
   "601088": {
@@ -2231,9 +2239,9 @@
    "rows": 1643,
    "first": "2020-01-02",
    "latest": "2026-10-16",
-   "price_basis": "MISSING",
-   "factor_coverage": 0.0,
-   "sha256_12": "e349a145639c",
+   "price_basis": "raw+adj_factor",
+   "factor_coverage": 1.0,
+   "sha256_12": "b559480df2ac",
    "delisted": null
   },
   "002548": {
@@ -2806,7 +2814,11 @@
    "price_basis": "raw+adj_factor",
    "factor_coverage": 1.0,
    "sha256_12": "58568d519604",
-   "delisted": "2024-06-24"
+   "delisted": {
+    "decision_date": "2024-06-24",
+    "last_trade_date": "2024-07-11",
+    "delist_date": "2024-07-11"
+   }
   },
   "000069": {
    "name": "华侨城A",
