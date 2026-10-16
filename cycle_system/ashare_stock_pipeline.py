@@ -41,7 +41,7 @@ def fetch_one(code: str, start: str = "20200101") -> pd.DataFrame:
     return df
 
 
-def run(max_stocks: int = None, force: bool = False, per_call_sleep: float = 0.4) -> dict:
+def run(max_stocks: int = None, force: bool = False, per_call_sleep: float = 2.0) -> dict:
     """落盘251只(断点续传)。结果审计含每股状态; 部分失败如实记录不掩盖。"""
     os.makedirs(DATA_DIR, exist_ok=True)
     stocks = configured_stocks()
@@ -59,8 +59,18 @@ def run(max_stocks: int = None, force: bool = False, per_call_sleep: float = 0.4
             audit[code] = {**audit.get(code, {}), "status": audit.get(code, {}).get("status", "CACHED"), "name": name, "sector": sector}
             ok += 1
             continue
+        df, err = None, None
+        for attempt in range(3):  # 限频退避重试: 5s/15s/30s
+            try:
+                df = fetch_one(code)
+                break
+            except Exception as e:
+                err = str(e)[:200]
+                if attempt < 2:
+                    time.sleep([5, 15, 30][attempt])
         try:
-            df = fetch_one(code)
+            if df is None:
+                raise RuntimeError(err or "fetch failed after retries")
             if df.empty:
                 audit[code] = {"status": "EMPTY", "name": name, "sector": sector}
                 fail += 1
