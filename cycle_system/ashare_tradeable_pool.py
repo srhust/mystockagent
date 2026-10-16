@@ -19,34 +19,39 @@ import ashare_stock_pipeline as sp
 
 
 def pool_at(day: str, require_history_days: int = 0) -> dict:
-    """T日可投资池: {tradeable:[...], suspended:[...], not_yet_listed:[...], stats}。"""
+    """F4五态: TRADEABLE/SUSPENDED_CONFIRMED/DATA_MISSING/NOT_YET_LISTED/DELISTED_CONFIRMED; 唯一代码去重。"""
     import ashare_calendar as cal
     if not cal.is_trading_day(day):  # fail-closed: 非交易日/UNKNOWN拒绝
         raise RuntimeError(f"非确认交易日: {day}")
     T = pd.Timestamp(day).normalize()
-    tradeable, suspended, not_listed = [], [], []
-    for code, name, sector in sp.configured_stocks():
+    buckets = {k: [] for k in ("TRADEABLE", "SUSPENDED_CONFIRMED", "DATA_MISSING", "NOT_YET_LISTED", "DELISTED_CONFIRMED")}
+    seen, sector_membership = set(), []
+    for code, name, sector in sp.configured_stocks():  # F4: 249唯一代码去重, 251条行业关联单列
+        sector_membership.append({"code": code, "sector": sector})
+        if code in seen:
+            continue
+        seen.add(code)
         p = os.path.join(sp.DATA_DIR, f"{code}.csv")
         if not os.path.exists(p):
+            buckets["DATA_MISSING"].append(code)  # 文件缺失≠可交易名单, 保守排除
             continue
         df = pd.read_csv(p, usecols=["date"])
         d = pd.to_datetime(df["date"]).dt.normalize()
         first, last = d.min(), d.max()
         if T < first:
-            not_listed.append(code)
+            buckets["NOT_YET_LISTED"].append(code)  # 首行情近似上市日
         elif T > last + pd.Timedelta(days=60):
-            continue  # 已退市(池内无此情形, 防御)
-        elif T > last:
-            suspended.append(code)  # 最后行情早于T→停牌近似
+            buckets["DELISTED_CONFIRMED"].append(code)  # 长期无行情(近似退市, 保守排除)
         elif (T > first) and ((T - first).days < require_history_days):
-            continue  # 上市历史不足
+            buckets["NOT_YET_LISTED"].append(code)  # 上市历史不足
         elif T not in set(d):
-            suspended.append(code)  # 当日无K线→停牌近似
+            buckets["DATA_MISSING"].append(code)  # 当日无K线: 数据未到/漏行/停牌不可区分→不作停牌确认
         else:
-            tradeable.append(code)
-    return {"date": str(T.date()), "tradeable": tradeable, "suspended": suspended,
-            "not_yet_listed": not_listed,
-            "stats": {"tradeable": len(tradeable), "suspended": len(suspended),
-                      "not_yet_listed": len(not_listed)},
+            buckets["TRADEABLE"].append(code)
+    return {"date": str(T.date()),
+            "buckets": buckets,
+            "stats": {k: len(v) for k, v in buckets.items()},
+            "universe": len(seen), "sector_membership": len(sector_membership),
             "caveats": {"st_history": "UNAVAILABLE", "industry": "当前快照非历史时点",
-                        "suspension": "行情存在性近似, 非官方停复牌记录"}}
+                        "suspension": "无权威停复牌数据, 当日无K线一律DATA_MISSING不作SUSPENDED_CONFIRMED",
+                        "survivorship": "仅当前配置池, 历史已退市/被替换股不在内"}}

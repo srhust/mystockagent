@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 """R7: 交易日历推导 + 数据管道审计 + executor接入。"""
 import json
 import os
@@ -93,11 +93,11 @@ def test_e3_tradeable_pool():
     """E3: 历史可投资池 — 上市/停牌近似/交易日fail-closed/诚实边界。"""
     import ashare_tradeable_pool as tp
     r = tp.pool_at("2026-09-28")
-    assert 200 <= r["stats"]["tradeable"] <= 249
+    assert 200 <= r["stats"]["TRADEABLE"] <= 249
     assert r["caveats"]["st_history"] == "UNAVAILABLE"  # ST历史不猜测
     r2 = tp.pool_at("2022-06-15")
-    assert r2["stats"]["not_yet_listed"] > 0  # 2022年仍有后来上市股
-    assert r2["stats"]["tradeable"] < r["stats"]["tradeable"]
+    assert r2["stats"]["NOT_YET_LISTED"] > 0  # 2022年仍有后来上市股
+    assert r2["stats"]["TRADEABLE"] < r["stats"]["TRADEABLE"]
     with pytest.raises(RuntimeError, match="非确认交易日"):
         tp.pool_at("2026-10-03")  # 国庆fail-closed
 

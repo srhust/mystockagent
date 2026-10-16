@@ -29,9 +29,10 @@ def configured_stocks() -> list:
     return out  # (code, name, sector)
 
 
-def fetch_one(code: str, start: str = "20200101") -> pd.DataFrame:
+def fetch_one(code: str, start: str = "20200101", adjust: str = "") -> pd.DataFrame:
+    """F3: adjust=""为原始真实成交价(执行器/涨跌停/费用口径); adjust="hfq"仅研究信号复权口径。"""
     import akshare as ak
-    df = ak.stock_zh_a_hist(symbol=code, period="daily", start_date=start, adjust="hfq")
+    df = ak.stock_zh_a_hist(symbol=code, period="daily", start_date=start, adjust=adjust)
     if df is None or df.empty:
         return pd.DataFrame()
     df = df.rename(columns={"日期": "date", "开盘": "open", "收盘": "close", "最高": "high", "最低": "low", "成交量": "volume", "成交额": "amount"})
@@ -56,9 +57,15 @@ def run(max_stocks: int = None, force: bool = False, per_call_sleep: float = 2.0
     for code, name, sector in stocks:
         p = os.path.join(DATA_DIR, f"{code}.csv")
         if not force and os.path.exists(p):
-            audit[code] = {**audit.get(code, {}), "status": audit.get(code, {}).get("status", "CACHED"), "name": name, "sector": sector}
-            ok += 1
-            continue
+            try:  # F3: 断点续传必须校验新鲜度, 不得只看文件存在
+                _d = pd.read_csv(p, usecols=["date"])
+                _latest = pd.Timestamp(_d["date"].max())
+                if (pd.Timestamp.now().normalize() - _latest).days <= 7 and len(_d) >= 100:
+                    audit[code] = {**audit.get(code, {}), "status": audit.get(code, {}).get("status", "CACHED"), "name": name, "sector": sector, "latest": str(_latest.date())}
+                    ok += 1
+                    continue
+            except (pd.errors.ParserError, KeyError, ValueError):
+                pass  # 损坏→重抓
         df, err = None, None
         for attempt in range(3):  # 限频退避重试: 5s/15s/30s
             try:
@@ -75,9 +82,16 @@ def run(max_stocks: int = None, force: bool = False, per_call_sleep: float = 2.0
                 audit[code] = {"status": "EMPTY", "name": name, "sector": sector}
                 fail += 1
             else:
+                try:  # F3: adj_factor=hfq/raw(研究口径); 执行器用raw真实价——两口径显式分离
+                    hf = fetch_one(code, adjust="hfq")
+                    df = df.merge(hf[["date", "close"]].rename(columns={"close": "hfq_close"}), on="date", how="left")
+                    df["adj_factor"] = (df["hfq_close"] / df["close"]).round(6)
+                    df = df.drop(columns=["hfq_close"])
+                except Exception:
+                    df["adj_factor"] = float("nan")  # 复权因子缺失如实留空
                 df.to_csv(p, index=False)
                 audit[code] = {"status": "OK", "name": name, "sector": sector, "rows": len(df),
-                               "latest": str(df["date"].max())}
+                               "latest": str(df["date"].max()), "price_basis": "raw+adj_factor"}
                 ok += 1
         except Exception as e:  # 如实记录失败, 不静默
             audit[code] = {"status": "FAILED", "name": name, "sector": sector, "error": str(e)[:200]}
