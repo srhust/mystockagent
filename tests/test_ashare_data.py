@@ -110,7 +110,7 @@ def test_h1_h3_identity_and_report():
     assert ("603609", "禾丰股份") in feed
     assert all(c != "603603" for c, _ in feed)
     assert sp.DELISTED_CONFIRMED["000961"]["decision_date"] == "2024-06-24"  # 深交所决定日
-    assert sp.DELISTED_CONFIRMED["000961"]["last_trade_date"] == "2024-07-11"  # H2: 摘牌日语义分立
+    assert sp.DELISTED_CONFIRMED["000961"]["last_trade_date"] == "2024-05-08"  # 深交所: 05-08最后交易/05-09停牌
     rep = sp.availability_report()
     assert rep["tradeable_pool"], "H3: 新状态体系下不得误报空池"
     assert "000961" not in rep["tradeable_pool"]  # 退市股不入可交易池

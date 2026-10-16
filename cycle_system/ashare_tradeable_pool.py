@@ -41,11 +41,14 @@ def pool_at(day: str, require_history_days: int = 0) -> dict:
             buckets["DATA_UNVERIFIED"].append(code)
             continue
         df = pd.read_csv(p, usecols=["date", "adj_factor"])
+        if float(df["adj_factor"].notna().mean() if len(df) else 0.0) < 0.999:
+            buckets["DATA_UNVERIFIED"].append(code)  # H3b: 表头有列但因子实际缺失→不进TRADEABLE
+            continue
         d = pd.to_datetime(df["date"]).dt.normalize()
         first, last = d.min(), d.max()
         if T < first:
             buckets["NOT_YET_LISTED"].append(code)  # 仅首行情晚于T(首行情近似上市日)
-        elif code in sp.DELISTED_CONFIRMED and T >= pd.Timestamp(sp.DELISTED_CONFIRMED[code]["last_trade_date"] if isinstance(sp.DELISTED_CONFIRMED[code], dict) else sp.DELISTED_CONFIRMED[code]):
+        elif code in sp.DELISTED_CONFIRMED and T > pd.Timestamp(sp.DELISTED_CONFIRMED[code]["last_trade_date"] if isinstance(sp.DELISTED_CONFIRMED[code], dict) else sp.DELISTED_CONFIRMED[code]):
             buckets["DELISTED_CONFIRMED"].append(code)  # H2: 按最后交易日(可交易性终点)
         elif T > last + pd.Timedelta(days=60):
             buckets["INACTIVE_UNVERIFIED"].append(code)  # 无权威记录不称CONFIRMED

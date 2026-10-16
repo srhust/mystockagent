@@ -1747,5 +1747,10 @@
   "fail_empty": 0,
   "total": 3,
   "generated_at": "2026-10-16T10:41:17.112499+08:00"
+ },
+ "_superseded": {
+  "by": "stocks_final_audit.json",
+  "note": "旧状态体系(OK/CACHED)+错误映射603603=禾丰股份, 保留仅作历史, 下游勿读",
+  "marked_at": "R13"
  }
 }

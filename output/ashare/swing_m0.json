@@ -1,0 +1,19 @@
+{
+ "caveats": {
+  "survivorship": "仅当前配置池",
+  "st_history": "UNAVAILABLE",
+  "suspension": "行情近似",
+  "industry": "当前快照非历史时点",
+  "oos": "样本外验证未完成, 探索性结果不构成正式业绩"
+ },
+ "m0": {
+  "return": 0.921,
+  "ann": 0.1055,
+  "max_dd": -0.2105,
+  "calmar": 0.5,
+  "sharpe": 0.72,
+  "trades": 659,
+  "rejects": 63,
+  "n_days": 1578
+ }
+}

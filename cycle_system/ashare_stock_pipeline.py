@@ -121,7 +121,7 @@ def run(max_stocks: int = None, force: bool = False, per_call_sleep: float = 2.0
 
 # H2: 交易所公告核实的真实退市(权威来源: 深交所2024-07公告/上交所公告, 三日期语义分立)
 DELISTED_CONFIRMED = {
-    "000961": {"decision_date": "2024-06-24", "last_trade_date": "2024-07-11", "delist_date": "2024-07-11"},
+    "000961": {"decision_date": "2024-06-24", "last_trade_date": "2024-05-08", "delist_date": "2024-07-11"},
     "603603": {"decision_date": "2024-03-19", "last_trade_date": "2024-04-18", "delist_date": "2024-04-25"},
 }
 
