@@ -1,0 +1,64 @@
+{
+ "strategy": "nogate3f",
+ "caveats": {
+  "survivorship": "仅当前配置池",
+  "st_history": "UNAVAILABLE",
+  "suspension": "行情近似",
+  "industry": "当前快照非历史时点",
+  "oos": "样本外验证未完成, 探索性不构成正式业绩",
+  "executor": "统一执行器+账本(raw价/涨跌停/停牌/整手/T+1/真实费用)"
+ },
+ "stats": {
+  "return": -0.1811,
+  "ann": -0.029,
+  "max_dd": -0.2676,
+  "calmar": -0.11,
+  "sharpe": -0.33,
+  "trades": {
+   "BUY": 124,
+   "SELL": 119
+  },
+  "rejects": {
+   "halted": 0,
+   "limit": 0,
+   "lot": 3,
+   "no_px": 0,
+   "pool": 0,
+   "other": 0,
+   "insufficient_cash": 103,
+   "reason_detail": {
+    "insufficient_cash_after_fees": 21
+   },
+   "reject_other": 21
+  },
+  "cash_pct": 0.692,
+  "avg_hold_days": 34,
+  "flat_days": 148,
+  "avg_pos": 2.58,
+  "hold_buckets": {
+   "1-5": 7,
+   "6-20": 52,
+   "21-60": 46,
+   "61-90": 6,
+   ">90": 8
+  },
+  "open_pos_tdays": {
+   "600028": 47,
+   "601857": 5,
+   "601668": 5,
+   "601919": 5,
+   "600019": 5
+  },
+  "n_days": 1643
+ },
+ "segments": {
+  "seg_2020_2022": {
+   "return": -0.1609,
+   "max_dd": -0.2512
+  },
+  "seg_2023_2026": {
+   "return": -0.0254,
+   "max_dd": -0.1451
+  }
+ }
+}

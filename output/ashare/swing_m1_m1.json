@@ -26,10 +26,28 @@
    "pool": 0,
    "other": 0,
    "insufficient_cash": 116,
+   "reason_detail": {
+    "insufficient_cash_after_fees": 22
+   },
    "reject_other": 22
   },
   "cash_pct": 0.707,
   "avg_hold_days": 30,
+  "flat_days": 202,
+  "avg_pos": 2.53,
+  "hold_buckets": {
+   "1-5": 8,
+   "6-20": 62,
+   "21-60": 50,
+   "61-90": 7,
+   ">90": 7
+  },
+  "open_pos_tdays": {
+   "600028": 47,
+   "601919": 5,
+   "600795": 5,
+   "600011": 5
+  },
   "n_days": 1643
  },
  "segments": {

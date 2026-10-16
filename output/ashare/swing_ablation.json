@@ -1,0 +1,50 @@
+{
+ "caveats": {
+  "survivorship": "仅当前配置池",
+  "st_history": "UNAVAILABLE",
+  "suspension": "行情近似",
+  "industry": "当前快照非历史时点",
+  "oos": "样本外验证未完成, 探索性不构成正式业绩",
+  "executor": "统一执行器+账本(raw价/涨跌停/停牌/整手/T+1/真实费用)"
+ },
+ "compare": {
+  "m1": {
+   "return": -0.1966,
+   "max_dd": -0.2939,
+   "calmar": -0.11,
+   "sharpe": -0.31,
+   "cash_pct": 0.707,
+   "flat_days": 202,
+   "avg_hold_days": 30
+  },
+  "nogate3f": {
+   "return": -0.1811,
+   "max_dd": -0.2676,
+   "calmar": -0.11,
+   "sharpe": -0.33,
+   "cash_pct": 0.692,
+   "flat_days": 148,
+   "avg_hold_days": 34
+  },
+  "gatemom": {
+   "return": -0.422,
+   "max_dd": -0.4991,
+   "calmar": -0.16,
+   "sharpe": -0.6,
+   "cash_pct": 0.79,
+   "flat_days": 408,
+   "avg_hold_days": 18
+  },
+  "nogatemom": {
+   "return": -0.4281,
+   "max_dd": -0.4894,
+   "calmar": -0.16,
+   "sharpe": -0.67,
+   "cash_pct": 0.811,
+   "flat_days": 508,
+   "avg_hold_days": 17
+  },
+  "_gate_effect_3f": -0.0155,
+  "_gate_effect_mom": 0.0061
+ }
+}

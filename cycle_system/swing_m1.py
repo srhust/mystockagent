@@ -82,7 +82,7 @@ def stock_rank(panel: pd.DataFrame, day, kind: str = "3f") -> list:
     if f.empty:
         return []
     z = (f.rank(pct=True) - 0.5) * 2
-    col = "mom" if kind == "mom" else ["mom", "stab", "liq"]  # L3: 消融排序口径(纯动量 vs 三因子)
+    col = ["mom"] if kind == "mom" else ["mom", "stab", "liq"]  # L3: 消融排序口径(纯动量 vs 三因子)
     return list((z[col].sum(axis=1)).sort_values(ascending=False).index)
 
 
