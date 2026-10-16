@@ -27,7 +27,7 @@
     "other": 0
    },
    "cash_pct": 0.54,
-   "avg_hold_days": 1,
+   "avg_hold_days": 170,
    "n_days": 1643
   },
   "bh": {
@@ -71,7 +71,7 @@
     "other": 0
    },
    "cash_pct": 0.748,
-   "avg_hold_days": 1,
+   "avg_hold_days": 80,
    "n_days": 1643
   },
   "mom": {

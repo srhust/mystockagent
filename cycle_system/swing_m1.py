@@ -100,7 +100,7 @@ def run(strategy: str = "m1", n_hold: int = 5) -> dict:
     cash, pos, pending = ledger.cash, {}, []  # pending=[(code,action,signal_day)]
     nav_log, trades, rej = [], {"BUY": 0, "SELL": 0}, {"halted": 0, "limit": 0, "lot": 0, "no_px": 0, "pool": 0, "other": 0}
     month_seen = None
-    hold_days = []
+    hold_days, buy_day = [], {}
     prev_tradeable = set()
 
     for i, day in enumerate(dates):
@@ -139,12 +139,13 @@ def run(strategy: str = "m1", n_hold: int = 5) -> dict:
                     cash = ledger.cash
                     if action == "BUY":
                         pos[code] = pos.get(code, 0) + fill["shares"]
+                        buy_day.setdefault(code, day)
                         trades["BUY"] += 1
                     else:
                         pos[code] = pos.get(code, 0) - fill["shares"]
                         if pos[code] <= 0:
                             pos.pop(code)
-                            hold_days.append((pd.Timestamp(day) - pd.Timestamp(sig_day)).days)
+                            hold_days.append((pd.Timestamp(day) - pd.Timestamp(buy_day.pop(code, day))).days)  # 真实持有: 买入执行日→卖出执行日
                         trades["SELL"] += 1
                 else:
                     rej["limit"] += 1
@@ -218,6 +219,13 @@ def run(strategy: str = "m1", n_hold: int = 5) -> dict:
                      "avg_hold_days": int(np.mean(hold_days)) if hold_days else None,
                      "n_days": len(nav)}}
     os.makedirs(r"E:\mystockagent\output\ashare", exist_ok=True)
+    seg = {}  # 滚动样本外近似: 前段构建参考/后段更晚数据(非严格OOS, 如实标注)
+    for a, b, tag in [("2020-01-01", "2022-12-31", "seg_2020_2022"), ("2023-01-01", "2026-12-31", "seg_2023_2026")]:
+        s2 = nav[(nav.index >= a) & (nav.index <= b)]
+        if len(s2) > 10:
+            seg[tag] = {"return": round(s2.iloc[-1] / s2.iloc[0] - 1, 4),
+                        "max_dd": round((s2 / s2.cummax() - 1).min(), 4)}
+    out["segments"] = seg
     json.dump(out, open(rf"E:\mystockagent\output\ashare\swing_m1_{strategy}.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     return out
 

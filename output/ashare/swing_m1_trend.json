@@ -27,7 +27,17 @@
    "other": 0
   },
   "cash_pct": 0.748,
-  "avg_hold_days": 1,
+  "avg_hold_days": 80,
   "n_days": 1643
+ },
+ "segments": {
+  "seg_2020_2022": {
+   "return": -0.1315,
+   "max_dd": -0.295
+  },
+  "seg_2023_2026": {
+   "return": -0.0624,
+   "max_dd": -0.1017
+  }
  }
 }
