@@ -1,0 +1,132 @@
+{
+ "caveats": {
+  "survivorship": "仅当前配置池",
+  "st_history": "UNAVAILABLE",
+  "suspension": "行情近似",
+  "industry": "当前快照非历史时点",
+  "oos": "样本外验证未完成, 探索性不构成正式业绩",
+  "executor": "统一执行器+账本(raw价/涨跌停/停牌/整手/T+1/真实费用)"
+ },
+ "E": {
+  "E1": {
+   "gate": true,
+   "exit": "daily",
+   "return": -0.1966,
+   "max_dd": -0.2939,
+   "calmar": -0.11,
+   "cash_pct": 0.707,
+   "flat_days": 202,
+   "avg_hold": 30,
+   "rejects": {
+    "halted": 0,
+    "limit": 0,
+    "lot": 3,
+    "no_px": 0,
+    "pool": 0,
+    "other": 0,
+    "insufficient_cash": 116,
+    "market_reject_other": 22
+   }
+  },
+  "E2": {
+   "gate": false,
+   "exit": "daily",
+   "return": -0.1811,
+   "max_dd": -0.2676,
+   "calmar": -0.11,
+   "cash_pct": 0.692,
+   "flat_days": 148,
+   "avg_hold": 34,
+   "rejects": {
+    "halted": 0,
+    "limit": 0,
+    "lot": 3,
+    "no_px": 0,
+    "pool": 0,
+    "other": 0,
+    "insufficient_cash": 103,
+    "market_reject_other": 21
+   }
+  },
+  "E3": {
+   "gate": true,
+   "exit": "monthly",
+   "return": 0.0687,
+   "max_dd": -0.3242,
+   "calmar": 0.03,
+   "cash_pct": 0.494,
+   "flat_days": 81,
+   "avg_hold": 95,
+   "rejects": {
+    "halted": 0,
+    "limit": 0,
+    "lot": 3,
+    "no_px": 0,
+    "pool": 0,
+    "other": 0,
+    "insufficient_cash": 137,
+    "market_reject_other": 21
+   }
+  },
+  "E4": {
+   "gate": false,
+   "exit": "monthly",
+   "return": -0.0985,
+   "max_dd": -0.2917,
+   "calmar": -0.05,
+   "cash_pct": 0.513,
+   "flat_days": 80,
+   "avg_hold": 103,
+   "rejects": {
+    "halted": 0,
+    "limit": 0,
+    "lot": 2,
+    "no_px": 0,
+    "pool": 0,
+    "other": 0,
+    "insufficient_cash": 125,
+    "market_reject_other": 21
+   }
+  },
+  "E5": {
+   "gate": true,
+   "exit": "none",
+   "return": 0.8478,
+   "max_dd": -0.3558,
+   "calmar": 0.27,
+   "cash_pct": 0.177,
+   "flat_days": 80,
+   "avg_hold": null,
+   "rejects": {
+    "halted": 0,
+    "limit": 0,
+    "lot": 0,
+    "no_px": 0,
+    "pool": 0,
+    "other": 0,
+    "insufficient_cash": 205,
+    "market_reject_other": 7
+   }
+  },
+  "E6": {
+   "gate": false,
+   "exit": "none",
+   "return": 0.4272,
+   "max_dd": -0.3484,
+   "calmar": 0.15,
+   "cash_pct": 0.194,
+   "flat_days": 80,
+   "avg_hold": null,
+   "rejects": {
+    "halted": 0,
+    "limit": 0,
+    "lot": 0,
+    "no_px": 0,
+    "pool": 0,
+    "other": 0,
+    "insufficient_cash": 150,
+    "market_reject_other": 9
+   }
+  }
+ }
+}

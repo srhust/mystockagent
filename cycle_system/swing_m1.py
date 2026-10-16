@@ -86,7 +86,9 @@ def stock_rank(panel: pd.DataFrame, day, kind: str = "3f") -> list:
     return list((z[col].sum(axis=1)).sort_values(ascending=False).index)
 
 
-def run(strategy: str = "m1", n_hold: int = 5) -> dict:
+def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: str = "auto", rank_kind: str = "auto") -> dict:
+    """R18: gate/exit_mode/rank_kind显式参数(auto=按strategy推导); E系列=expt+显式三参。
+    exit_mode: daily(每日MA20x0.97)/monthly(月末信号, 新月首日执行)/none(无趋势退出, 持有至期末按最近价估值)。"""
     """统一回测状态机。strategy: m1(周期门禁+三因子) / bh(买入持有) / trend(行业MA20) / mom(纯动量)。"""
     panel = load_panel()
     idx = industry_index(panel)
@@ -98,7 +100,13 @@ def run(strategy: str = "m1", n_hold: int = 5) -> dict:
     close_raw = panel.pivot(index="date", columns="code", values="close")
     open_raw = panel.pivot(index="date", columns="code", values="open_raw")
     last_px = {}  # 最近有效价(NAV估值, 缺行情不蒸发)
-    ledger = ex.Ledger(f"swing_{strategy}", nav0=20000.0, root=os.path.join(tempfile.gettempdir(), f"m1_{strategy}"), test_mode=False)  # K2: 正式账本模式
+    if gate == "auto":
+        gate = strategy in ("m1", "gatemom")
+    if rank_kind == "auto":
+        rank_kind = "mom" if strategy in ("gatemom", "nogatemom") else "3f"
+    if exit_mode == "auto":
+        exit_mode = {"m1": "daily", "gatemom": "daily", "nogatemom": "daily", "nogate3f": "daily"}.get(strategy, "daily" if strategy in ("m1", "gatemom", "nogatemom", "nogate3f") else "daily")
+    ledger = ex.Ledger(f"swing_{strategy}_{gate}_{exit_mode}", nav0=20000.0, root=os.path.join(tempfile.gettempdir(), f"m1_{strategy}"), test_mode=False)  # K2: 正式账本模式
     cash, pos, pending = ledger.cash, {}, []  # pending=[(code,action,signal_day)]
     nav_log, trades, rej = [], {"BUY": 0, "SELL": 0}, {"halted": 0, "limit": 0, "lot": 0, "no_px": 0, "pool": 0, "other": 0}
     month_seen = None
@@ -141,13 +149,20 @@ def run(strategy: str = "m1", n_hold: int = 5) -> dict:
                     r = str(fill.get("reason", "unknown"))  # L2: reason原样逐笔归因
                     rej.setdefault("reason_detail", {}).setdefault(r, 0)
                     rej["reason_detail"][r] += 1
-                    key = "limit" if ("涨停" in r or "跌停" in r) else ("halted" if "停" in r else "reject_other")
+                    if "现金" in r:
+                        key = "execution_cash_reject"  # P1: T+1跳空费用后现金不足
+                    elif "涨停" in r or "跌停" in r or "停" in r:
+                        key = "market_reject"  # P1: 涨跌停/停牌
+                    else:
+                        key = "market_reject_other"
                     rej[key] = rej.get(key, 0) + 1
-            except Exception as _e:
-                msg = str(_e)[:70]
-                key = "insufficient_cash" if "现金透支" in msg else "other"  # K3: 现金透支独立分类
-                rej[key] = rej.get(key, 0) + 1
-                rej.setdefault("other_msgs", []).append(msg)
+                    rej.setdefault("other_msgs", []).append(r[:70])
+            except AssertionError as _e:  # P3: 账本断言异常=账本一致性破坏, 立即失败不吞
+                if "现金透支" in str(_e):
+                    rej["execution_cash_reject"] = rej.get("execution_cash_reject", 0) + 1
+                    rej.setdefault("other_msgs", []).append(str(_e)[:70])
+                else:
+                    raise
         assert abs(reserved[0]) < 1e-6, f"L1: 日终预留未清零 {reserved[0]}"  # 预算预留日终恒等
         pending = []
         # ── 2) 收盘估值+新信号(I1: 信号冻结至明日) ──
@@ -190,24 +205,32 @@ def run(strategy: str = "m1", n_hold: int = 5) -> dict:
             if i == 65 and not pos and not pending:
                 for c in stock_rank(panel, day)[:20]:
                     freeze(c, "BUY")
-        elif strategy in ("m1", "nogate3f", "gatemom", "nogatemom"):  # L3: 2x2消融
+        elif strategy in ("m1", "nogate3f", "gatemom", "nogatemom", "expt"):  # L3+E系列
             if new_month and day in stages.index:
-                gate = strategy in ("m1", "gatemom")  # L3: 行业门禁开关
+                gate = bool(gate)  # L3/R18: 门禁开关(显式参数)
                 good = {c for c in stages.columns if stages.loc[day, c] in ("recover", "expand")} if gate else set(stages.columns)
                 try:
                     prev_tradeable = set(pool_at(day_str)["buckets"]["TRADEABLE"])
                 except RuntimeError:
                     prev_tradeable = prev_tradeable  # 日历未知→沿用(fail-closed不猜)
-                rank = [c for c in stock_rank(panel, day, "mom" if strategy in ("gatemom", "nogatemom") else "3f") if sector_of.get(c) in good and c in prev_tradeable]
+                rank = [c for c in stock_rank(panel, day, rank_kind) if sector_of.get(c) in good and c in prev_tradeable]
                 for c in rank[:n_hold]:
                     s20 = close_adj[c].loc[:day].tail(20)
                     if c not in pos and len(s20) >= 20 and close_adj[c].get(day, np.nan) > s20.mean():  # 趋势确认入场(收盘>MA20), 否则次日即破位翻转
                         freeze(c, "BUY")
-        if strategy in ("m1", "nogate3f", "gatemom", "nogatemom"):  # K1: 每日退出(四版本统一)
+        if strategy in ("m1", "nogate3f", "gatemom", "nogatemom", "expt") and exit_mode == "daily":  # E系列: 退出模式参数化
             for c in list(pos):
                 s = close_adj[c].loc[:day].tail(20)
                 if len(s) >= 20 and close_adj[c].get(day, np.nan) < s.mean() * 0.97:  # 3%破位缓冲
                     freeze(c, "SELL")
+        elif strategy in ("m1", "nogate3f", "gatemom", "nogatemom", "expt") and exit_mode == "monthly":
+            # R18 E3/E4: 月末MA20x0.97信号(收盘产生, 新月首日执行; 无提前时序)
+            if i + 1 < len(dates) and dates[i + 1].month != day.month:
+                for c in list(pos):
+                    s = close_adj[c].loc[:day].tail(20)
+                    if len(s) >= 20 and close_adj[c].get(day, np.nan) < s.mean() * 0.97:
+                        freeze(c, "SELL")
+        # exit_mode == "none": 无趋势退出(E5/E6), 持有至期末按最近有效价估值
         elif strategy == "trend":
             si = idx.mean(axis=1)
             ma20 = si.loc[:day].tail(20).mean()
