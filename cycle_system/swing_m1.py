@@ -97,11 +97,12 @@ def run(strategy: str = "m1", n_hold: int = 5) -> dict:
     close_raw = panel.pivot(index="date", columns="code", values="close")
     open_raw = panel.pivot(index="date", columns="code", values="open_raw")
     last_px = {}  # 最近有效价(NAV估值, 缺行情不蒸发)
-    ledger = ex.Ledger(f"swing_{strategy}", nav0=20000.0, root=os.path.join(tempfile.gettempdir(), f"m1_{strategy}"), test_mode=True)
+    ledger = ex.Ledger(f"swing_{strategy}", nav0=20000.0, root=os.path.join(tempfile.gettempdir(), f"m1_{strategy}"), test_mode=False)  # K2: 正式账本模式
     cash, pos, pending = ledger.cash, {}, []  # pending=[(code,action,signal_day)]
     nav_log, trades, rej = [], {"BUY": 0, "SELL": 0}, {"halted": 0, "limit": 0, "lot": 0, "no_px": 0, "pool": 0, "other": 0}
     month_seen = None
     hold_days, buy_day = [], {}
+    reserved = [0.0]  # K2: 冻结中BUY预算(执行日释放)
     prev_tradeable = set()
 
     for i, day in enumerate(dates):
@@ -116,6 +117,8 @@ def run(strategy: str = "m1", n_hold: int = 5) -> dict:
             if px != px:
                 rej["no_px"] += 1
                 continue
+            if action == "BUY":
+                reserved[0] -= float(plan["cash_budget"])  # K2: 执行日释放预算(无论成交与否)
             try:
                 halted = raw_day.get(code, np.nan) != raw_day.get(code, np.nan)
                 pc = last_px.get(code)  # J2: 全市场前收盘(非当日开盘)
@@ -134,10 +137,14 @@ def run(strategy: str = "m1", n_hold: int = 5) -> dict:
                             hold_days.append(dix[day] - buy_day.pop(code, dix[day]))  # J4: 交易日计数
                         trades["SELL"] += 1
                 else:
-                    rej["limit"] += 1
+                    r = str(fill.get("reason", ""))  # K3: 按执行器真实reason分类
+                    key = "limit" if ("涨停" in r or "跌停" in r or "limit" in r) else ("halted" if "停" in r else "reject_other")
+                    rej[key] = rej.get(key, 0) + 1
             except Exception as _e:
-                rej.setdefault("other_msgs", []).append(str(_e)[:70])
-                rej["other"] += 1
+                msg = str(_e)[:70]
+                key = "insufficient_cash" if "现金透支" in msg else "other"  # K3: 现金透支独立分类
+                rej[key] = rej.get(key, 0) + 1
+                rej.setdefault("other_msgs", []).append(msg)
         pending = []
         # ── 2) 收盘估值+新信号(I1: 信号冻结至明日) ──
         for c, v in raw_day.dropna().items():  # J2: 全市场前收盘维护(非仅持仓)
@@ -156,12 +163,16 @@ def run(strategy: str = "m1", n_hold: int = 5) -> dict:
                 return
             if action == "BUY":
                 base = 200 if code.startswith("68") else 100
-                alloc = min(cash / max(1, n_hold), cash)
+                alloc = min((cash - reserved[0]) / max(1, n_hold), cash - reserved[0])  # K2: 扣除冻结中预算
+                if alloc < sigc * base:  # K2: 预算不足不再超额申报
+                    rej["insufficient_cash"] = rej.get("insufficient_cash", 0) + 1
+                    return
                 sh = int(alloc * 0.99 / sigc / base) * base
                 if sh < base:
                     rej["lot"] += 1
                     return
                 plan = ex.create_plan(code, "BUY", sig, px_ref=sigc, cash_budget=round(sh * sigc * 1.005, 2), created_at=sig + "T15:30:00+08:00")
+                reserved[0] += float(plan["cash_budget"])  # K2: 冻结预算预留
             else:
                 sh = pos.get(code, 0)
                 if sh <= 0:
@@ -187,11 +198,11 @@ def run(strategy: str = "m1", n_hold: int = 5) -> dict:
                     s20 = close_adj[c].loc[:day].tail(20)
                     if c not in pos and len(s20) >= 20 and close_adj[c].get(day, np.nan) > s20.mean():  # 趋势确认入场(收盘>MA20), 否则次日即破位翻转
                         freeze(c, "BUY")
-                if strategy == "m1":  # 趋势破坏退出: close_adj跌破行业门禁或MA20(收盘信号, T+1执行)
-                    for c in list(pos):
-                        s = close_adj[c].loc[:day].tail(20)
-                        if len(s) >= 20 and close_adj[c].get(day, np.nan) < s.mean() * 0.97:  # 3%破位缓冲, 减边缘翻转
-                            freeze(c, "SELL")
+        if strategy == "m1":  # K1: 趋势破坏退出每日检查(月度只控入场), 收盘信号T+1执行
+            for c in list(pos):
+                s = close_adj[c].loc[:day].tail(20)
+                if len(s) >= 20 and close_adj[c].get(day, np.nan) < s.mean() * 0.97:  # 3%破位缓冲
+                    freeze(c, "SELL")
         elif strategy == "trend":
             si = idx.mean(axis=1)
             ma20 = si.loc[:day].tail(20).mean()

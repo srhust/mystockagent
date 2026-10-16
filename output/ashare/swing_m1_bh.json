@@ -9,45 +9,37 @@
   "executor": "统一执行器+账本(raw价/涨跌停/停牌/整手/T+1/真实费用)"
  },
  "stats": {
-  "return": 0.2931,
-  "ann": 0.0386,
-  "max_dd": -0.2277,
-  "calmar": 0.17,
-  "sharpe": 0.3,
+  "return": 0.2384,
+  "ann": 0.032,
+  "max_dd": -0.1633,
+  "calmar": 0.2,
+  "sharpe": 0.32,
   "trades": {
-   "BUY": 7,
+   "BUY": 6,
    "SELL": 0
   },
   "rejects": {
    "halted": 0,
-   "limit": 2,
-   "lot": 3,
+   "limit": 0,
+   "lot": 0,
    "no_px": 0,
    "pool": 0,
-   "other": 8,
-   "other_msgs": [
-    "现金透支: -1276.22",
-    "现金透支: -668.21",
-    "现金透支: -932.22",
-    "现金透支: -809.21",
-    "现金透支: -62.21",
-    "现金透支: -1072.22",
-    "现金透支: -826.21",
-    "现金透支: -3668.25"
-   ]
+   "other": 0,
+   "insufficient_cash": 10,
+   "reject_other": 4
   },
-  "cash_pct": 0.04,
+  "cash_pct": 0.385,
   "avg_hold_days": null,
   "n_days": 1643
  },
  "segments": {
   "seg_2020_2022": {
-   "return": -0.0392,
-   "max_dd": -0.2277
+   "return": 0.0771,
+   "max_dd": -0.1586
   },
   "seg_2023_2026": {
-   "return": 0.3486,
-   "max_dd": -0.1885
+   "return": 0.1479,
+   "max_dd": -0.1633
   }
  }
 }
