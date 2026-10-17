@@ -117,20 +117,27 @@ def analyze(tag: str) -> dict:
     pi = nav.loc[:ti].idxmax()
     pos2 = {c: 0 for c in close.columns}
     stock_dd = {}
+    op = panel.pivot(index="date", columns="code", values="open_raw").ffill()  # R25: 隔夜/盘中拆分(缺开盘用前收, 与主回测一致)
     for k in range(1, len(dates)):
         dt, prev = dates[k], dates[k - 1]
         if dt > ti:
             break
-        for t in by_day.get(str(dt.date()), []):
-            if t["px"] == 0:
-                continue
+        tds = [t for t in by_day.get(str(dt.date()), []) if t["px"] != 0]
+        pos_open = dict(pos2)  # 隔夜段持仓(前日收盘)
+        for t in tds:
             pos2[t["code"]] += t["shares"] if t["action"] == "BUY" else -t["shares"]
-        if dt >= pi and dt in close.index:
-            for c, sh in pos2.items():
-                if sh and close.at[dt, c] == close.at[dt, c] and close.at[prev, c] == close.at[prev, c]:
-                    v = sh * (close.at[dt, c] - close.at[prev, c])
-                    if v:
-                        stock_dd[c] = stock_dd.get(c, 0.0) + v
+        if dt >= pi and dt in close.index and prev in close.index:
+            for c in set(pos_open) | set(pos2):
+                q0, q1 = pos_open.get(c, 0), pos2.get(c, 0)
+                if not q0 and not q1:
+                    continue
+                o = op.at[dt, c] if c in op.columns else np.nan
+                c0, c1 = close.at[prev, c], close.at[dt, c]
+                if not (o == o and c0 == c0 and c1 == c1):
+                    continue
+                v = q0 * (o - c0) + q1 * (c1 - o)  # R25审查者公式: 隔夜+盘中
+                if v:
+                    stock_dd[c] = stock_dd.get(c, 0.0) + v
     sector_dd = {}
     for c, v in stock_dd.items():
         sector_dd[sector_of.get(c, "?")] = sector_dd.get(sector_of.get(c, "?"), 0.0) + v
@@ -144,7 +151,7 @@ def analyze(tag: str) -> dict:
                         "avg_tdays": round(float(np.mean([x["tdays"] for x in closed])), 1) if closed else None,
                         "mae_bucket": {"<-40%": sum(1 for x in closed if x["mae"] <= -0.40), "-40~-25%": sum(1 for x in closed if -0.40 < x["mae"] <= -0.25), "-25~-10%": sum(1 for x in closed if -0.25 < x["mae"] <= -0.10), ">-10%": sum(1 for x in closed if x["mae"] > -0.10)},
                         "open_avg_mae": round(float(np.mean([x["mae"] for x in open_lots])), 4) if open_lots else None},
-            "post_exit_20d": {"avoid": post["avoid"], "neutral": post["neutral"], "whipsaw": post["whipsaw"]},
+            "post_exit_price_direction": {"down": post["avoid"], "flat": post["neutral"], "up>5pct": post["whipsaw"], "denom_all": post["avoid"] + post["neutral"] + post["whipsaw"], "note": "价格方向统计, 非交易正确率(未计替代收益/费用/风险)"},
             "whipsaw_top10": sorted(post["detail"], key=lambda x: -x["r20"])[:10]}
 
 
@@ -154,4 +161,4 @@ for t, o in out.items():
     print(t, "| recon_gap:", o["recon_max_gap"], "| maxDD:", o["maxdd"], o["peak"], "→", o["trough"])
     print("   sectors:", json.dumps(o["dd_sector_top8"], ensure_ascii=False))
     print("   MAE/MFE:", json.dumps(o["mae_mfe"], ensure_ascii=False)[:280])
-    print("   exit20d:", json.dumps(o["post_exit_20d"]))
+    print("   exit20d:", json.dumps(o["post_exit_price_direction"], ensure_ascii=False))
