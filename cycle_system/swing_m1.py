@@ -116,7 +116,7 @@ def stock_rank(panel: pd.DataFrame, day, kind: str = "3f") -> list:
     return list(row.sort_values(col, ascending=False)["code"])
 
 
-def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: str = "auto", rank_kind: str = "auto", entry_mode: str = "auto", cap: int = 0, alloc_policy: str = "equal", risk_mode: str = "none", s2_bad_win: int = 20, s2_rs_th: float = 0.0) -> dict:
+def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: str = "auto", rank_kind: str = "auto", entry_mode: str = "auto", cap: int = 0, alloc_policy: str = "equal", risk_mode: str = "none", s2_bad_win: int = 20, s2_rs_th: float = 0.0, gate_realloc: str = "realloc") -> dict:
     """R18: gate/exit_mode/rank_kind显式参数(auto=按strategy推导); E系列=expt+显式三参。
     exit_mode: daily(每日MA20x0.97)/monthly(月末信号, 新月首日执行)/none(无趋势退出, 持有至期末按最近价估值)。"""
     """统一回测状态机。strategy: m1(周期门禁+三因子) / bh(买入持有) / trend(行业MA20) / mom(纯动量)。"""
@@ -285,27 +285,39 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
                 today_scores = stock_scores(panel, day, rank_kind) if alloc_policy in ("score", "score_cap") else None
                 rank = [c for c in stock_rank(panel, day, rank_kind) if sector_of.get(c) in good and c in prev_tradeable]
                 # R22/P0修复: eligible=实际可入场集(rank[:n_hold]中未持仓+MA20确认+非冷却非在途), 分母只含它
-                eligible = []
+                eligible, blocked = [], []  # R29: blocked=Gate拦截(记录用)
                 for c in rank[:n_hold]:
                     s20v = ma20[c].get(day, np.nan)
                     if c not in pos and s20v == s20v and close_adj[c].get(day, np.nan) > s20v \
                             and not any(p["code"] == c for p in pending) \
                             and dix[day] >= reentry_block.get(c, -1):
                         if risk_mode == "gate" and s2_active is not None and c in s2_active.columns and bool(s2_active.at[day, c]):
-                            rej["s2gate"] = rej.get("s2gate", 0) + 1  # R26/S2-Gate: 行业双确认风险准入暂停(不卖持仓)
-                            _cs = _cash_snap[0]
-                            _th_alloc = _cs * (max(today_scores.get(c, 0.0), 0.0) / max(today_sum[0], 1e-9)) if alloc_policy in ("score", "score_cap") else (_cs / n_elig[0] if alloc_policy == "equal_all" else min(_cs / max(1, n_hold), _cs))
-                            _base = 200 if c.startswith("68") else 100
-                            _sigc = float(close_adj[c].get(day, np.nan))
-                            gate_log.append({"signal_day": day_str, "code": c, "sector": sector_of.get(c, "?"), "score": today_scores.get(c) if today_scores is not None else None, "cash_available": round(_cs, 2), "nav": round(float(nav), 2), "theory_alloc": round(float(_th_alloc), 2), "theory_shares": int(_th_alloc * 0.99 / _sigc / _base) * _base if _sigc == _sigc and _sigc > 0 else 0, "reason": "S2_GATE"})  # R28: run内直接记录
+                            blocked.append(c)  # R29: 先收集, 循环外用正确分母记录
                             continue
                         eligible.append(c)
                 _cash_snap[0] = cash - reserved[0]  # R22: 冻结前同一份可用资金快照(整批预算共用)
+                _cs = _cash_snap[0]
                 if alloc_policy in ("score", "score_cap"):
                     sc = {c: max(today_scores.get(c, 0.0), 0.0) for c in eligible}
-                    today_sum[0] = sum(sc.values())  # P0修复: 分母=eligible评分和(非全部rank)
+                    sc_all = {c: max(today_scores.get(c, 0.0), 0.0) for c in eligible + blocked}
+                    # R29: realloc=F2(分母=通过者, 资金重分配); hold=F1(分母含被拦者, 其份额留现金)
+                    today_sum[0] = sum(sc.values()) if (risk_mode != "gate" or gate_realloc == "realloc") else sum(sc_all.values())
+                    _den = sc if (risk_mode != "gate" or gate_realloc == "realloc") else sc_all
                 elif alloc_policy == "equal_all":
-                    n_elig[0] = max(1, len(eligible))
+                    n_elig[0] = max(1, len(eligible)) if (risk_mode != "gate" or gate_realloc == "realloc") else max(1, len(eligible) + len(blocked))
+                    _den = None
+                # R29: Gate拦截事件记录(理论预算用最终分母语义; today_sum近零时爆炸值如实保留)
+                for c in blocked:
+                    rej["s2gate"] = rej.get("s2gate", 0) + 1
+                    if alloc_policy in ("score", "score_cap"):
+                        _th_alloc = _cs * (max(today_scores.get(c, 0.0), 0.0) / max(today_sum[0], 1e-9))
+                    elif alloc_policy == "equal_all":
+                        _th_alloc = _cs / n_elig[0]
+                    else:
+                        _th_alloc = min(_cs / max(1, n_hold), _cs)
+                    _base = 200 if c.startswith("68") else 100
+                    _sigc = float(close_adj[c].get(day, np.nan))
+                    gate_log.append({"signal_day": day_str, "code": c, "sector": sector_of.get(c, "?"), "score": today_scores.get(c) if today_scores is not None else None, "cash_available": round(_cs, 2), "nav": round(float(nav), 2), "theory_alloc": round(float(_th_alloc), 2), "theory_shares": int(_th_alloc * 0.99 / _sigc / _base) * _base if _sigc == _sigc and _sigc > 0 else 0, "reason": "S2_GATE", "realloc": gate_realloc})
                 for c in eligible:
                     freeze(c, "BUY", sig_score=today_scores.get(c) if today_scores is not None else None)
         if strategy in ("m1", "nogate3f", "gatemom", "nogatemom", "expt") and exit_mode == "daily":  # E系列: 退出模式参数化
