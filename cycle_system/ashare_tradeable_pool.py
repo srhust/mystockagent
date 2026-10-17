@@ -19,8 +19,14 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import ashare_stock_pipeline as sp
 
 
+_POOL_AT_CACHE = {}  # R21: 纯缓存(同day同require_history_days同结果, 不改判定口径; 进程内)
+
+
 def pool_at(day: str, require_history_days: int = 0) -> dict:
     """F4五态: TRADEABLE/SUSPENDED_CONFIRMED/DATA_MISSING/NOT_YET_LISTED/DELISTED_CONFIRMED; 唯一代码去重。"""
+    ck = (str(day), require_history_days)
+    if ck in _POOL_AT_CACHE:  # R21: 回测热点优化(每日入场模式每日调用249CSV)
+        return _POOL_AT_CACHE[ck]
     import ashare_calendar as cal
     if not cal.is_trading_day(day):  # fail-closed: 非交易日/UNKNOWN拒绝
         raise RuntimeError(f"非确认交易日: {day}")
@@ -58,12 +64,14 @@ def pool_at(day: str, require_history_days: int = 0) -> dict:
             buckets["DATA_MISSING"].append(code)  # 当日无K线: 数据未到/漏行/停牌不可区分→不作停牌确认
         else:
             buckets["TRADEABLE"].append(code)
-    return {"date": str(T.date()),
-            "buckets": buckets,
-            "stats": {k: len(v) for k, v in buckets.items()},
-            "universe": len(seen), "sector_membership": len(sector_membership),
-            "caveats": {"st_history": "UNAVAILABLE", "industry": "当前快照非历史时点",
-                        "suspension": "无权威停复牌数据, 当日无K线一律DATA_MISSING不作SUSPENDED_CONFIRMED",
-                        "survivorship": "仅当前配置池, 历史已退市/被替换股不在内",
-                        "inactive": "INACTIVE_UNVERIFIED=长期无行情待权威退市记录核实(603603/000961类)",
-                        "fetch_start": "行情抓取默认2020起, 更早日期的上市判定不可靠"}}
+    out = {"date": str(T.date()),
+           "buckets": buckets,
+           "stats": {k: len(v) for k, v in buckets.items()},
+           "universe": len(seen), "sector_membership": len(sector_membership),
+           "caveats": {"st_history": "UNAVAILABLE", "industry": "当前快照非历史时点",
+                       "suspension": "无权威停复牌数据, 当日无K线一律DATA_MISSING不作SUSPENDED_CONFIRMED",
+                       "survivorship": "仅当前配置池, 历史已退市/被替换股不在内",
+                       "inactive": "INACTIVE_UNVERIFIED=长期无行情待权威退市记录核实(603603/000961类)",
+                       "fetch_start": "行情抓取默认2020起, 更早日期的上市判定不可靠"}}
+    _POOL_AT_CACHE[ck] = out  # R21: 纯缓存写入(同参同结果)
+    return out

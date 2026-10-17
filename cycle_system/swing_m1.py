@@ -82,6 +82,18 @@ def build_factor_table(panel: pd.DataFrame) -> pd.DataFrame:
 FACTOR_TABLE = None  # R19性能: 预计算因子表(模块级, 首次run构建)
 
 
+def stock_scores(panel: pd.DataFrame, day, kind: str = "3f") -> dict:
+    """R21: 返回{code: score}(当日截面, 仅T日数据), 供评分加权资金分配。"""
+    global FACTOR_TABLE
+    if FACTOR_TABLE is None:
+        FACTOR_TABLE = build_factor_table(panel)
+    row = FACTOR_TABLE[FACTOR_TABLE["date"] == pd.Timestamp(day)]
+    if row.empty:
+        return {}
+    col = "score_mom" if kind == "mom" else "score_3f"
+    return dict(zip(row["code"], row[col]))
+
+
 def stock_rank(panel: pd.DataFrame, day, kind: str = "3f") -> list:
     """R19查表版: 因子已预计算(滚动20日口径v2, 与旧60日尾部窗口近似非恒等——如实标注)。仅用T日数据(因子不含未来)。"""
     global FACTOR_TABLE
@@ -95,7 +107,7 @@ def stock_rank(panel: pd.DataFrame, day, kind: str = "3f") -> list:
     return list(row.sort_values(col, ascending=False)["code"])
 
 
-def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: str = "auto", rank_kind: str = "auto", entry_mode: str = "auto", cap: int = 0) -> dict:
+def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: str = "auto", rank_kind: str = "auto", entry_mode: str = "auto", cap: int = 0, alloc_policy: str = "equal") -> dict:
     """R18: gate/exit_mode/rank_kind显式参数(auto=按strategy推导); E系列=expt+显式三参。
     exit_mode: daily(每日MA20x0.97)/monthly(月末信号, 新月首日执行)/none(无趋势退出, 持有至期末按最近价估值)。"""
     """统一回测状态机。strategy: m1(周期门禁+三因子) / bh(买入持有) / trend(行业MA20) / mom(纯动量)。"""
@@ -122,6 +134,7 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
     nav_log, trades, rej = [], {"BUY": 0, "SELL": 0}, {"halted": 0, "limit": 0, "lot": 0, "no_px": 0, "pool": 0, "other": 0}
     month_seen = None
     hold_days, buy_day = [], {}
+    today_sum = [1.0]  # R21: 当日候选正分和(score分配分母)
     reentry_block = {}  # R19: 冷却期(卖出执行日起5个交易日内禁重入, 预设统一)
     reserved = [0.0]  # K2: 冻结中BUY预算(执行日释放)
     prev_tradeable = set()
@@ -188,7 +201,7 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
         nav = cash + sum(sh * last_px.get(c, 0.0) for c, sh in pos.items())
         nav_log.append({"date": day_str, "nav": round(nav, 2), "cash": round(cash, 2), "n_pos": len(pos)})
         # ── 3) 收盘信号→冻结完整计划(J1: 信号日create+register, T+1只execute; px_ref/股数/预算全用信号日收盘) ──
-        def freeze(code, action, sig=day_str, sig_close=None):
+        def freeze(code, action, sig=day_str, sig_close=None, sig_score=None):
             sigc = float(sig_close) if sig_close is not None else last_px.get(code)
             if sigc != sigc:
                 rej["no_px"] += 1
@@ -202,7 +215,12 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
                     rej["cooldown"] = rej.get("cooldown", 0) + 1
                     return
                 base = 200 if code.startswith("68") else 100
-                alloc = min((cash - reserved[0]) / max(1, n_hold), cash - reserved[0])  # K2: 扣除冻结中预算
+                if alloc_policy == "score" and sig_score is not None:
+                    alloc = (cash - reserved[0]) * (sig_score / max(today_sum[0], 1e-9))  # R21: 评分比例分配
+                elif alloc_policy == "free_slots":
+                    alloc = (cash - reserved[0]) / max(1, (cap or 8) - n_open)  # R21: 剩余现金/剩余空位
+                else:
+                    alloc = min((cash - reserved[0]) / max(1, n_hold), cash - reserved[0])  # K2: 扣除冻结中预算
                 if alloc < sigc * base:  # K2: 预算不足不再超额申报
                     rej["insufficient_cash"] = rej.get("insufficient_cash", 0) + 1
                     return
@@ -233,11 +251,16 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
                     prev_tradeable = set(pool_at(day_str)["buckets"]["TRADEABLE"])
                 except RuntimeError:
                     prev_tradeable = prev_tradeable  # 日历未知→沿用(fail-closed不猜)
+                if alloc_policy == "score":
+                    today_scores = stock_scores(panel, day, rank_kind)  # R21: 当日评分(截面前向无未来)
+                    today_sum[0] = sum(today_scores.get(c, 0.0) for c in (pos | set()))  # 占位, 下面按候选求和
                 rank = [c for c in stock_rank(panel, day, rank_kind) if sector_of.get(c) in good and c in prev_tradeable]
+                if alloc_policy == "score":
+                    today_sum[0] = sum(max(today_scores.get(c, 0.0), 0.0) for c in rank)  # 候选正分归一
                 for c in rank[:n_hold]:
                     s20 = close_adj[c].loc[:day].tail(20)
                     if c not in pos and len(s20) >= 20 and close_adj[c].get(day, np.nan) > s20.mean():  # 趋势确认入场(收盘>MA20), 否则次日即破位翻转
-                        freeze(c, "BUY")
+                        freeze(c, "BUY", sig_score=today_scores.get(c) if alloc_policy == "score" else None)
         if strategy in ("m1", "nogate3f", "gatemom", "nogatemom", "expt") and exit_mode == "daily":  # E系列: 退出模式参数化
             for c in list(pos):
                 s = close_adj[c].loc[:day].tail(20)
