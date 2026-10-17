@@ -306,18 +306,27 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
                 elif alloc_policy == "equal_all":
                     n_elig[0] = max(1, len(eligible)) if (risk_mode != "gate" or gate_realloc == "realloc") else max(1, len(eligible) + len(blocked))
                     _den = None
-                # R29: Gate拦截事件记录(理论预算用最终分母语义; today_sum近零时爆炸值如实保留)
+                # R30: Gate拦截事件四字段预算(pre_gate=Gate前全候选分母/retained=F1保留额/redistributed=F2新增分配) + raw价整手
                 for c in blocked:
                     rej["s2gate"] = rej.get("s2gate", 0) + 1
                     if alloc_policy in ("score", "score_cap"):
-                        _th_alloc = _cs * (max(today_scores.get(c, 0.0), 0.0) / max(today_sum[0], 1e-9))
+                        _den_pre = max(sum(max(today_scores.get(x, 0.0), 0.0) for x in eligible + blocked), 1e-9)
+                        _den_post = max(sum(max(today_scores.get(x, 0.0), 0.0) for x in eligible), 1e-9)
+                        _sc = max(today_scores.get(c, 0.0), 0.0)
+                        _pre = _cs * _sc / _den_pre  # Gate生效前会分到的预算
+                        _th_alloc = _cs * _sc / _den_post  # realloc语义下通过者分母(仅参照)
+                        _redistributed = max(0.0, _pre - _th_alloc)  # 被通过者瓜分的份额(近似)
                     elif alloc_policy == "equal_all":
-                        _th_alloc = _cs / n_elig[0]
+                        _pre = _cs / max(1, len(eligible) + len(blocked))
+                        _th_alloc = _cs / max(1, len(eligible))
+                        _redistributed = 0.0
                     else:
-                        _th_alloc = min(_cs / max(1, n_hold), _cs)
+                        _pre = _th_alloc = min(_cs / max(1, n_hold), _cs)
+                        _redistributed = 0.0
                     _base = 200 if c.startswith("68") else 100
-                    _sigc = float(close_adj[c].get(day, np.nan))
-                    gate_log.append({"signal_day": day_str, "code": c, "sector": sector_of.get(c, "?"), "score": today_scores.get(c) if today_scores is not None else None, "cash_available": round(_cs, 2), "nav": round(float(nav), 2), "theory_alloc": round(float(_th_alloc), 2), "theory_shares": int(_th_alloc * 0.99 / _sigc / _base) * _base if _sigc == _sigc and _sigc > 0 else 0, "reason": "S2_GATE", "realloc": gate_realloc})
+                    _sigc_raw = float(close_raw[c].get(day, np.nan))  # R30: 执行器按原始价整手
+                    _sigc_adj = float(close_adj[c].get(day, np.nan))
+                    gate_log.append({"signal_day": day_str, "code": c, "sector": sector_of.get(c, "?"), "score": today_scores.get(c) if today_scores is not None else None, "cash_available": round(_cs, 2), "nav": round(float(nav), 2), "blocked_budget_pre_gate": round(float(_pre), 2), "retained_budget": round(float(_pre), 2), "redistributed_budget": round(float(_redistributed), 2), "theory_alloc_realloc_ref": round(float(_th_alloc), 2), "theory_shares": int(_pre * 0.99 / _sigc_raw / _base) * _base if _sigc_raw == _sigc_raw and _sigc_raw > 0 else 0, "px_adj_ref": round(_sigc_adj, 4) if _sigc_adj == _sigc_adj else None, "reason": "S2_GATE", "realloc": gate_realloc})
                 for c in eligible:
                     freeze(c, "BUY", sig_score=today_scores.get(c) if today_scores is not None else None)
         if strategy in ("m1", "nogate3f", "gatemom", "nogatemom", "expt") and exit_mode == "daily":  # E系列: 退出模式参数化
