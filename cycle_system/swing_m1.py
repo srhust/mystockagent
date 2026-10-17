@@ -116,7 +116,7 @@ def stock_rank(panel: pd.DataFrame, day, kind: str = "3f") -> list:
     return list(row.sort_values(col, ascending=False)["code"])
 
 
-def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: str = "auto", rank_kind: str = "auto", entry_mode: str = "auto", cap: int = 0, alloc_policy: str = "equal", risk_mode: str = "none") -> dict:
+def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: str = "auto", rank_kind: str = "auto", entry_mode: str = "auto", cap: int = 0, alloc_policy: str = "equal", risk_mode: str = "none", s2_bad_win: int = 20, s2_rs_th: float = 0.0) -> dict:
     """R18: gate/exit_mode/rank_kind显式参数(auto=按strategy推导); E系列=expt+显式三参。
     exit_mode: daily(每日MA20x0.97)/monthly(月末信号, 新月首日执行)/none(无趋势退出, 持有至期末按最近价估值)。"""
     """统一回测状态机。strategy: m1(周期门禁+三因子) / bh(买入持有) / trend(行业MA20) / mom(纯动量)。"""
@@ -130,10 +130,10 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
     ma20 = close_adj.rolling(20, min_periods=20).mean()  # R21性能: MA20面板一次预计算(与loc[:day].tail(20).mean()恒等)
     s2_active = None  # R26: S2双确认表(行业最近20交易日bad AND 个股RS20<0; 全部前向窗口, 信号日可知, 无未来信息)
     if risk_mode in ("exit", "gate"):
-        bad20 = (~stages.isin(("recover", "expand"))).rolling(20, min_periods=1).max().astype(bool)
+        bad20 = (~stages.isin(("recover", "expand"))).rolling(s2_bad_win, min_periods=1).max().astype(bool)  # R28: 预注册参数
         _rs_ind = pd.DataFrame({c: idx[sector_of[c]].pct_change(20) for c in close_adj.columns if sector_of.get(c) in idx.columns})
         rs20 = close_adj.pct_change(20) - _rs_ind.reindex(columns=close_adj.columns)
-        s2_active = pd.DataFrame({c: bad20[sector_of[c]] & (rs20[c] < 0) for c in close_adj.columns if sector_of.get(c) in idx.columns}, index=close_adj.index).reindex(columns=close_adj.columns).fillna(False)
+        s2_active = pd.DataFrame({c: bad20[sector_of[c]] & (rs20[c] < s2_rs_th) for c in close_adj.columns if sector_of.get(c) in idx.columns}, index=close_adj.index).reindex(columns=close_adj.columns).fillna(False)
     close_raw = panel.pivot(index="date", columns="code", values="close")
     open_raw = panel.pivot(index="date", columns="code", values="open_raw")
     last_px = {}  # 最近有效价(NAV估值, 缺行情不蒸发)
@@ -148,6 +148,7 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
     ledger = ex.Ledger(f"swing_{strategy}_{gate}_{exit_mode}", nav0=20000.0, root=os.path.join(tempfile.gettempdir(), f"m1_{strategy}"), test_mode=False)  # K2: 正式账本模式
     cash, pos, pending = ledger.cash, {}, []  # pending=[(code,action,signal_day)]
     trade_log = []  # R23: 成交事件日志(订单级, 离线归因用)
+    gate_log = []  # R28: Gate拦截事件(信号日可知全量字段, 反事实+归因用)
     nav_log, trades, rej = [], {"BUY": 0, "SELL": 0}, {"halted": 0, "limit": 0, "lot": 0, "no_px": 0, "pool": 0, "other": 0}
     month_seen = None
     hold_days, buy_day = [], {}
@@ -292,6 +293,11 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
                             and dix[day] >= reentry_block.get(c, -1):
                         if risk_mode == "gate" and s2_active is not None and c in s2_active.columns and bool(s2_active.at[day, c]):
                             rej["s2gate"] = rej.get("s2gate", 0) + 1  # R26/S2-Gate: 行业双确认风险准入暂停(不卖持仓)
+                            _cs = _cash_snap[0]
+                            _th_alloc = _cs * (max(today_scores.get(c, 0.0), 0.0) / max(today_sum[0], 1e-9)) if alloc_policy in ("score", "score_cap") else (_cs / n_elig[0] if alloc_policy == "equal_all" else min(_cs / max(1, n_hold), _cs))
+                            _base = 200 if c.startswith("68") else 100
+                            _sigc = float(close_adj[c].get(day, np.nan))
+                            gate_log.append({"signal_day": day_str, "code": c, "sector": sector_of.get(c, "?"), "score": today_scores.get(c) if today_scores is not None else None, "cash_available": round(_cs, 2), "nav": round(float(nav), 2), "theory_alloc": round(float(_th_alloc), 2), "theory_shares": int(_th_alloc * 0.99 / _sigc / _base) * _base if _sigc == _sigc and _sigc > 0 else 0, "reason": "S2_GATE"})  # R28: run内直接记录
                             continue
                         eligible.append(c)
                 _cash_snap[0] = cash - reserved[0]  # R22: 冻结前同一份可用资金快照(整批预算共用)
@@ -361,7 +367,7 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
                       "max_pos": max(x["n_pos"] for x in nav_log),  # R20: 最大持仓数
                       "open_pos_tdays": {c: dix[nav.index[-1]] - i for c, i in buy_day.items()},
                      "n_days": len(nav)},
-           "trade_log": trade_log, "nav_log": nav_log}
+           "trade_log": trade_log, "nav_log": nav_log, "gate_log": gate_log}
     os.makedirs(r"E:\mystockagent\output\ashare", exist_ok=True)
     seg = {}  # 滚动样本外近似: 前段构建参考/后段更晚数据(非严格OOS, 如实标注)
     for a, b, tag in [("2020-01-01", "2022-12-31", "seg_2020_2022"), ("2023-01-01", "2026-12-31", "seg_2023_2026")]:
