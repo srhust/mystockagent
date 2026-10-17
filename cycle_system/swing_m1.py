@@ -125,9 +125,9 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
     stages = cycle_stage(idx)
     sector_of = panel.drop_duplicates("code").set_index("code")["sector"].to_dict()
     dates = [pd.Timestamp(x) for x in sorted(panel["date"].unique())]
-    ma20 = close_adj.rolling(20, min_periods=20).mean()  # R21性能: MA20面板一次预计算(与loc[:day].tail(20).mean()恒等)
     dix = {d: i for i, d in enumerate(dates)}  # J4: 交易日索引
     close_adj = panel.pivot(index="date", columns="code", values="close_adj")
+    ma20 = close_adj.rolling(20, min_periods=20).mean()  # R21性能: MA20面板一次预计算(与loc[:day].tail(20).mean()恒等)
     close_raw = panel.pivot(index="date", columns="code", values="close")
     open_raw = panel.pivot(index="date", columns="code", values="open_raw")
     last_px = {}  # 最近有效价(NAV估值, 缺行情不蒸发)
