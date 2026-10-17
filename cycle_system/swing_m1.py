@@ -95,7 +95,7 @@ def stock_rank(panel: pd.DataFrame, day, kind: str = "3f") -> list:
     return list(row.sort_values(col, ascending=False)["code"])
 
 
-def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: str = "auto", rank_kind: str = "auto", entry_mode: str = "auto") -> dict:
+def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: str = "auto", rank_kind: str = "auto", entry_mode: str = "auto", cap: int = 0) -> dict:
     """R18: gate/exit_mode/rank_kind显式参数(auto=按strategy推导); E系列=expt+显式三参。
     exit_mode: daily(每日MA20x0.97)/monthly(月末信号, 新月首日执行)/none(无趋势退出, 持有至期末按最近价估值)。"""
     """统一回测状态机。strategy: m1(周期门禁+三因子) / bh(买入持有) / trend(行业MA20) / mom(纯动量)。"""
@@ -194,6 +194,10 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
                 rej["no_px"] += 1
                 return
             if action == "BUY":
+                n_open = len(pos) + sum(1 for p in pending if p["action"] == "BUY")  # R20: 持仓+在途买单
+                if cap and n_open >= cap:  # 容量上限: 不自动卖出(避免混入调仓效应)
+                    rej["cap"] = rej.get("cap", 0) + 1
+                    return
                 if any(p["code"] == code for p in pending) or dix.get(pd.Timestamp(sig), -1) < reentry_block.get(code, -1):  # R19: 队列去重+冷却期
                     rej["cooldown"] = rej.get("cooldown", 0) + 1
                     return
@@ -283,6 +287,7 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
                       "flat_days": sum(1 for x in nav_log if x["n_pos"] == 0),
                       "avg_pos": round(np.mean([x["n_pos"] for x in nav_log]), 2),
                       "hold_buckets": {"1-5": sum(1 for h in hold_days if h <= 5), "6-20": sum(1 for h in hold_days if 6 <= h <= 20), "21-60": sum(1 for h in hold_days if 21 <= h <= 60), "61-90": sum(1 for h in hold_days if 61 <= h <= 90), ">90": sum(1 for h in hold_days if h > 90)},
+                      "max_pos": max(x["n_pos"] for x in nav_log),  # R20: 最大持仓数
                       "open_pos_tdays": {c: dix[nav.index[-1]] - i for c, i in buy_day.items()},
                      "n_days": len(nav)}}
     os.makedirs(r"E:\mystockagent\output\ashare", exist_ok=True)
@@ -293,7 +298,7 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
             seg[tag] = {"return": round(s2.iloc[-1] / s2.iloc[0] - 1, 4),
                         "max_dd": round((s2 / s2.cummax() - 1).min(), 4)}
     out["segments"] = seg
-    fid = f"{strategy}_{gate}_{exit_mode}_{rank_kind}_{entry_mode}"  # R19/P0: 唯一实验ID防覆盖
+    fid = f"{strategy}_{gate}_{exit_mode}_{rank_kind}_{entry_mode}_cap{cap}"  # R19/P0+R20: 唯一实验ID防覆盖(含容量)
     json.dump(out, open(rf"E:\mystockagent\output\ashare\swing_m1_{fid}.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     return out
 
