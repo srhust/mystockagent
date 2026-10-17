@@ -253,7 +253,6 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
                     prev_tradeable = prev_tradeable  # 日历未知→沿用(fail-closed不猜)
                 if alloc_policy == "score":
                     today_scores = stock_scores(panel, day, rank_kind)  # R21: 当日评分(截面前向无未来)
-                    today_sum[0] = sum(today_scores.get(c, 0.0) for c in (pos | set()))  # 占位, 下面按候选求和
                 rank = [c for c in stock_rank(panel, day, rank_kind) if sector_of.get(c) in good and c in prev_tradeable]
                 if alloc_policy == "score":
                     today_sum[0] = sum(max(today_scores.get(c, 0.0), 0.0) for c in rank)  # 候选正分归一
