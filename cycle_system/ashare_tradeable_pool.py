@@ -19,6 +19,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import ashare_stock_pipeline as sp
 
 
+_CODE_META = {}  # R21perf: {code: (first, last, dates_set, factor_cov)} 249CSV只读一次
 _POOL_AT_CACHE = {}  # R21: 纯缓存(同day同require_history_days同结果, 不改判定口径; 进程内)
 
 
@@ -46,12 +47,17 @@ def pool_at(day: str, require_history_days: int = 0) -> dict:
         if "adj_factor" not in head:
             buckets["DATA_UNVERIFIED"].append(code)
             continue
-        df = pd.read_csv(p, usecols=["date", "adj_factor"])
-        if float(df["adj_factor"].notna().mean() if len(df) else 0.0) < 0.999:
+        if code in _CODE_META:  # R21perf: per-code元数据进程级缓存(249CSV读一次, 而非每日重读)
+            first, last, dset, fcov = _CODE_META[code]
+        else:
+            df = pd.read_csv(p, usecols=["date", "adj_factor"])
+            fcov = float(df["adj_factor"].notna().mean() if len(df) else 0.0)
+            d = pd.to_datetime(df["date"]).dt.normalize()
+            first, last, dset = d.min(), d.max(), set(d)
+            _CODE_META[code] = (first, last, dset, fcov)
+        if fcov < 0.999:
             buckets["DATA_UNVERIFIED"].append(code)  # H3b: 表头有列但因子实际缺失→不进TRADEABLE
             continue
-        d = pd.to_datetime(df["date"]).dt.normalize()
-        first, last = d.min(), d.max()
         if T < first:
             buckets["NOT_YET_LISTED"].append(code)  # 仅首行情晚于T(首行情近似上市日)
         elif code in sp.DELISTED_CONFIRMED and T > pd.Timestamp(sp.DELISTED_CONFIRMED[code]["last_trade_date"] if isinstance(sp.DELISTED_CONFIRMED[code], dict) else sp.DELISTED_CONFIRMED[code]):
@@ -60,7 +66,7 @@ def pool_at(day: str, require_history_days: int = 0) -> dict:
             buckets["INACTIVE_UNVERIFIED"].append(code)  # 无权威记录不称CONFIRMED
         elif (T > first) and ((T - first).days < require_history_days):
             buckets["INSUFFICIENT_HISTORY"].append(code)  # G2: 已上市但数据不足, 与上市状态分离
-        elif T not in set(d):
+        elif T not in dset:
             buckets["DATA_MISSING"].append(code)  # 当日无K线: 数据未到/漏行/停牌不可区分→不作停牌确认
         else:
             buckets["TRADEABLE"].append(code)
