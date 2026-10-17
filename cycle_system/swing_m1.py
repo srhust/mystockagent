@@ -66,24 +66,33 @@ def cycle_stage(idx: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(out)
 
 
+def build_factor_table(panel: pd.DataFrame) -> pd.DataFrame:
+    """R19性能: 因子一次性向量化预计算(滚动20日口径v2, 与旧60日尾部窗口近似非恒等——如实标注), 每日排序查表。"""
+    p = panel.sort_values(["date", "code"]).copy()
+    p["mom20"] = p.groupby("code")["close_adj"].pct_change(20)
+    p["stab20"] = -p.groupby("code")["close_adj"].transform(lambda s: s.pct_change().rolling(20).std())
+    p["liq20"] = p.groupby("code")["amount"].transform(lambda s: s.rolling(20).mean())
+    for c in ("mom20", "stab20", "liq20"):
+        p[f"z_{c}"] = p.groupby("date")[c].rank(pct=True)  # 每日截面分位
+    p["score_3f"] = p["z_mom20"] + p["z_stab20"] + p["z_liq20"]
+    p["score_mom"] = p["z_mom20"]
+    return p.dropna(subset=["score_3f"])
+
+
+FACTOR_TABLE = None  # R19性能: 预计算因子表(模块级, 首次run构建)
+
+
 def stock_rank(panel: pd.DataFrame, day, kind: str = "3f") -> list:
-    """三因子等权(复权口径): 20日动量+趋势稳定+流动性。仅用T日之前数据。"""
+    """R19查表版: 因子已预计算(滚动20日口径v2, 与旧60日尾部窗口近似非恒等——如实标注)。仅用T日数据(因子不含未来)。"""
+    global FACTOR_TABLE
+    if FACTOR_TABLE is None:
+        FACTOR_TABLE = build_factor_table(panel)
     d0 = pd.Timestamp(day)
-    hist = panel[panel["date"] < d0]
-    f = {}
-    for code, g in hist.groupby("code"):
-        g = g.tail(60)
-        if len(g) < 60:
-            continue
-        f[code] = [g["close_adj"].iloc[-1] / g["close_adj"].iloc[-21] - 1,
-                   -(g["close_adj"].iloc[-20:] / g["close_adj"].iloc[-20:].iloc[0]).std(),
-                   g["amount"].tail(20).mean()]
-    f = pd.DataFrame.from_dict(f, orient="index", columns=["mom", "stab", "liq"]).dropna()
-    if f.empty:
+    row = FACTOR_TABLE[FACTOR_TABLE["date"] == d0]
+    if row.empty:
         return []
-    z = (f.rank(pct=True) - 0.5) * 2
-    col = ["mom"] if kind == "mom" else ["mom", "stab", "liq"]  # L3: 消融排序口径(纯动量 vs 三因子)
-    return list((z[col].sum(axis=1)).sort_values(ascending=False).index)
+    col = "score_mom" if kind == "mom" else "score_3f"
+    return list(row.sort_values(col, ascending=False)["code"])
 
 
 def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: str = "auto", rank_kind: str = "auto", entry_mode: str = "auto") -> dict:

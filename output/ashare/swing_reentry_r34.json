@@ -1,0 +1,24 @@
+{
+ "R3": {
+  "entry": "monthly",
+  "exit": "monthly",
+  "return": 0.2043,
+  "max_dd": -0.2312,
+  "calmar": 0.12,
+  "cash_pct": 0.437,
+  "flat_days": 81,
+  "avg_hold": 95,
+  "cooldown": 0
+ },
+ "R4": {
+  "entry": "daily",
+  "exit": "monthly",
+  "return": 0.394,
+  "max_dd": -0.2847,
+  "calmar": 0.18,
+  "cash_pct": 0.296,
+  "flat_days": 60,
+  "avg_hold": 85,
+  "cooldown": 4
+ }
+}

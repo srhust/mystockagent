@@ -1,0 +1,90 @@
+{
+ "strategy": "expt",
+ "caveats": {
+  "survivorship": "仅当前配置池",
+  "st_history": "UNAVAILABLE",
+  "suspension": "行情近似",
+  "industry": "当前快照非历史时点",
+  "oos": "样本外验证未完成, 探索性不构成正式业绩",
+  "executor": "统一执行器+账本(raw价/涨跌停/停牌/整手/T+1/真实费用)"
+ },
+ "stats": {
+  "return": 0.009,
+  "ann": 0.0013,
+  "max_dd": -0.2582,
+  "calmar": 0.01,
+  "sharpe": 0.07,
+  "trades": {
+   "BUY": 148,
+   "SELL": 143
+  },
+  "rejects": {
+   "halted": 0,
+   "limit": 0,
+   "lot": 2,
+   "no_px": 0,
+   "pool": 0,
+   "other": 0,
+   "insufficient_cash": 135,
+   "reason_detail": {
+    "insufficient_cash_after_fees": 23
+   },
+   "execution_cash_reject": 23,
+   "other_msgs": [
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees"
+   ],
+   "cooldown": 1
+  },
+  "cash_pct": 0.669,
+  "avg_hold_days": 32,
+  "flat_days": 172,
+  "avg_pos": 2.88,
+  "hold_buckets": {
+   "1-5": 6,
+   "6-20": 71,
+   "21-60": 47,
+   "61-90": 9,
+   ">90": 10
+  },
+  "open_pos_tdays": {
+   "601919": 47,
+   "601857": 47,
+   "000002": 5,
+   "600048": 5,
+   "600011": 5
+  },
+  "n_days": 1643
+ },
+ "segments": {
+  "seg_2020_2022": {
+   "return": -0.1167,
+   "max_dd": -0.2582
+  },
+  "seg_2023_2026": {
+   "return": 0.1408,
+   "max_dd": -0.1497
+  }
+ }
+}
