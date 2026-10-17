@@ -1,0 +1,90 @@
+{
+ "generated": "2026-10-17 21:28:14.951199",
+ "git_sha": "a304606ab9d6090633d62171f7ee2fd19297718c",
+ "pool_points": {
+  "2018-06-29": {
+   "TRADEABLE": 0,
+   "SUSPENDED_CONFIRMED": 0,
+   "DATA_MISSING": 0,
+   "NOT_YET_LISTED": 249,
+   "INACTIVE_UNVERIFIED": 0,
+   "INSUFFICIENT_HISTORY": 0,
+   "DELISTED_CONFIRMED": 0,
+   "DATA_UNVERIFIED": 0
+  },
+  "2020-01-02": {
+   "TRADEABLE": 239,
+   "SUSPENDED_CONFIRMED": 0,
+   "DATA_MISSING": 0,
+   "NOT_YET_LISTED": 10,
+   "INACTIVE_UNVERIFIED": 0,
+   "INSUFFICIENT_HISTORY": 0,
+   "DELISTED_CONFIRMED": 0,
+   "DATA_UNVERIFIED": 0
+  },
+  "2021-09-22": {
+   "TRADEABLE": 244,
+   "SUSPENDED_CONFIRMED": 0,
+   "DATA_MISSING": 0,
+   "NOT_YET_LISTED": 5,
+   "INACTIVE_UNVERIFIED": 0,
+   "INSUFFICIENT_HISTORY": 0,
+   "DELISTED_CONFIRMED": 0,
+   "DATA_UNVERIFIED": 0
+  },
+  "2023-06-30": {
+   "TRADEABLE": 249,
+   "SUSPENDED_CONFIRMED": 0,
+   "DATA_MISSING": 0,
+   "NOT_YET_LISTED": 0,
+   "INACTIVE_UNVERIFIED": 0,
+   "INSUFFICIENT_HISTORY": 0,
+   "DELISTED_CONFIRMED": 0,
+   "DATA_UNVERIFIED": 0
+  },
+  "2025-12-31": {
+   "TRADEABLE": 247,
+   "SUSPENDED_CONFIRMED": 0,
+   "DATA_MISSING": 1,
+   "NOT_YET_LISTED": 0,
+   "INACTIVE_UNVERIFIED": 0,
+   "INSUFFICIENT_HISTORY": 0,
+   "DELISTED_CONFIRMED": 1,
+   "DATA_UNVERIFIED": 0
+  }
+ },
+ "delisted_confirmed_n": 2,
+ "delisted_confirmed_sample": [
+  "000961",
+  "603603"
+ ],
+ "coverage": {
+  "n_codes": 249,
+  "perfect_coverage_codes": 170,
+  "worst10_gap_tdays": {
+   "688525": 727,
+   "601022": 711,
+   "301308": 628,
+   "001309": 603,
+   "000961": 593,
+   "601868": 422,
+   "000792": 312,
+   "605007": 205,
+   "603565": 179,
+   "300866": 155
+  }
+ },
+ "survivorship": {
+  "known_limitation": "当前池=configured_stocks当前快照(249只); 历史时点池经pool_at排除未上市/退市确认/历史不足, 但'2020年后才入选当前池的成长股'在早期时点不存在——回测起点(2020-04)的池=当时已上市且现在仍被跟踪的股票, 存在幸存者偏差(入选基于当前名单)",
+  "delisted_in_pool_n": 2
+ },
+ "industry_lookahead": {
+  "known_limitation": "行业归属使用当前快照分类(无历史时点映射数据源); T日使用当前行业——重组/更名股票的行业穿越风险存在, 无法自动检出",
+  "sector_null_n": 0
+ },
+ "st_suspend": {
+  "known_limitation": "历史ST/停牌状态无独立数据源; 依赖: ①数据缺失=不可交易(保守) ②涨跌停拒单已测 ③DATA_UNVERIFIED桶(因子覆盖率<99.9%不进TRADEABLE)",
+  "rejection_reasons_current": {}
+ },
+ "oos_status": "retrospective walk-forward only(2020-2026已反复研究); 严格OOS需独立历史样本或冻结日后新数据"
+}
