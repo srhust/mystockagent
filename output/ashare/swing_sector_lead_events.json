@@ -13,11 +13,12 @@
   "avg_r20": 0.0133,
   "avg_r60": 0.0374
  },
- "lead_days_to_first_s0": {
-  "n": 243,
-  "median": 185,
-  "p25": 49,
-  "p75": 460
+ "lead_days_same_holding_60td": {
+  "n": 84,
+  "unmatched": 314,
+  "median": 16,
+  "p25": 6,
+  "p75": 33
  },
  "top_events_2122": [
   {
@@ -111,11 +112,16 @@
    "negative_case": false
   }
  ],
+ "tail20_id": {
+  "s1_event_r20_le_-20pct": 0.0,
+  "baseline_r20_le_-20pct": 0.0043,
+  "note": "极端下跌识别率对比(基线=全部行业x交易日), 处理重叠事件的统计依赖未做(如实标注)"
+ },
  "s2_on_b1_exits": {
   "n": 158,
-  "s2_true": 134,
-  "s2_true_after20_down_rate": 0.485,
-  "s2_false_after20_down_rate": 0.208,
-  "note": "固定B1原始卖出事件的事后判别(非可执行回测); 关口二需固定建仓+统一执行器"
+  "s2_true": 72,
+  "s2_true_after20_down_rate": 0.444,
+  "s2_false_after20_down_rate": 0.442,
+  "note": "R26泄漏修复版: RS20前向窗口+AND+bad20; 退出后方向仍为事后统计但判别输入无未来信息"
  }
 }

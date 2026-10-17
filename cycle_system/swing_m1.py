@@ -116,7 +116,7 @@ def stock_rank(panel: pd.DataFrame, day, kind: str = "3f") -> list:
     return list(row.sort_values(col, ascending=False)["code"])
 
 
-def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: str = "auto", rank_kind: str = "auto", entry_mode: str = "auto", cap: int = 0, alloc_policy: str = "equal") -> dict:
+def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: str = "auto", rank_kind: str = "auto", entry_mode: str = "auto", cap: int = 0, alloc_policy: str = "equal", risk_mode: str = "none") -> dict:
     """R18: gate/exit_mode/rank_kind显式参数(auto=按strategy推导); E系列=expt+显式三参。
     exit_mode: daily(每日MA20x0.97)/monthly(月末信号, 新月首日执行)/none(无趋势退出, 持有至期末按最近价估值)。"""
     """统一回测状态机。strategy: m1(周期门禁+三因子) / bh(买入持有) / trend(行业MA20) / mom(纯动量)。"""
@@ -128,6 +128,12 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
     dix = {d: i for i, d in enumerate(dates)}  # J4: 交易日索引
     close_adj = panel.pivot(index="date", columns="code", values="close_adj")
     ma20 = close_adj.rolling(20, min_periods=20).mean()  # R21性能: MA20面板一次预计算(与loc[:day].tail(20).mean()恒等)
+    s2_active = None  # R26: S2双确认表(行业最近20交易日bad AND 个股RS20<0; 全部前向窗口, 信号日可知, 无未来信息)
+    if risk_mode in ("exit", "gate"):
+        bad20 = (~stages.isin(("recover", "expand"))).rolling(20, min_periods=1).max().astype(bool)
+        _rs_ind = pd.DataFrame({c: idx[sector_of[c]].pct_change(20) for c in close_adj.columns if sector_of.get(c) in idx.columns})
+        rs20 = close_adj.pct_change(20) - _rs_ind.reindex(columns=close_adj.columns)
+        s2_active = pd.DataFrame({c: bad20[sector_of[c]] & (rs20[c] < 0) for c in close_adj.columns if sector_of.get(c) in idx.columns}, index=close_adj.index).reindex(columns=close_adj.columns).fillna(False)
     close_raw = panel.pivot(index="date", columns="code", values="close")
     open_raw = panel.pivot(index="date", columns="code", values="open_raw")
     last_px = {}  # 最近有效价(NAV估值, 缺行情不蒸发)
@@ -281,6 +287,9 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
                     if c not in pos and s20v == s20v and close_adj[c].get(day, np.nan) > s20v \
                             and not any(p["code"] == c for p in pending) \
                             and dix[day] >= reentry_block.get(c, -1):
+                        if risk_mode == "gate" and s2_active is not None and c in s2_active.columns and bool(s2_active.at[day, c]):
+                            rej["s2gate"] = rej.get("s2gate", 0) + 1  # R26/S2-Gate: 行业双确认风险准入暂停(不卖持仓)
+                            continue
                         eligible.append(c)
                 _cash_snap[0] = cash - reserved[0]  # R22: 冻结前同一份可用资金快照(整批预算共用)
                 if alloc_policy in ("score", "score_cap"):
@@ -295,6 +304,11 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
                 s = ma20[c].get(day, np.nan)
                 if s == s and close_adj[c].get(day, np.nan) < s * 0.97:  # 3%破位缓冲(查表)
                     freeze(c, "SELL")
+        if risk_mode == "exit" and s2_active is not None:  # R26/S2-Exit: 独立每日块(不受exit_mode限制), 双确认提前退出
+            for c in list(pos):
+                if c in s2_active.columns and bool(s2_active.at[day, c]):
+                    rej["s2exit"] = rej.get("s2exit", 0) + 1
+                    freeze(c, "SELL")  # 信号日收盘确认, T+1执行
         elif strategy in ("m1", "nogate3f", "gatemom", "nogatemom", "expt") and exit_mode == "monthly":
             # R18 E3/E4: 月末MA20x0.97信号(收盘产生, 新月首日执行; 无提前时序)
             if i + 1 < len(dates) and dates[i + 1].month != day.month:

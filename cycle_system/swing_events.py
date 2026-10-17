@@ -53,14 +53,25 @@ for t in b1["trade_log"]:
         sec = sector_of.get(t["code"], "?")
         s0.setdefault(sec, []).append(pd.Timestamp(t["sig_day"]))
 
-lead = []
+# R26: S1->S0配对改为同持仓(同code)+60交易日窗口, 超窗未匹配(不无限向后找)
+tidx = {d: i for i, d in enumerate(stages.index)}
+lead, unmatched = [], 0
 for e in s1_events:
     sec = e["sector"]
-    nxt = [d for d in s0.get(sec, []) if d >= e["day"]]
-    if nxt:
-        d0 = min(nxt)
-        e["days_to_first_s0"] = int((d0 - e["day"]).days)  # 自然日近似
-        lead.append(e["days_to_first_s0"])
+    i1 = tidx.get(e["day"])
+    if i1 is None:
+        continue
+    matches = []
+    for t in b1["trade_log"]:
+        if t["reason"] == "FILLED" and t["action"] == "SELL" and sector_of.get(t["code"]) == sec:
+            i2 = tidx.get(pd.Timestamp(t["sig_day"]))
+            if i2 is not None and 0 <= i2 - i1 <= 60:  # 同持仓(该code)在60交易日窗口内的S0
+                matches.append(i2 - i1)
+    if matches:
+        lead.append(min(matches))
+        e["matched_hold_days"] = min(matches)
+    else:
+        unmatched += 1
 
 s1ev = [e for e in s1_events if e.get("r60") is not None]
 neg = sum(1 for e in s1ev if e["negative_case"])
@@ -74,10 +85,13 @@ out = {
     "seg_other": {"n": len(s1ev) - len(seg_2122),
                    "avg_r20": round(float(np.mean([e["r20"] for e in s1ev if e not in seg_2122])), 4),
                    "avg_r60": round(float(np.mean([e["r60"] for e in s1ev if e not in seg_2122])), 4)},
-    "lead_days_to_first_s0": {"n": len(lead), "median": int(np.median(lead)) if lead else None, "p25": int(np.percentile(lead, 25)) if lead else None, "p75": int(np.percentile(lead, 75)) if lead else None},
+    "lead_days_same_holding_60td": {"n": len(lead), "unmatched": unmatched, "median": int(np.median(lead)) if lead else None, "p25": int(np.percentile(lead, 25)) if lead else None, "p75": int(np.percentile(lead, 75)) if lead else None},
     "top_events_2122": sorted([{k: e[k] for k in ("sector", "day", "r5", "r20", "r60", "min_after60", "negative_case")} for e in seg_2122], key=lambda x: x["r60"])[:10],
 }
 # S2: 对B1每笔实际卖出, 判定S2条件(行业状态非good 或 个股r20<行业r20) vs 退出后20日方向
+# R26: 泄漏修复——RS20=个股(t-20,t)收益-行业(t-20,t)收益(信号日收盘可知); S2=bad20 AND rs_weak(严格AND)
+bad20 = (~stages.isin(("recover", "expand"))).rolling(20, min_periods=1).max().astype(bool)
+rs20 = close.pct_change(20) - pd.DataFrame({c: idx[sector_of[c]].pct_change(20) for c in close.columns if sector_of.get(c) in idx.columns}).reindex(columns=close.columns)
 rows = []
 for t in b1["trade_log"]:
     if t["reason"] != "FILLED" or t["action"] != "SELL":
@@ -87,21 +101,31 @@ for t in b1["trade_log"]:
     if i0 is None or i0 + 20 >= len(close.index):
         continue
     sec = sector_of.get(c, "?")
-    sec_ok = sec in stages.columns
-    st_bad = bool(sec_ok and stages.at[sig, sec] not in ("recover", "expand"))
-    try:
-        r20_s = float(close.iloc[i0 + 20][c] / close.iloc[i0 - 1][c] - 1)
-        r20_i = float(idx.at[idx.index[min(i0 + 20, len(idx) - 1)], sec] / idx.at[idx.index[max(i0 - 1, 0)], sec] - 1)
-    except KeyError:
+    if sec not in stages.columns or c not in rs20.columns:
         continue
-    rows.append({"code": c, "sig": t["sig_day"], "st_bad": st_bad, "rs_weak": bool(r20_s < r20_i), "s2": bool(st_bad or r20_s < r20_i), "after20_down": bool(r20_s < 0)})
+    st_bad20 = bool(bad20.at[sig, sec])  # 近20交易日内行业bad(含转坏事件)
+    rs_v = rs20.at[sig, c] if sig in rs20.index else np.nan
+    rs_weak = bool(rs_v == rs_v and rs_v < 0)
+    after20 = float(close.iloc[i0 + 20][c] / close.iloc[i0 - 1][c] - 1) if i0 > 0 else np.nan
+    rows.append({"code": c, "sig": t["sig_day"], "bad20": st_bad20, "rs_weak": rs_weak, "s2": bool(st_bad20 and rs_weak), "after20_down": bool(after20 == after20 and after20 < 0), "after20": round(after20, 4) if after20 == after20 else None})
 df2 = pd.DataFrame(rows)
+# R26: 极端下跌识别——S1事件后20日行业跌幅<=-20%占比 vs 全体(所有行业-交易日)基线
+s1r20 = [e["r20"] for e in s1ev]
+base_r20 = []
+for sec in idx.columns:
+    v = idx[sec].pct_change(20).dropna()
+    base_r20.extend(v.tolist())
+out["tail20_id"] = {
+    "s1_event_r20_le_-20pct": round(float(np.mean([1 if r <= -0.20 else 0 for r in s1r20])), 4),
+    "baseline_r20_le_-20pct": round(float(np.mean([1 if r <= -0.20 else 0 for r in base_r20])), 4),
+    "note": "极端下跌识别率对比(基线=全部行业x交易日), 处理重叠事件的统计依赖未做(如实标注)",
+}
 out["s2_on_b1_exits"] = {
     "n": len(df2),
     "s2_true": int(df2["s2"].sum()),
     "s2_true_after20_down_rate": round(float(df2[df2["s2"]]["after20_down"].mean()), 3) if len(df2) else None,
     "s2_false_after20_down_rate": round(float(df2[~df2["s2"]]["after20_down"].mean()), 3) if (len(df2) - int(df2["s2"].sum())) else None,
-    "note": "固定B1原始卖出事件的事后判别(非可执行回测); 关口二需固定建仓+统一执行器",
+    "note": "R26泄漏修复版: RS20前向窗口+AND+bad20; 退出后方向仍为事后统计但判别输入无未来信息",
 }
 json.dump(out, open(r"E:\mystockagent\output\ashare\swing_sector_lead_events.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1, default=str)
 print(json.dumps({k: v for k, v in out.items() if k != "top_events_2122"}, ensure_ascii=False, indent=1))
