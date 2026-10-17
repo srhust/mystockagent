@@ -144,7 +144,9 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
     nav_log, trades, rej = [], {"BUY": 0, "SELL": 0}, {"halted": 0, "limit": 0, "lot": 0, "no_px": 0, "pool": 0, "other": 0}
     month_seen = None
     hold_days, buy_day = [], {}
-    today_sum = [1.0]  # R21: 当日候选正分和(score分配分母)
+    today_sum = [1.0]  # R21: 当日eligible正分和(R22/P0: 分母=实际可入场集)
+    _cash_snap = [0.0]  # R22: 冻结前可用资金快照
+    n_elig = [1]  # R22: eligible数(equal_all分母)
     reentry_block = {}  # R19: 冷却期(卖出执行日起5个交易日内禁重入, 预设统一)
     reserved = [0.0]  # K2: 冻结中BUY预算(执行日释放)
     prev_tradeable = set()
@@ -225,12 +227,18 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
                     rej["cooldown"] = rej.get("cooldown", 0) + 1
                     return
                 base = 200 if code.startswith("68") else 100
-                if alloc_policy == "score" and sig_score is not None:
-                    alloc = (cash - reserved[0]) * (sig_score / max(today_sum[0], 1e-9))  # R21: 评分比例分配
+                csnap = _cash_snap[0]  # R22: 冻结前快照(整批共用分母)
+                if alloc_policy in ("score", "score_cap") and sig_score is not None:
+                    alloc = csnap * (sig_score / max(today_sum[0], 1e-9))  # R22/P0: 分母=eligible和, 快照预算
+                    if alloc_policy == "score_cap":
+                        alloc = min(alloc, 0.30 * csnap)  # B3: 预设单股30%风险上限
+                elif alloc_policy == "equal_all":
+                    alloc = csnap / n_elig[0]  # B2: eligible等权
                 elif alloc_policy == "free_slots":
                     alloc = (cash - reserved[0]) / max(1, (cap or 8) - n_open)  # R21: 剩余现金/剩余空位
                 else:
                     alloc = min((cash - reserved[0]) / max(1, n_hold), cash - reserved[0])  # K2: 扣除冻结中预算
+                alloc = min(alloc, max(0.0, cash - reserved[0]))  # R22: 批内不超剩余现金(Σ B_i ≤ C_avail)
                 if alloc < sigc * base:  # K2: 预算不足不再超额申报
                     rej["insufficient_cash"] = rej.get("insufficient_cash", 0) + 1
                     return
@@ -261,15 +269,24 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
                     prev_tradeable = set(pool_at(day_str)["buckets"]["TRADEABLE"])
                 except RuntimeError:
                     prev_tradeable = prev_tradeable  # 日历未知→沿用(fail-closed不猜)
-                if alloc_policy == "score":
-                    today_scores = stock_scores(panel, day, rank_kind)  # R21: 当日评分(截面前向无未来)
+                today_scores = stock_scores(panel, day, rank_kind) if alloc_policy in ("score", "score_cap") else None
                 rank = [c for c in stock_rank(panel, day, rank_kind) if sector_of.get(c) in good and c in prev_tradeable]
-                if alloc_policy == "score":
-                    today_sum[0] = sum(max(today_scores.get(c, 0.0), 0.0) for c in rank)  # 候选正分归一
+                # R22/P0修复: eligible=实际可入场集(rank[:n_hold]中未持仓+MA20确认+非冷却非在途), 分母只含它
+                eligible = []
                 for c in rank[:n_hold]:
-                    s20v = ma20[c].get(day, np.nan)  # 查表(恒等: 滚动20均值)
-                    if c not in pos and s20v == s20v and close_adj[c].get(day, np.nan) > s20v:  # 趋势确认入场(收盘>MA20)
-                        freeze(c, "BUY", sig_score=today_scores.get(c) if alloc_policy == "score" else None)
+                    s20v = ma20[c].get(day, np.nan)
+                    if c not in pos and s20v == s20v and close_adj[c].get(day, np.nan) > s20v \
+                            and not any(p["code"] == c for p in pending) \
+                            and dix[day] >= reentry_block.get(c, -1):
+                        eligible.append(c)
+                _cash_snap[0] = cash - reserved[0]  # R22: 冻结前同一份可用资金快照(整批预算共用)
+                if alloc_policy in ("score", "score_cap"):
+                    sc = {c: max(today_scores.get(c, 0.0), 0.0) for c in eligible}
+                    today_sum[0] = sum(sc.values())  # P0修复: 分母=eligible评分和(非全部rank)
+                elif alloc_policy == "equal_all":
+                    n_elig[0] = max(1, len(eligible))
+                for c in eligible:
+                    freeze(c, "BUY", sig_score=today_scores.get(c) if today_scores is not None else None)
         if strategy in ("m1", "nogate3f", "gatemom", "nogatemom", "expt") and exit_mode == "daily":  # E系列: 退出模式参数化
             for c in list(pos):
                 s = ma20[c].get(day, np.nan)

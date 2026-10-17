@@ -9,28 +9,28 @@
   "executor": "统一执行器+账本(raw价/涨跌停/停牌/整手/T+1/真实费用)"
  },
  "stats": {
-  "return": 0.4256,
-  "ann": 0.0536,
-  "max_dd": -0.2958,
-  "calmar": 0.18,
-  "sharpe": 0.4,
+  "return": 0.3604,
+  "ann": 0.0464,
+  "max_dd": -0.3737,
+  "calmar": 0.12,
+  "sharpe": 0.33,
   "trades": {
-   "BUY": 245,
-   "SELL": 233
+   "BUY": 255,
+   "SELL": 243
   },
   "rejects": {
    "halted": 0,
    "limit": 0,
-   "lot": 8,
+   "lot": 5,
    "no_px": 0,
    "pool": 0,
    "other": 0,
-   "insufficient_cash": 3564,
+   "insufficient_cash": 3501,
    "reason_detail": {
-    "insufficient_cash_after_fees": 123,
+    "insufficient_cash_after_fees": 139,
     "limit_up": 2
    },
-   "execution_cash_reject": 123,
+   "execution_cash_reject": 139,
    "other_msgs": [
     "insufficient_cash_after_fees",
     "insufficient_cash_after_fees",
@@ -129,8 +129,24 @@
     "insufficient_cash_after_fees",
     "insufficient_cash_after_fees",
     "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
     "limit_up",
     "limit_up",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
+    "insufficient_cash_after_fees",
     "insufficient_cash_after_fees",
     "insufficient_cash_after_fees",
     "insufficient_cash_after_fees",
@@ -158,45 +174,44 @@
     "insufficient_cash_after_fees",
     "insufficient_cash_after_fees"
    ],
-   "cooldown": 4,
    "market_reject_other": 2
   },
-  "cash_pct": 0.292,
-  "avg_hold_days": 88,
+  "cash_pct": 0.199,
+  "avg_hold_days": 84,
   "flat_days": 60,
-  "avg_pos": 13.47,
+  "avg_pos": 13.4,
   "hold_buckets": {
-   "1-5": 5,
-   "6-20": 35,
-   "21-60": 95,
-   "61-90": 26,
-   ">90": 72
+   "1-5": 4,
+   "6-20": 39,
+   "21-60": 101,
+   "61-90": 28,
+   ">90": 71
   },
   "max_pos": 22,
   "open_pos_tdays": {
    "600019": 773,
-   "601919": 378,
+   "601919": 372,
    "601211": 70,
-   "600028": 54,
    "601668": 54,
    "601857": 49,
    "600048": 40,
-   "000983": 33,
+   "600028": 35,
+   "000983": 31,
    "600795": 16,
    "000002": 13,
    "600011": 8,
-   "600027": 7
+   "601225": 4
   },
   "n_days": 1643
  },
  "segments": {
   "seg_2020_2022": {
-   "return": 0.214,
-   "max_dd": -0.2958
+   "return": 0.2474,
+   "max_dd": -0.3737
   },
   "seg_2023_2026": {
-   "return": 0.162,
-   "max_dd": -0.2545
+   "return": 0.0786,
+   "max_dd": -0.3012
   }
  }
 }
