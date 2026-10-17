@@ -141,6 +141,7 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
         exit_mode = {"m1": "daily", "gatemom": "daily", "nogatemom": "daily", "nogate3f": "daily"}.get(strategy, "daily" if strategy in ("m1", "gatemom", "nogatemom", "nogate3f") else "daily")
     ledger = ex.Ledger(f"swing_{strategy}_{gate}_{exit_mode}", nav0=20000.0, root=os.path.join(tempfile.gettempdir(), f"m1_{strategy}"), test_mode=False)  # K2: 正式账本模式
     cash, pos, pending = ledger.cash, {}, []  # pending=[(code,action,signal_day)]
+    trade_log = []  # R23: 成交事件日志(订单级, 离线归因用)
     nav_log, trades, rej = [], {"BUY": 0, "SELL": 0}, {"halted": 0, "limit": 0, "lot": 0, "no_px": 0, "pool": 0, "other": 0}
     month_seen = None
     hold_days, buy_day = [], {}
@@ -172,6 +173,7 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
                 if fill["status"] == "FILLED":
                     ledger.apply(fill)  # J3: 正式通道(register_plan已登记, 无allow_unplanned)
                     cash = ledger.cash
+                    trade_log.append({"oid": len(trade_log), "code": code, "action": action, "sig_day": sig_day, "exec_day": day_str, "px": float(px), "shares": int(fill["shares"]), "fees": round(float(fill.get("fees", 0.0)), 2), "reason": "FILLED"})  # R23: 事件日志
                     if action == "BUY":
                         pos[code] = pos.get(code, 0) + fill["shares"]
                         buy_day.setdefault(code, dix[day])
@@ -183,6 +185,7 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
                             hold_days.append(dix[day] - buy_day.pop(code, dix[day]))  # J4: 交易日计数
                             reentry_block[code] = dix[day] + 5  # R19: 冷却
                         trades["SELL"] += 1
+                    trade_log.append({"oid": len(trade_log), "code": code, "action": action, "sig_day": sig_day, "exec_day": day_str, "px": 0.0, "shares": 0, "fees": 0.0, "reason": str(fill.get("reason", "unknown"))[:40]})
                 else:
                     r = str(fill.get("reason", "unknown"))  # L2: reason原样逐笔归因
                     rej.setdefault("reason_detail", {}).setdefault(r, 0)
@@ -338,7 +341,8 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
                       "hold_buckets": {"1-5": sum(1 for h in hold_days if h <= 5), "6-20": sum(1 for h in hold_days if 6 <= h <= 20), "21-60": sum(1 for h in hold_days if 21 <= h <= 60), "61-90": sum(1 for h in hold_days if 61 <= h <= 90), ">90": sum(1 for h in hold_days if h > 90)},
                       "max_pos": max(x["n_pos"] for x in nav_log),  # R20: 最大持仓数
                       "open_pos_tdays": {c: dix[nav.index[-1]] - i for c, i in buy_day.items()},
-                     "n_days": len(nav)}}
+                     "n_days": len(nav)},
+           "trade_log": trade_log, "nav_log": nav_log}
     os.makedirs(r"E:\mystockagent\output\ashare", exist_ok=True)
     seg = {}  # 滚动样本外近似: 前段构建参考/后段更晚数据(非严格OOS, 如实标注)
     for a, b, tag in [("2020-01-01", "2022-12-31", "seg_2020_2022"), ("2023-01-01", "2026-12-31", "seg_2023_2026")]:
