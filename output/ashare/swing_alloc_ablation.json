@@ -1,0 +1,57 @@
+{
+ "caveats": {
+  "rank_caliber": "v2预计算滚动20日",
+  "engine": "panel-cache+parallel"
+ },
+ "A": {
+  "A0": {
+   "return": 0.4256,
+   "max_dd": -0.2958,
+   "calmar": 0.18,
+   "sharpe": 0.4,
+   "cash_pct": 0.292,
+   "avg_pos": 13.47,
+   "max_pos": 22,
+   "flat_days": 60,
+   "avg_hold_days": 88,
+   "_secs": 175.7
+  },
+  "A1": {
+   "return": 0.1463,
+   "max_dd": -0.0941,
+   "calmar": 0.22,
+   "sharpe": 0.44,
+   "cash_pct": 0.871,
+   "avg_pos": 2.96,
+   "max_pos": 9,
+   "flat_days": 599,
+   "avg_hold_days": 134,
+   "_secs": 165.3
+  },
+  "A2": {
+   "return": 0.0857,
+   "max_dd": -0.0715,
+   "calmar": 0.17,
+   "sharpe": 0.33,
+   "cash_pct": 0.888,
+   "avg_pos": 2.81,
+   "max_pos": 8,
+   "flat_days": 599,
+   "avg_hold_days": 127,
+   "_secs": 165.1
+  },
+  "A3": {
+   "return": -0.1142,
+   "max_dd": -0.4805,
+   "calmar": -0.04,
+   "sharpe": 0.02,
+   "cash_pct": 0.101,
+   "avg_pos": 4.74,
+   "max_pos": 5,
+   "flat_days": 60,
+   "avg_hold_days": 92,
+   "_secs": 163.6
+  },
+  "_wall": "parallel"
+ }
+}
