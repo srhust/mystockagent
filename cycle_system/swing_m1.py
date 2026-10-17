@@ -227,6 +227,9 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
             if sigc != sigc:
                 rej["no_px"] += 1
                 return
+            if action == "SELL" and any(p["code"] == code and p["action"] == "SELL" for p in pending):  # R27: SELL统一去重(月末+ S2同日双冻结→同plan_hash二次入账A3)
+                rej["dup_sell"] = rej.get("dup_sell", 0) + 1
+                return
             if action == "BUY":
                 n_open = len(pos) + sum(1 for p in pending if p["action"] == "BUY")  # R20: 持仓+在途买单
                 if cap and n_open >= cap:  # 容量上限: 不自动卖出(避免混入调仓效应)
@@ -307,9 +310,11 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
         if risk_mode == "exit" and s2_active is not None:  # R26/S2-Exit: 独立每日块(不受exit_mode限制), 双确认提前退出
             for c in list(pos):
                 if c in s2_active.columns and bool(s2_active.at[day, c]):
+                    if any(p["code"] == c and p["action"] == "SELL" for p in pending):  # R27: 同股同日已冻结SELL(月末块)→跳过, 防同plan_hash二次入账(A3)
+                        continue
                     rej["s2exit"] = rej.get("s2exit", 0) + 1
                     freeze(c, "SELL")  # 信号日收盘确认, T+1执行
-        elif strategy in ("m1", "nogate3f", "gatemom", "nogatemom", "expt") and exit_mode == "monthly":
+        if strategy in ("m1", "nogate3f", "gatemom", "nogatemom", "expt") and exit_mode == "monthly":  # R27修复: 独立if(此前elif挂S2块上, risk_mode=exit时月末退出被短路——审查者发现)
             # R18 E3/E4: 月末MA20x0.97信号(收盘产生, 新月首日执行; 无提前时序)
             if i + 1 < len(dates) and dates[i + 1].month != day.month:
                 for c in list(pos):
