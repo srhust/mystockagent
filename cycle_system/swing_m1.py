@@ -80,6 +80,15 @@ def build_factor_table(panel: pd.DataFrame) -> pd.DataFrame:
 
 
 FACTOR_TABLE = None  # R19性能: 预计算因子表(模块级, 首次run构建)
+_DATE_ROWS = {}  # R21性能: {day: subdf}按日分组(O(1)查), 替代每日40万行布尔扫
+
+
+def _date_rows(ft: pd.DataFrame, day) -> pd.DataFrame:
+    d0 = pd.Timestamp(day)
+    if not _DATE_ROWS:
+        for d, g in ft.groupby("date"):
+            _DATE_ROWS[d] = g
+    return _DATE_ROWS.get(d0, pd.DataFrame())
 
 
 def stock_scores(panel: pd.DataFrame, day, kind: str = "3f") -> dict:
@@ -116,6 +125,7 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
     stages = cycle_stage(idx)
     sector_of = panel.drop_duplicates("code").set_index("code")["sector"].to_dict()
     dates = [pd.Timestamp(x) for x in sorted(panel["date"].unique())]
+    ma20 = close_adj.rolling(20, min_periods=20).mean()  # R21性能: MA20面板一次预计算(与loc[:day].tail(20).mean()恒等)
     dix = {d: i for i, d in enumerate(dates)}  # J4: 交易日索引
     close_adj = panel.pivot(index="date", columns="code", values="close_adj")
     close_raw = panel.pivot(index="date", columns="code", values="close")
@@ -257,20 +267,20 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
                 if alloc_policy == "score":
                     today_sum[0] = sum(max(today_scores.get(c, 0.0), 0.0) for c in rank)  # 候选正分归一
                 for c in rank[:n_hold]:
-                    s20 = close_adj[c].loc[:day].tail(20)
-                    if c not in pos and len(s20) >= 20 and close_adj[c].get(day, np.nan) > s20.mean():  # 趋势确认入场(收盘>MA20), 否则次日即破位翻转
+                    s20v = ma20[c].get(day, np.nan)  # 查表(恒等: 滚动20均值)
+                    if c not in pos and s20v == s20v and close_adj[c].get(day, np.nan) > s20v:  # 趋势确认入场(收盘>MA20)
                         freeze(c, "BUY", sig_score=today_scores.get(c) if alloc_policy == "score" else None)
         if strategy in ("m1", "nogate3f", "gatemom", "nogatemom", "expt") and exit_mode == "daily":  # E系列: 退出模式参数化
             for c in list(pos):
-                s = close_adj[c].loc[:day].tail(20)
-                if len(s) >= 20 and close_adj[c].get(day, np.nan) < s.mean() * 0.97:  # 3%破位缓冲
+                s = ma20[c].get(day, np.nan)
+                if s == s and close_adj[c].get(day, np.nan) < s * 0.97:  # 3%破位缓冲(查表)
                     freeze(c, "SELL")
         elif strategy in ("m1", "nogate3f", "gatemom", "nogatemom", "expt") and exit_mode == "monthly":
             # R18 E3/E4: 月末MA20x0.97信号(收盘产生, 新月首日执行; 无提前时序)
             if i + 1 < len(dates) and dates[i + 1].month != day.month:
                 for c in list(pos):
-                    s = close_adj[c].loc[:day].tail(20)
-                    if len(s) >= 20 and close_adj[c].get(day, np.nan) < s.mean() * 0.97:
+                    s = ma20[c].get(day, np.nan)
+                    if s == s and close_adj[c].get(day, np.nan) < s * 0.97:
                         freeze(c, "SELL")
         # exit_mode == "none": 无趋势退出(E5/E6), 持有至期末按最近有效价估值
         elif strategy == "trend":
