@@ -1,0 +1,65 @@
+{
+ "caveats": {
+  "survivorship": "仅当前配置池",
+  "st_history": "UNAVAILABLE",
+  "suspension": "行情近似",
+  "industry": "当前快照非历史时点",
+  "oos": "样本外验证未完成, 探索性不构成正式业绩",
+  "executor": "统一执行器+账本(raw价/涨跌停/停牌/整手/T+1/真实费用)",
+  "rank_caliber": "预计算滚动20日口径v2"
+ },
+ "C": {
+  "C1": {
+   "entry": "monthly",
+   "cap": null,
+   "return": 0.2043,
+   "max_dd": -0.2312,
+   "calmar": 0.12,
+   "cash_pct": 0.437,
+   "avg_pos": 6.4,
+   "max_pos": 11,
+   "flat_days": 81,
+   "avg_hold": 95,
+   "cap_rej": 0
+  },
+  "C2": {
+   "entry": "daily",
+   "cap": null,
+   "return": 0.394,
+   "max_dd": -0.2847,
+   "calmar": 0.18,
+   "cash_pct": 0.296,
+   "avg_pos": 13.69,
+   "max_pos": 23,
+   "flat_days": 60,
+   "avg_hold": 85,
+   "cap_rej": 0
+  },
+  "C3": {
+   "entry": "monthly",
+   "cap": 5,
+   "return": -0.0393,
+   "max_dd": -0.2168,
+   "calmar": -0.03,
+   "cash_pct": 0.557,
+   "avg_pos": 4.2,
+   "max_pos": 5,
+   "flat_days": 81,
+   "avg_hold": 96,
+   "cap_rej": 172
+  },
+  "C4": {
+   "entry": "daily",
+   "cap": 5,
+   "return": 0.0712,
+   "max_dd": -0.2981,
+   "calmar": 0.03,
+   "cash_pct": 0.501,
+   "avg_pos": 4.71,
+   "max_pos": 5,
+   "flat_days": 60,
+   "avg_hold": 101,
+   "cap_rej": 5393
+  }
+ }
+}

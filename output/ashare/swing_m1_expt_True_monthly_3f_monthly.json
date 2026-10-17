@@ -9,14 +9,14 @@
   "executor": "统一执行器+账本(raw价/涨跌停/停牌/整手/T+1/真实费用)"
  },
  "stats": {
-  "return": 0.2043,
-  "ann": 0.0278,
-  "max_dd": -0.2312,
-  "calmar": 0.12,
-  "sharpe": 0.28,
+  "return": -0.0393,
+  "ann": -0.0059,
+  "max_dd": -0.2168,
+  "calmar": -0.03,
+  "sharpe": -0.0,
   "trades": {
-   "BUY": 107,
-   "SELL": 99
+   "BUY": 66,
+   "SELL": 61
   },
   "rejects": {
    "halted": 0,
@@ -25,11 +25,11 @@
    "no_px": 0,
    "pool": 0,
    "other": 0,
-   "insufficient_cash": 162,
+   "insufficient_cash": 58,
    "reason_detail": {
-    "insufficient_cash_after_fees": 15
+    "insufficient_cash_after_fees": 10
    },
-   "execution_cash_reject": 15,
+   "execution_cash_reject": 10,
    "other_msgs": [
     "insufficient_cash_after_fees",
     "insufficient_cash_after_fees",
@@ -40,45 +40,39 @@
     "insufficient_cash_after_fees",
     "insufficient_cash_after_fees",
     "insufficient_cash_after_fees",
-    "insufficient_cash_after_fees",
-    "insufficient_cash_after_fees",
-    "insufficient_cash_after_fees",
-    "insufficient_cash_after_fees",
-    "insufficient_cash_after_fees",
     "insufficient_cash_after_fees"
-   ]
+   ],
+   "cap": 172
   },
-  "cash_pct": 0.437,
-  "avg_hold_days": 95,
+  "cash_pct": 0.557,
+  "avg_hold_days": 96,
   "flat_days": 81,
-  "avg_pos": 6.4,
+  "avg_pos": 4.2,
   "hold_buckets": {
    "1-5": 0,
-   "6-20": 23,
-   "21-60": 30,
-   "61-90": 10,
-   ">90": 36
+   "6-20": 14,
+   "21-60": 22,
+   "61-90": 5,
+   ">90": 20
   },
+  "max_pos": 5,
   "open_pos_tdays": {
    "600019": 451,
    "601919": 372,
    "601211": 70,
    "601668": 47,
-   "601857": 47,
-   "000002": 5,
-   "600048": 5,
-   "600011": 5
+   "601857": 47
   },
   "n_days": 1643
  },
  "segments": {
   "seg_2020_2022": {
-   "return": -0.0088,
-   "max_dd": -0.2312
+   "return": -0.08,
+   "max_dd": -0.2168
   },
   "seg_2023_2026": {
-   "return": 0.2069,
-   "max_dd": -0.1876
+   "return": 0.0383,
+   "max_dd": -0.1399
   }
  }
 }
