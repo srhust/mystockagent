@@ -1,0 +1,967 @@
+{
+ "records_n": 120,
+ "records": [
+  {
+   "query_date": "2020-06-30",
+   "stock_code": "sz.000002",
+   "industry": "K70房地产业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2020-06-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2020-06-30",
+   "stock_code": "sz.000012",
+   "industry": "C30非金属矿物制品业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2020-06-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2020-06-30",
+   "stock_code": "sz.000050",
+   "industry": "C39计算机、通信和其他电子设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2020-06-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2020-06-30",
+   "stock_code": "sz.000059",
+   "industry": "C25石油、煤炭及其他燃料加工业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2020-06-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2020-06-30",
+   "stock_code": "sz.000060",
+   "industry": "C32有色金属冶炼和压延加工业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2020-06-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2020-06-30",
+   "stock_code": "sz.000069",
+   "industry": "K70房地产业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2020-06-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2020-06-30",
+   "stock_code": "sz.000100",
+   "industry": "C39计算机、通信和其他电子设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2020-06-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2020-06-30",
+   "stock_code": "sz.000157",
+   "industry": "C35专用设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2020-06-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2020-06-30",
+   "stock_code": "sz.000301",
+   "industry": "C28化学纤维制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2020-06-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2020-06-30",
+   "stock_code": "sz.000401",
+   "industry": "C30非金属矿物制品业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2020-06-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2020-06-30",
+   "stock_code": "sz.000408",
+   "industry": "C26化学原料和化学制品制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2020-06-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2020-06-30",
+   "stock_code": "sz.000420",
+   "industry": "C28化学纤维制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2020-06-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2020-06-30",
+   "stock_code": "sz.000422",
+   "industry": "C26化学原料和化学制品制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2020-06-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2020-06-30",
+   "stock_code": "sz.000425",
+   "industry": "C35专用设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2020-06-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2020-06-30",
+   "stock_code": "sz.000488",
+   "industry": "C22造纸和纸制品业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2020-06-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2020-06-30",
+   "stock_code": "sz.000520",
+   "industry": "G55水上运输业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2020-06-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2020-06-30",
+   "stock_code": "sz.000528",
+   "industry": "C35专用设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2020-06-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2020-06-30",
+   "stock_code": "sz.000625",
+   "industry": "C36汽车制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2020-06-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2020-06-30",
+   "stock_code": "sz.000630",
+   "industry": "C32有色金属冶炼和压延加工业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2020-06-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2020-06-30",
+   "stock_code": "sz.000636",
+   "industry": "C39计算机、通信和其他电子设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2020-06-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2020-06-30",
+   "stock_code": "sz.000672",
+   "industry": "C30非金属矿物制品业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2020-06-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2020-06-30",
+   "stock_code": "sz.000680",
+   "industry": "C35专用设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2020-06-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2020-06-30",
+   "stock_code": "sz.000683",
+   "industry": "C26化学原料和化学制品制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2020-06-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2020-06-30",
+   "stock_code": "sz.000703",
+   "industry": "C28化学纤维制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2020-06-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2020-06-30",
+   "stock_code": "sz.000708",
+   "industry": "C31黑色金属冶炼和压延加工业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2020-06-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2020-06-30",
+   "stock_code": "sz.000725",
+   "industry": "C39计算机、通信和其他电子设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2020-06-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2020-06-30",
+   "stock_code": "sz.000733",
+   "industry": "C39计算机、通信和其他电子设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2020-06-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2020-06-30",
+   "stock_code": "sz.000776",
+   "industry": "J67资本市场服务",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2020-06-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2020-06-30",
+   "stock_code": "sz.000789",
+   "industry": "C30非金属矿物制品业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2020-06-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2020-06-30",
+   "stock_code": "sz.000792",
+   "industry": "C26化学原料和化学制品制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2020-06-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2021-12-10",
+   "stock_code": "sz.000002",
+   "industry": "K70房地产业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2021-11-15",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2021-12-10",
+   "stock_code": "sz.000012",
+   "industry": "C30非金属矿物制品业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2021-11-15",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2021-12-10",
+   "stock_code": "sz.000050",
+   "industry": "C39计算机、通信和其他电子设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2021-11-15",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2021-12-10",
+   "stock_code": "sz.000059",
+   "industry": "C25石油、煤炭及其他燃料加工业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2021-11-15",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2021-12-10",
+   "stock_code": "sz.000060",
+   "industry": "C32有色金属冶炼和压延加工业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2021-11-15",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2021-12-10",
+   "stock_code": "sz.000069",
+   "industry": "K70房地产业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2021-11-15",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2021-12-10",
+   "stock_code": "sz.000100",
+   "industry": "C39计算机、通信和其他电子设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2021-11-15",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2021-12-10",
+   "stock_code": "sz.000157",
+   "industry": "C35专用设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2021-11-15",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2021-12-10",
+   "stock_code": "sz.000301",
+   "industry": "C28化学纤维制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2021-11-15",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2021-12-10",
+   "stock_code": "sz.000401",
+   "industry": "C30非金属矿物制品业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2021-11-15",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2021-12-10",
+   "stock_code": "sz.000408",
+   "industry": "C26化学原料和化学制品制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2021-11-15",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2021-12-10",
+   "stock_code": "sz.000420",
+   "industry": "C28化学纤维制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2021-11-15",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2021-12-10",
+   "stock_code": "sz.000422",
+   "industry": "C26化学原料和化学制品制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2021-11-15",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2021-12-10",
+   "stock_code": "sz.000425",
+   "industry": "C35专用设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2021-11-15",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2021-12-10",
+   "stock_code": "sz.000488",
+   "industry": "C22造纸和纸制品业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2021-11-15",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2021-12-10",
+   "stock_code": "sz.000520",
+   "industry": "G55水上运输业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2021-11-15",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2021-12-10",
+   "stock_code": "sz.000528",
+   "industry": "C35专用设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2021-11-15",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2021-12-10",
+   "stock_code": "sz.000625",
+   "industry": "C36汽车制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2021-11-15",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2021-12-10",
+   "stock_code": "sz.000630",
+   "industry": "C32有色金属冶炼和压延加工业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2021-11-15",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2021-12-10",
+   "stock_code": "sz.000636",
+   "industry": "C39计算机、通信和其他电子设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2021-11-15",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2021-12-10",
+   "stock_code": "sz.000672",
+   "industry": "C30非金属矿物制品业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2021-11-15",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2021-12-10",
+   "stock_code": "sz.000680",
+   "industry": "C35专用设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2021-11-15",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2021-12-10",
+   "stock_code": "sz.000683",
+   "industry": "C26化学原料和化学制品制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2021-11-15",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2021-12-10",
+   "stock_code": "sz.000703",
+   "industry": "C28化学纤维制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2021-11-15",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2021-12-10",
+   "stock_code": "sz.000708",
+   "industry": "C31黑色金属冶炼和压延加工业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2021-11-15",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2021-12-10",
+   "stock_code": "sz.000725",
+   "industry": "C39计算机、通信和其他电子设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2021-11-15",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2021-12-10",
+   "stock_code": "sz.000733",
+   "industry": "C39计算机、通信和其他电子设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2021-11-15",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2021-12-10",
+   "stock_code": "sz.000776",
+   "industry": "J67资本市场服务",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2021-11-15",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2021-12-10",
+   "stock_code": "sz.000789",
+   "industry": "C30非金属矿物制品业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2021-11-15",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2021-12-10",
+   "stock_code": "sz.000792",
+   "industry": "C26化学原料和化学制品制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2021-11-15",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2023-06-30",
+   "stock_code": "sz.000002",
+   "industry": "K70房地产业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2023-06-26",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2023-06-30",
+   "stock_code": "sz.000012",
+   "industry": "C30非金属矿物制品业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2023-06-26",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2023-06-30",
+   "stock_code": "sz.000050",
+   "industry": "C39计算机、通信和其他电子设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2023-06-26",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2023-06-30",
+   "stock_code": "sz.000059",
+   "industry": "C25石油、煤炭及其他燃料加工业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2023-06-26",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2023-06-30",
+   "stock_code": "sz.000060",
+   "industry": "C32有色金属冶炼和压延加工业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2023-06-26",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2023-06-30",
+   "stock_code": "sz.000069",
+   "industry": "K70房地产业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2023-06-26",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2023-06-30",
+   "stock_code": "sz.000100",
+   "industry": "C39计算机、通信和其他电子设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2023-06-26",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2023-06-30",
+   "stock_code": "sz.000157",
+   "industry": "C35专用设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2023-06-26",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2023-06-30",
+   "stock_code": "sz.000301",
+   "industry": "C28化学纤维制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2023-06-26",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2023-06-30",
+   "stock_code": "sz.000401",
+   "industry": "C30非金属矿物制品业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2023-06-26",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2023-06-30",
+   "stock_code": "sz.000408",
+   "industry": "C26化学原料和化学制品制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2023-06-26",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2023-06-30",
+   "stock_code": "sz.000420",
+   "industry": "C28化学纤维制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2023-06-26",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2023-06-30",
+   "stock_code": "sz.000422",
+   "industry": "C26化学原料和化学制品制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2023-06-26",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2023-06-30",
+   "stock_code": "sz.000425",
+   "industry": "C35专用设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2023-06-26",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2023-06-30",
+   "stock_code": "sz.000488",
+   "industry": "C22造纸和纸制品业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2023-06-26",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2023-06-30",
+   "stock_code": "sz.000520",
+   "industry": "G55水上运输业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2023-06-26",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2023-06-30",
+   "stock_code": "sz.000528",
+   "industry": "C35专用设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2023-06-26",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2023-06-30",
+   "stock_code": "sz.000625",
+   "industry": "C36汽车制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2023-06-26",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2023-06-30",
+   "stock_code": "sz.000630",
+   "industry": "C32有色金属冶炼和压延加工业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2023-06-26",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2023-06-30",
+   "stock_code": "sz.000636",
+   "industry": "C39计算机、通信和其他电子设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2023-06-26",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2023-06-30",
+   "stock_code": "sz.000672",
+   "industry": "C30非金属矿物制品业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2023-06-26",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2023-06-30",
+   "stock_code": "sz.000680",
+   "industry": "C35专用设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2023-06-26",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2023-06-30",
+   "stock_code": "sz.000683",
+   "industry": "C26化学原料和化学制品制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2023-06-26",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2023-06-30",
+   "stock_code": "sz.000703",
+   "industry": "C28化学纤维制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2023-06-26",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2023-06-30",
+   "stock_code": "sz.000708",
+   "industry": "C31黑色金属冶炼和压延加工业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2023-06-26",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2023-06-30",
+   "stock_code": "sz.000725",
+   "industry": "C39计算机、通信和其他电子设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2023-06-26",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2023-06-30",
+   "stock_code": "sz.000733",
+   "industry": "C39计算机、通信和其他电子设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2023-06-26",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2023-06-30",
+   "stock_code": "sz.000776",
+   "industry": "J67资本市场服务",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2023-06-26",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2023-06-30",
+   "stock_code": "sz.000789",
+   "industry": "C30非金属矿物制品业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2023-06-26",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2023-06-30",
+   "stock_code": "sz.000792",
+   "industry": "C26化学原料和化学制品制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2023-06-26",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2025-12-31",
+   "stock_code": "sz.000002",
+   "industry": "K70房地产业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2025-12-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2025-12-31",
+   "stock_code": "sz.000012",
+   "industry": "C30非金属矿物制品业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2025-12-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2025-12-31",
+   "stock_code": "sz.000050",
+   "industry": "C39计算机、通信和其他电子设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2025-12-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2025-12-31",
+   "stock_code": "sz.000059",
+   "industry": "C25石油、煤炭及其他燃料加工业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2025-12-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2025-12-31",
+   "stock_code": "sz.000060",
+   "industry": "C32有色金属冶炼和压延加工业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2025-12-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2025-12-31",
+   "stock_code": "sz.000069",
+   "industry": "K70房地产业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2025-12-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2025-12-31",
+   "stock_code": "sz.000100",
+   "industry": "C39计算机、通信和其他电子设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2025-12-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2025-12-31",
+   "stock_code": "sz.000157",
+   "industry": "C35专用设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2025-12-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2025-12-31",
+   "stock_code": "sz.000301",
+   "industry": "C26化学原料和化学制品制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2025-12-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2025-12-31",
+   "stock_code": "sz.000401",
+   "industry": "C30非金属矿物制品业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2025-12-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2025-12-31",
+   "stock_code": "sz.000408",
+   "industry": "C26化学原料和化学制品制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2025-12-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2025-12-31",
+   "stock_code": "sz.000420",
+   "industry": "C28化学纤维制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2025-12-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2025-12-31",
+   "stock_code": "sz.000422",
+   "industry": "C26化学原料和化学制品制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2025-12-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2025-12-31",
+   "stock_code": "sz.000425",
+   "industry": "C35专用设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2025-12-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2025-12-31",
+   "stock_code": "sz.000488",
+   "industry": "C22造纸和纸制品业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2025-12-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2025-12-31",
+   "stock_code": "sz.000520",
+   "industry": "G55水上运输业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2025-12-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2025-12-31",
+   "stock_code": "sz.000528",
+   "industry": "C35专用设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2025-12-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2025-12-31",
+   "stock_code": "sz.000625",
+   "industry": "C36汽车制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2025-12-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2025-12-31",
+   "stock_code": "sz.000630",
+   "industry": "C32有色金属冶炼和压延加工业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2025-12-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2025-12-31",
+   "stock_code": "sz.000636",
+   "industry": "C39计算机、通信和其他电子设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2025-12-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2025-12-31",
+   "stock_code": "sz.000672",
+   "industry": "C30非金属矿物制品业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2025-12-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2025-12-31",
+   "stock_code": "sz.000680",
+   "industry": "C35专用设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2025-12-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2025-12-31",
+   "stock_code": "sz.000683",
+   "industry": "C26化学原料和化学制品制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2025-12-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2025-12-31",
+   "stock_code": "sz.000703",
+   "industry": "C28化学纤维制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2025-12-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2025-12-31",
+   "stock_code": "sz.000708",
+   "industry": "C31黑色金属冶炼和压延加工业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2025-12-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2025-12-31",
+   "stock_code": "sz.000725",
+   "industry": "C39计算机、通信和其他电子设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2025-12-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2025-12-31",
+   "stock_code": "sz.000733",
+   "industry": "C39计算机、通信和其他电子设备制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2025-12-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2025-12-31",
+   "stock_code": "sz.000776",
+   "industry": "J67资本市场服务",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2025-12-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2025-12-31",
+   "stock_code": "sz.000789",
+   "industry": "C30非金属矿物制品业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2025-12-29",
+   "source": "baostock.query_stock_industry"
+  },
+  {
+   "query_date": "2025-12-31",
+   "stock_code": "sz.000792",
+   "industry": "C26化学原料和化学制品制造业",
+   "industryClassification": "证监会行业分类",
+   "updateDate": "2025-12-29",
+   "source": "baostock.query_stock_industry"
+  }
+ ],
+ "sha256_records": "12db6db6384575f0a39b301f6e0f2701a825ede1d678eda7bc8a642810f0be2f",
+ "field_note": "updateDate_after_query=晚于查询日的不同更新日期数(非记录数, R41字段名修正)"
+}
