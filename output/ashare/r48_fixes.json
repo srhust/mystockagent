@@ -1,0 +1,22 @@
+{
+ "sha_canonical": {
+  "algorithm": "per-record canonical-json sorted 后总哈希",
+  "value": "cb566f3280a0afc8",
+  "full": "cb566f3280a0afc8f001417fd1e5cc33b898d22bb107285d387cbadaff70fb64",
+  "r46_original_seq_sha": "0572b0795fff90ff00e3f9aca105733559c9f6d7285a24f18d33bf8d39f3f873",
+  "note": "R46顺序敏感SHA与R47重算差异已由规范化哈希消解——两文件内容同源(227条), 规范化口径=审计基准"
+ },
+ "formula_fix": {
+  "P0_INDUSTRY_UNKNOWN": "正确=alive_codes - set(ind.code6) 集合差(原公式=上市存续数-行业表行数, 错误); 需记录缺失代码清单",
+  "P1_proxy": "关键词匹配→证监会行业代码白名单+分行业覆盖; L2不得解释为原策略周期候选池",
+  "applied_in": "cycle_system/coverage_gap_report.py(待Baostock恢复后单次执行, 不重复登录)"
+ },
+ "L1_offline": {
+  "status": "DATA_NOT_CACHED",
+  "detail": "9011条全名录未落盘(R45/R46仅存统计+227退市)——离线不可精确反推L1集合; 需一次有界补充(query_stock_basic单次)后转全离线"
+ },
+ "dual_path": {
+  "data_trust": "历史股票池/申万归属/发布时间审计",
+  "market_research": "牧原/铜/黄金/煤炭/金融周期位置观察——不修改冻结策略, 不引用未验证回测"
+ }
+}
