@@ -1,0 +1,144 @@
+{
+ "term": "partial_membership_coverage(非严格Coverage_PIT; verified恒为0——无历史可追溯来源)",
+ "signal_day_decision": {
+  "gate": {
+   "n": 1253,
+   "partial": 945,
+   "unknown": 308,
+   "partial_membership_coverage": 0.7542,
+   "verified_pit_coverage": 0.0,
+   "by_period": {
+    "2020-2021": {
+     "n": 302,
+     "partial": 11,
+     "unknown": 291,
+     "partial_rate": 0.036
+    },
+    "2022-2023": {
+     "n": 519,
+     "partial": 502,
+     "unknown": 17,
+     "partial_rate": 0.967
+    },
+    "2024-2026": {
+     "n": 432,
+     "partial": 432,
+     "unknown": 0,
+     "partial_rate": 1.0
+    }
+   },
+   "key_sectors": {
+    "证券": {
+     "n": 243,
+     "partial_rate": 0.593
+    },
+    "工业金属": {
+     "n": 66,
+     "partial_rate": 0.591
+    },
+    "农化制品": {
+     "n": 8,
+     "partial_rate": 0.375
+    }
+   }
+  },
+  "buy": {
+   "n": 163,
+   "partial": 116,
+   "unknown": 47,
+   "partial_membership_coverage": 0.7117,
+   "verified_pit_coverage": 0.0,
+   "by_period": {
+    "2020-2021": {
+     "n": 47,
+     "partial": 1,
+     "unknown": 46,
+     "partial_rate": 0.021
+    },
+    "2022-2023": {
+     "n": 46,
+     "partial": 46,
+     "unknown": 0,
+     "partial_rate": 1.0
+    },
+    "2024-2026": {
+     "n": 70,
+     "partial": 69,
+     "unknown": 1,
+     "partial_rate": 0.986
+    }
+   },
+   "key_sectors": {
+    "工业金属": {
+     "n": 14,
+     "partial_rate": 0.5
+    },
+    "证券": {
+     "n": 15,
+     "partial_rate": 0.667
+    },
+    "农化制品": {
+     "n": 1,
+     "partial_rate": 1.0
+    }
+   }
+  },
+  "sell": {
+   "n": 154,
+   "partial": 113,
+   "unknown": 41,
+   "partial_membership_coverage": 0.7338,
+   "verified_pit_coverage": 0.0,
+   "by_period": {
+    "2020-2021": {
+     "n": 42,
+     "partial": 2,
+     "unknown": 40,
+     "partial_rate": 0.048
+    },
+    "2022-2023": {
+     "n": 45,
+     "partial": 45,
+     "unknown": 0,
+     "partial_rate": 1.0
+    },
+    "2024-2026": {
+     "n": 67,
+     "partial": 66,
+     "unknown": 1,
+     "partial_rate": 0.985
+    }
+   },
+   "key_sectors": {
+    "工业金属": {
+     "n": 14,
+     "partial_rate": 0.5
+    },
+    "证券": {
+     "n": 14,
+     "partial_rate": 0.786
+    },
+    "农化制品": {
+     "n": 1,
+     "partial_rate": 1.0
+    }
+   }
+  },
+  "buy_execday_ref": {
+   "n": 163,
+   "partial": 116,
+   "note": "执行日口径对照(审查者P1: 信号日为准, 此列仅示口径差异)"
+  }
+ },
+ "full_sample_monthly": {
+  "n": 19422,
+  "partial": 13986,
+  "conflict": 0,
+  "unknown": 5436,
+  "partial_rate": 0.7201
+ },
+ "conflicts_n": 0,
+ "mapping_v2": "list结构不覆盖, 冲突单列",
+ "verdict": "审计范围仍=已记录执行事件+全样本月度截面近似; 行业过滤前候选/行业指数成分依赖未含(需R35完整候选回放)",
+ "limitation": "B0/B1/F2冻结, 不接入策略, 不跑收益实验"
+}
