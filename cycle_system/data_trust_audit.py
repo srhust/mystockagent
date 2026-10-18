@@ -22,7 +22,7 @@ def sha(p: str) -> str:
     with open(p, "rb") as f:
         for chunk in iter(lambda: f.read(1 << 20), b""):
             h.update(chunk)
-    return h.hexdigest()[:12]
+    return h.hexdigest()  # R32: 完整64位摘要(长期冻结)
 
 
 # ── 1) manifest ──
@@ -42,6 +42,9 @@ manifest = {
     "factor_caliber": "v2(rolling20: mom20/stab20/liq20, 每日截面z, score_3f)——与旧60日尾部窗口近似非恒等",
     "status": "candidates frozen; F2 not default; retrospective WF only",
 }
+cfg_files = {f"{c}.csv" for c, _, _ in sp.configured_stocks() if os.path.exists(os.path.join(r"E:\mystockagent\data\stocks", f"{c}.csv"))}
+all_files = {os.path.basename(x) for x in csvs}
+manifest["csv_vs_pool_diff"] = {"manifest_minus_config": sorted(all_files - cfg_files), "config_minus_manifest": sorted(cfg_files - all_files), "n_config": len(cfg_files)}
 json.dump(manifest, open(os.path.join(OUT, "manifest.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 
 # ── 2) 历史时点股票池曲线 ──
@@ -59,10 +62,14 @@ delisted = list(getattr(sp, "DELISTED_CONFIRMED", {}).keys())
 
 # ── 4) 数据缺失覆盖(每股缺交易日数) ──
 dates_all = pd.DatetimeIndex(sorted(panel["date"].unique()))
-full = dates_all
-gaps = panel.groupby("code")["date"].nunique()
-gap_ser = (len(full) - gaps).sort_values(ascending=False)
-coverage = {"n_codes": int(len(gaps)), "perfect_coverage_codes": int((gap_ser == 0).sum()), "worst10_gap_tdays": {c: int(v) for c, v in gap_ser.head(10).items()}}
+# R32: 上市后区间口径(本地首行→末行; 上市前不计缺失; 交易日数=本地日历密度近似)
+firsts, lasts = panel.groupby("code")["date"].min(), panel.groupby("code")["date"].max()
+cnt = panel.groupby("code")["date"].nunique()
+_dmin, _dmax = pd.Timestamp(dates_all.min()), pd.Timestamp(dates_all.max())
+_tpf = len(dates_all) / max(1, (_dmax - _dmin).days)  # 本地交易日密度
+exp_tdays = (((pd.to_datetime(lasts) - pd.to_datetime(firsts)).dt.days + 1) * _tpf).round()
+gap_ser2 = (exp_tdays - cnt).sort_values(ascending=False)
+coverage = {"n_codes": int(len(cnt)), "full_span_zero_gap": int((gap_ser2 <= 1).sum()), "worst10_gap_after_list_approx_tdays": {c: int(v) for c, v in gap_ser2.head(10).items()}, "note": "上市后区间口径(本地交易日密度近似); 本地起始前历史缺失不计缺失但=更早历史不可得"}
 
 # ── 5) 行业归属与ST局限声明 ──
 sector_null = int(panel.drop_duplicates("code")["sector"].isna().sum())

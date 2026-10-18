@@ -1,12 +1,13 @@
 {
- "generated": "2026-10-17 21:28:14.951199",
- "git_sha": "a304606ab9d6090633d62171f7ee2fd19297718c",
+ "generated": "2026-10-18 09:40:49.772771",
+ "git_sha": "d46c50f258244650634c36f37e7af23d4edb689c",
  "pool_points": {
   "2018-06-29": {
    "TRADEABLE": 0,
    "SUSPENDED_CONFIRMED": 0,
    "DATA_MISSING": 0,
-   "NOT_YET_LISTED": 249,
+   "NOT_YET_LISTED": 0,
+   "HISTORY_UNAVAILABLE": 249,
    "INACTIVE_UNVERIFIED": 0,
    "INSUFFICIENT_HISTORY": 0,
    "DELISTED_CONFIRMED": 0,
@@ -17,6 +18,7 @@
    "SUSPENDED_CONFIRMED": 0,
    "DATA_MISSING": 0,
    "NOT_YET_LISTED": 10,
+   "HISTORY_UNAVAILABLE": 0,
    "INACTIVE_UNVERIFIED": 0,
    "INSUFFICIENT_HISTORY": 0,
    "DELISTED_CONFIRMED": 0,
@@ -27,6 +29,7 @@
    "SUSPENDED_CONFIRMED": 0,
    "DATA_MISSING": 0,
    "NOT_YET_LISTED": 5,
+   "HISTORY_UNAVAILABLE": 0,
    "INACTIVE_UNVERIFIED": 0,
    "INSUFFICIENT_HISTORY": 0,
    "DELISTED_CONFIRMED": 0,
@@ -37,6 +40,7 @@
    "SUSPENDED_CONFIRMED": 0,
    "DATA_MISSING": 0,
    "NOT_YET_LISTED": 0,
+   "HISTORY_UNAVAILABLE": 0,
    "INACTIVE_UNVERIFIED": 0,
    "INSUFFICIENT_HISTORY": 0,
    "DELISTED_CONFIRMED": 0,
@@ -47,6 +51,7 @@
    "SUSPENDED_CONFIRMED": 0,
    "DATA_MISSING": 1,
    "NOT_YET_LISTED": 0,
+   "HISTORY_UNAVAILABLE": 0,
    "INACTIVE_UNVERIFIED": 0,
    "INSUFFICIENT_HISTORY": 0,
    "DELISTED_CONFIRMED": 1,
@@ -60,19 +65,20 @@
  ],
  "coverage": {
   "n_codes": 249,
-  "perfect_coverage_codes": 170,
-  "worst10_gap_tdays": {
-   "688525": 727,
-   "601022": 711,
-   "301308": 628,
-   "001309": 603,
-   "000961": 593,
-   "601868": 422,
-   "000792": 312,
-   "605007": 205,
-   "603565": 179,
-   "300866": 155
-  }
+  "full_span_zero_gap": 173,
+  "worst10_gap_after_list_approx_tdays": {
+   "000792": 313,
+   "000959": 33,
+   "000425": 24,
+   "000401": 23,
+   "000528": 22,
+   "002387": 21,
+   "601211": 20,
+   "000420": 18,
+   "001979": 17,
+   "600958": 17
+  },
+  "note": "上市后区间口径(本地交易日密度近似); 本地起始前历史缺失不计缺失但=更早历史不可得"
  },
  "survivorship": {
   "known_limitation": "当前池=configured_stocks当前快照(249只); 历史时点池经pool_at排除未上市/退市确认/历史不足, 但'2020年后才入选当前池的成长股'在早期时点不存在——回测起点(2020-04)的池=当时已上市且现在仍被跟踪的股票, 存在幸存者偏差(入选基于当前名单)",

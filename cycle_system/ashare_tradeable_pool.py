@@ -19,12 +19,31 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import ashare_stock_pipeline as sp
 
 
+_DATA_START = None  # R32: 本地数据全局起始日(全部CSV首行date最小值); 此前=HISTORY_UNAVAILABLE
 _CODE_META = {}  # R21perf: {code: (first, last, dates_set, factor_cov)} 249CSV只读一次
 _POOL_AT_CACHE = {}  # R21: 纯缓存(同day同require_history_days同结果, 不改判定口径; 进程内)
 
 
+def _ensure_data_start():
+    """R32: 全局数据起始=min(全部CSV首行date); CSV升序首行=最早日期(已验证600585=2020-01-02)."""
+    global _DATA_START
+    if _DATA_START is None:
+        ds = []
+        for c, _, _ in sp.configured_stocks():
+            fp = os.path.join(sp.DATA_DIR, f"{c}.csv")
+            if os.path.exists(fp):
+                with io.open(fp, encoding="utf-8") as fh:
+                    fh.readline()
+                    line = fh.readline()
+                    if line.strip():
+                        ds.append(pd.Timestamp(line.split(",")[0]))
+        _DATA_START = min(ds) if ds else pd.Timestamp("2000-01-01")
+    return _DATA_START
+
+
 def pool_at(day: str, require_history_days: int = 0) -> dict:
     """F4五态: TRADEABLE/SUSPENDED_CONFIRMED/DATA_MISSING/NOT_YET_LISTED/DELISTED_CONFIRMED; 唯一代码去重。"""
+    _ensure_data_start()
     ck = (str(day), require_history_days)
     if ck in _POOL_AT_CACHE:  # R21: 回测热点优化(每日入场模式每日调用249CSV)
         return _POOL_AT_CACHE[ck]
@@ -32,7 +51,7 @@ def pool_at(day: str, require_history_days: int = 0) -> dict:
     if not cal.is_trading_day(day):  # fail-closed: 非交易日/UNKNOWN拒绝
         raise RuntimeError(f"非确认交易日: {day}")
     T = pd.Timestamp(day).normalize()
-    buckets = {k: [] for k in ("TRADEABLE", "SUSPENDED_CONFIRMED", "DATA_MISSING", "NOT_YET_LISTED", "INACTIVE_UNVERIFIED", "INSUFFICIENT_HISTORY", "DELISTED_CONFIRMED", "DATA_UNVERIFIED")}
+    buckets = {k: [] for k in ("TRADEABLE", "SUSPENDED_CONFIRMED", "DATA_MISSING", "NOT_YET_LISTED", "HISTORY_UNAVAILABLE", "INACTIVE_UNVERIFIED", "INSUFFICIENT_HISTORY", "DELISTED_CONFIRMED", "DATA_UNVERIFIED")}
     seen, sector_membership = set(), []
     for code, name, sector in sp.configured_stocks():  # F4: 249唯一代码去重, 251条行业关联单列
         sector_membership.append({"code": code, "sector": sector})
@@ -58,7 +77,9 @@ def pool_at(day: str, require_history_days: int = 0) -> dict:
         if fcov < 0.999:
             buckets["DATA_UNVERIFIED"].append(code)  # H3b: 表头有列但因子实际缺失→不进TRADEABLE
             continue
-        if T < first:
+        if T < _DATA_START:
+            buckets["HISTORY_UNAVAILABLE"].append(code)  # R32: 本地行情起始前≠未上市(语义修正)
+        elif T < first:
             buckets["NOT_YET_LISTED"].append(code)  # 仅首行情晚于T(首行情近似上市日)
         elif code in sp.DELISTED_CONFIRMED and T > pd.Timestamp(sp.DELISTED_CONFIRMED[code]["last_trade_date"] if isinstance(sp.DELISTED_CONFIRMED[code], dict) else sp.DELISTED_CONFIRMED[code]):
             buckets["DELISTED_CONFIRMED"].append(code)  # H2: 按最后交易日(可交易性终点)
