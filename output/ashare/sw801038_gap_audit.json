@@ -1,0 +1,46 @@
+{
+ "missing_days": [
+  {
+   "date": "2022-03-03",
+   "local_market_open": true,
+   "ref_801033": false,
+   "ref_801021": false,
+   "verdict": "UNKNOWN"
+  },
+  {
+   "date": "2022-03-23",
+   "local_market_open": true,
+   "ref_801033": false,
+   "ref_801021": false,
+   "verdict": "UNKNOWN"
+  },
+  {
+   "date": "2022-03-31",
+   "local_market_open": true,
+   "ref_801033": false,
+   "ref_801021": false,
+   "verdict": "UNKNOWN"
+  },
+  {
+   "date": "2022-04-14",
+   "local_market_open": true,
+   "ref_801033": false,
+   "ref_801021": false,
+   "verdict": "UNKNOWN"
+  },
+  {
+   "date": "2022-05-05",
+   "local_market_open": true,
+   "ref_801033": false,
+   "ref_801021": false,
+   "verdict": "UNKNOWN"
+  }
+ ],
+ "summary": {
+  "SOURCE_GAP": 0,
+  "NOT_PUBLISHED": 0,
+  "UNKNOWN": 5,
+  "NOT_TRADE_DAY(check)": 0
+ },
+ "note": "两个对照指数同日均有行情且本地市场开市→801038官方停发/源缺(SOURCE_GAP); 独立交易所日历未接入, NOT_TRADE_DAY仅本地口径"
+}
