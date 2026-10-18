@@ -1,0 +1,68 @@
+{
+ "day": "2026-06-30",
+ "pool_current": {
+  "TRADEABLE": 248,
+  "SUSPENDED_CONFIRMED": 0,
+  "DATA_MISSING": 0,
+  "NOT_YET_LISTED": 0,
+  "HISTORY_UNAVAILABLE": 0,
+  "INACTIVE_UNVERIFIED": 0,
+  "INSUFFICIENT_HISTORY": 0,
+  "DELISTED_CONFIRMED": 1,
+  "DATA_UNVERIFIED": 0
+ },
+ "data_layers": {
+  "HAS_QUOTES_T": 248,
+  "NO_QUOTES_YET(近似NOT_YET_LISTED, 仅数据内可知)": 0,
+  "AFTER_LAST_QUOTE": 2
+ },
+ "market_wide": {
+  "status": "DATA_BLOCKED",
+  "reason": "9011全名录未落盘(R48 DATA_NOT_CACHED); 逐股历史资格不可离线精确反推",
+  "aggregate_only": {
+   "month": "2026-06",
+   "n_alive": 5205,
+   "note": "月末存续计数≠可交易计数(停牌/ST/流动性未验证)"
+  },
+  "delisted_to_asof_n": 218
+ },
+ "delisted_in_pool_after_last": [
+  "000961",
+  "603603"
+ ],
+ "caveats": {
+  "st_history": "UNAVAILABLE",
+  "industry": "当前快照非历史时点",
+  "suspension": "无权威停复牌数据, 当日无K线一律DATA_MISSING不作SUSPENDED_CONFIRMED",
+  "survivorship": "SURVIVORSHIP_BIAS_PARTIAL: 250文件=当前配置池(249唯一码+603603), 全市场历史池仅聚合曲线可用(名录DATA_BLOCKED), 未消除幸存者偏差",
+  "inactive": "INACTIVE_UNVERIFIED=长期无行情待权威退市记录核实(603603/000961类)",
+  "fetch_start": "行情抓取默认2020起, 更早日期的上市判定不可靠",
+  "sixfold": {
+   "历史上市及退市日期查询": "CONFIRMED",
+   "历史上市存续股票池": "RECONSTRUCTABLE",
+   "历史实际可交易股票池": "NOT_VERIFIED",
+   "历史行业归属(证监会)": "HISTORICAL_DATE_QUERY_CONFIRMED",
+   "历史行业归属(申万二级)": "UNKNOWN",
+   "幸存者偏差对收益的影响": "NOT_ESTIMATED"
+  }
+ },
+ "_provenance": {
+  "code_version": "ebb35c548ca20aed79cae7569420c0061002a6b1",
+  "branch": "ashare-v2",
+  "config_hash": "688b9475a4172bbb",
+  "generated_at": "2026-10-18T22:00:02.937634+08:00",
+  "mode": "SYNTHETIC",
+  "asof": "2026-06-30"
+ },
+ "pool_stats_view": {
+  "TRADEABLE": 248,
+  "SUSPENDED_CONFIRMED": 0,
+  "DATA_MISSING": 0,
+  "NOT_YET_LISTED": 0,
+  "HISTORY_UNAVAILABLE": 0,
+  "INACTIVE_UNVERIFIED": 0,
+  "INSUFFICIENT_HISTORY": 0,
+  "DELISTED_CONFIRMED": 1,
+  "DATA_UNVERIFIED": 0
+ }
+}

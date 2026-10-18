@@ -58,7 +58,7 @@ def main():
             "RESEARCH_WINDOW: 2020-2026非OOS; 未经独立样本外验证不声明预测有效",
             "core.autocrlf=true无.gitattributes: 磁盘哈希行尾脆弱, 完整性用git-blob+CRLF双口径",
         ],
-        "phases": {"A": "完成", "B": "待做", "C": "待做", "D": "待做", "E": "待做", "F": "待做", "G": "待做"},
+        "phases": {"A": "完成", "B": "完成", "C": "待做", "D": "待做", "E": "待做", "F": "待做", "G": "待做"},
         "artifacts": inv,
         "generated_at": datetime.now(tz).isoformat(),
     }

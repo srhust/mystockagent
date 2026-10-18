@@ -1,0 +1,328 @@
+{
+ "_provenance": {
+  "code_version": "ebb35c548ca20aed79cae7569420c0061002a6b1",
+  "branch": "ashare-v2",
+  "config_hash": "688b9475a4172bbb",
+  "generated_at": "2026-10-18T22:00:03.467328+08:00",
+  "mode": "SYNTHETIC",
+  "asof": "2026-06-30"
+ },
+ "day": "2026-06-30",
+ "trust_gate": "全部状态判定基于 CURRENT_SNAPSHOT_ONLY 代理成分(PROXY_ONLY)——Strict模式不得据此出正式信号",
+ "membership_example": {
+  "code": "600438",
+  "asof": "2026-06-30",
+  "sw_partial": [
+   {
+    "industry_code": "801735",
+    "industry": "光伏设备",
+    "in_date": "2021-12-13",
+    "source": "ak.index_component_sw"
+   }
+  ],
+  "sw_trust": "SW_PARTIAL",
+  "sw_note": "in_date可证起点, out缺失(缺席≠非成员)"
+ },
+ "industries": [
+  {
+   "industry": "保险",
+   "state": "BOTTOM_WATCH",
+   "status": "PROXY_ONLY",
+   "range_pos_250d": 0.0199,
+   "trend_250d": -0.0592,
+   "mom_12m": -0.071,
+   "rel_mkt_120d": -0.2884,
+   "max_dd_window": -0.275
+  },
+  {
+   "industry": "元件",
+   "state": "EXPANSION",
+   "status": "PROXY_ONLY",
+   "range_pos_250d": 1.0,
+   "trend_250d": 3.0475,
+   "mom_12m": 3.1427,
+   "rel_mkt_120d": 1.48,
+   "max_dd_window": -0.1978
+  },
+  {
+   "industry": "养殖",
+   "state": "BOTTOM_WATCH",
+   "status": "PROXY_ONLY",
+   "range_pos_250d": 0.066,
+   "trend_250d": -0.1487,
+   "mom_12m": -0.1571,
+   "rel_mkt_120d": -0.2548,
+   "max_dd_window": -0.2904
+  },
+  {
+   "industry": "农化制品",
+   "state": "UNKNOWN",
+   "status": "PROXY_ONLY",
+   "range_pos_250d": 0.3597,
+   "trend_250d": 0.2073,
+   "mom_12m": 0.2007,
+   "rel_mkt_120d": -0.1324,
+   "max_dd_window": -0.2871
+  },
+  {
+   "industry": "化学原料",
+   "state": "BOTTOM_WATCH",
+   "status": "PROXY_ONLY",
+   "range_pos_250d": 0.1819,
+   "trend_250d": 0.1227,
+   "mom_12m": 0.1238,
+   "rel_mkt_120d": -0.1491,
+   "max_dd_window": -0.3509
+  },
+  {
+   "industry": "化纤",
+   "state": "EXPANSION",
+   "status": "PROXY_ONLY",
+   "range_pos_250d": 0.8003,
+   "trend_250d": 0.6036,
+   "mom_12m": 0.6011,
+   "rel_mkt_120d": 0.1107,
+   "max_dd_window": -0.2116
+  },
+  {
+   "industry": "半导体",
+   "state": "EXPANSION",
+   "status": "PROXY_ONLY",
+   "range_pos_250d": 1.0,
+   "trend_250d": 4.5536,
+   "mom_12m": 4.7584,
+   "rel_mkt_120d": 1.863,
+   "max_dd_window": -0.2603
+  },
+  {
+   "industry": "基建建筑",
+   "state": "BOTTOM_WATCH",
+   "status": "PROXY_ONLY",
+   "range_pos_250d": 0.0,
+   "trend_250d": -0.0741,
+   "mom_12m": -0.0729,
+   "rel_mkt_120d": -0.1847,
+   "max_dd_window": -0.2031
+  },
+  {
+   "industry": "小金属",
+   "state": "EXPANSION",
+   "status": "PROXY_ONLY",
+   "range_pos_250d": 0.8215,
+   "trend_250d": 0.9023,
+   "mom_12m": 0.8419,
+   "rel_mkt_120d": 0.2507,
+   "max_dd_window": -0.2585
+  },
+  {
+   "industry": "工业金属",
+   "state": "UNKNOWN",
+   "status": "PROXY_ONLY",
+   "range_pos_250d": 0.4669,
+   "trend_250d": 0.6515,
+   "mom_12m": 0.6497,
+   "rel_mkt_120d": -0.0902,
+   "max_dd_window": -0.3161
+  },
+  {
+   "industry": "工程机械",
+   "state": "UNKNOWN",
+   "status": "PROXY_ONLY",
+   "range_pos_250d": 0.266,
+   "trend_250d": 0.092,
+   "mom_12m": 0.1083,
+   "rel_mkt_120d": -0.2184,
+   "max_dd_window": -0.228
+  },
+  {
+   "industry": "房地产",
+   "state": "BOTTOM_WATCH",
+   "status": "PROXY_ONLY",
+   "range_pos_250d": 0.0,
+   "trend_250d": -0.1775,
+   "mom_12m": -0.1883,
+   "rel_mkt_120d": -0.2347,
+   "max_dd_window": -0.3231
+  },
+  {
+   "industry": "水泥建材",
+   "state": "UNKNOWN",
+   "status": "PROXY_ONLY",
+   "range_pos_250d": 0.3317,
+   "trend_250d": 0.0805,
+   "mom_12m": 0.0792,
+   "rel_mkt_120d": -0.1473,
+   "max_dd_window": -0.1405
+  },
+  {
+   "industry": "汽车整车",
+   "state": "BOTTOM_WATCH",
+   "status": "PROXY_ONLY",
+   "range_pos_250d": 0.0176,
+   "trend_250d": -0.2197,
+   "mom_12m": -0.2235,
+   "rel_mkt_120d": -0.3174,
+   "max_dd_window": -0.2997
+  },
+  {
+   "industry": "油气开采",
+   "state": "UNKNOWN",
+   "status": "PROXY_ONLY",
+   "range_pos_250d": 0.3148,
+   "trend_250d": 0.2183,
+   "mom_12m": 0.2833,
+   "rel_mkt_120d": 0.1156,
+   "max_dd_window": -0.3513
+  },
+  {
+   "industry": "消费电子",
+   "state": "EXPANSION",
+   "status": "PROXY_ONLY",
+   "range_pos_250d": 0.6769,
+   "trend_250d": 0.4646,
+   "mom_12m": 0.5033,
+   "rel_mkt_120d": -0.0809,
+   "max_dd_window": -0.3043
+  },
+  {
+   "industry": "煤炭",
+   "state": "BOTTOM_FORMING",
+   "status": "PROXY_ONLY",
+   "range_pos_250d": 0.3502,
+   "trend_250d": 0.1168,
+   "mom_12m": 0.1199,
+   "rel_mkt_120d": -0.033,
+   "max_dd_window": -0.2444
+  },
+  {
+   "industry": "玻璃玻纤",
+   "state": "EXPANSION",
+   "status": "PROXY_ONLY",
+   "range_pos_250d": 0.9997,
+   "trend_250d": 0.7832,
+   "mom_12m": 0.8031,
+   "rel_mkt_120d": 0.3809,
+   "max_dd_window": -0.1428
+  },
+  {
+   "industry": "电力",
+   "state": "EXPANSION",
+   "status": "PROXY_ONLY",
+   "range_pos_250d": 0.4693,
+   "trend_250d": 0.1284,
+   "mom_12m": 0.1353,
+   "rel_mkt_120d": -0.0173,
+   "max_dd_window": -0.207
+  },
+  {
+   "industry": "石油加工",
+   "state": "UNKNOWN",
+   "status": "PROXY_ONLY",
+   "range_pos_250d": 0.4757,
+   "trend_250d": 0.2398,
+   "mom_12m": 0.2328,
+   "rel_mkt_120d": -0.0146,
+   "max_dd_window": -0.1884
+  },
+  {
+   "industry": "种植种业",
+   "state": "BOTTOM_WATCH",
+   "status": "PROXY_ONLY",
+   "range_pos_250d": 0.0071,
+   "trend_250d": -0.1574,
+   "mom_12m": -0.1589,
+   "rel_mkt_120d": -0.2429,
+   "max_dd_window": -0.3139
+  },
+  {
+   "industry": "能源金属",
+   "state": "UNKNOWN",
+   "status": "PROXY_ONLY",
+   "range_pos_250d": 0.546,
+   "trend_250d": 0.7219,
+   "mom_12m": 0.7198,
+   "rel_mkt_120d": -0.1398,
+   "max_dd_window": -0.2872
+  },
+  {
+   "industry": "航空机场",
+   "state": "BOTTOM_WATCH",
+   "status": "PROXY_ONLY",
+   "range_pos_250d": 0.0083,
+   "trend_250d": -0.1392,
+   "mom_12m": -0.1442,
+   "rel_mkt_120d": -0.3178,
+   "max_dd_window": -0.2819
+  },
+  {
+   "industry": "航运港口",
+   "state": "UNKNOWN",
+   "status": "PROXY_ONLY",
+   "range_pos_250d": 0.4748,
+   "trend_250d": 0.2008,
+   "mom_12m": 0.234,
+   "rel_mkt_120d": 0.0402,
+   "max_dd_window": -0.266
+  },
+  {
+   "industry": "证券",
+   "state": "UNKNOWN",
+   "status": "PROXY_ONLY",
+   "range_pos_250d": 0.4337,
+   "trend_250d": 0.0724,
+   "mom_12m": 0.0627,
+   "rel_mkt_120d": -0.1359,
+   "max_dd_window": -0.2447
+  },
+  {
+   "industry": "贵金属",
+   "state": "BOTTOM_WATCH",
+   "status": "PROXY_ONLY",
+   "range_pos_250d": 0.1235,
+   "trend_250d": 0.0541,
+   "mom_12m": 0.0521,
+   "rel_mkt_120d": -0.2354,
+   "max_dd_window": -0.4871
+  },
+  {
+   "industry": "造纸",
+   "state": "BOTTOM_WATCH",
+   "status": "PROXY_ONLY",
+   "range_pos_250d": 0.1933,
+   "trend_250d": 0.0485,
+   "mom_12m": 0.0348,
+   "rel_mkt_120d": -0.1885,
+   "max_dd_window": -0.1877
+  },
+  {
+   "industry": "钢铁",
+   "state": "BOTTOM_WATCH",
+   "status": "PROXY_ONLY",
+   "range_pos_250d": 0.0288,
+   "trend_250d": -0.0539,
+   "mom_12m": -0.06,
+   "rel_mkt_120d": -0.2646,
+   "max_dd_window": -0.2599
+  },
+  {
+   "industry": "面板",
+   "state": "EXPANSION",
+   "status": "PROXY_ONLY",
+   "range_pos_250d": 1.0,
+   "trend_250d": 0.6071,
+   "mom_12m": 0.6178,
+   "rel_mkt_120d": 0.3481,
+   "max_dd_window": -0.2503
+  },
+  {
+   "industry": "饲料加工",
+   "state": "BOTTOM_WATCH",
+   "status": "PROXY_ONLY",
+   "range_pos_250d": 0.0693,
+   "trend_250d": -0.1007,
+   "mom_12m": -0.1058,
+   "rel_mkt_120d": -0.2998,
+   "max_dd_window": -0.2799
+  }
+ ]
+}
