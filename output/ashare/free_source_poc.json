@@ -1,0 +1,111 @@
+{
+ "baostock": {
+  "2020-06-30": {
+   "n_total": 3987,
+   "fields": [
+    "updateDate",
+    "code",
+    "code_name",
+    "industry",
+    "industryClassification"
+   ],
+   "pilot3": [
+    {
+     "updateDate": "2020-06-29",
+     "code": "sz.000422",
+     "code_name": "ST宜化",
+     "industry": "C26化学原料和化学制品制造业",
+     "industryClassification": "证监会行业分类"
+    },
+    {
+     "updateDate": "2020-06-29",
+     "code": "sz.000776",
+     "code_name": "广发证券",
+     "industry": "J67资本市场服务",
+     "industryClassification": "证监会行业分类"
+    }
+   ],
+   "updateDate_sample": [
+    "2020-06-29"
+   ],
+   "backfill_check": "updateDate若=晚于查询日的统一值→回填修订嫌疑"
+  },
+  "2021-12-10": {
+   "n_total": 4686,
+   "fields": [
+    "updateDate",
+    "code",
+    "code_name",
+    "industry",
+    "industryClassification"
+   ],
+   "pilot3": [
+    {
+     "updateDate": "2021-11-15",
+     "code": "sz.000422",
+     "code_name": "湖北宜化",
+     "industry": "C26化学原料和化学制品制造业",
+     "industryClassification": "证监会行业分类"
+    },
+    {
+     "updateDate": "2021-11-15",
+     "code": "sz.000776",
+     "code_name": "广发证券",
+     "industry": "J67资本市场服务",
+     "industryClassification": "证监会行业分类"
+    }
+   ],
+   "updateDate_sample": [
+    "2021-11-15"
+   ],
+   "backfill_check": "updateDate若=晚于查询日的统一值→回填修订嫌疑"
+  },
+  "2023-06-30": {
+   "n_total": 5214,
+   "fields": [
+    "updateDate",
+    "code",
+    "code_name",
+    "industry",
+    "industryClassification"
+   ],
+   "pilot3": [
+    {
+     "updateDate": "2023-06-26",
+     "code": "sz.000422",
+     "code_name": "湖北宜化",
+     "industry": "C26化学原料和化学制品制造业",
+     "industryClassification": "证监会行业分类"
+    },
+    {
+     "updateDate": "2023-06-26",
+     "code": "sz.000776",
+     "code_name": "广发证券",
+     "industry": "J67资本市场服务",
+     "industryClassification": "证监会行业分类"
+    }
+   ],
+   "updateDate_sample": [
+    "2023-06-26"
+   ],
+   "backfill_check": "updateDate若=晚于查询日的统一值→回填修订嫌疑"
+  },
+  "status": "EXECUTED"
+ },
+ "akshare_sw_hist": {
+  "n_rows_2020_2026": 1164,
+  "earliest": "2021-12-13(2021版分类起始日, 旧版指数代码需另查2014版)",
+  "latest": "2026-10-16",
+  "status": "OK(官方历史行情可得, 方案B数据基础)"
+ },
+ "joinquant": {
+  "status": "SDK_NOT_INSTALLED(免费账号路径待用户确认)"
+ },
+ "note": "只读POC; 冻结策略不修改; B目标=历史可用信息(可换分类体系), A目标=申万二级恢复(更难)",
+ "verdict": {
+  "goal_B_当时可用行业信息": "FREE_PATH_CONFIRMED: Baostock query_stock_industry(date)返回真实历史分类快照——updateDate全部<=查询日(2020-06-29/2021-11-15/2023-06-26)非回填; 证监会口径(非申万二级, 目标A仍需申万源); 连ST状态入名(ST宜化2020)——历史状态真实",
+  "official_sw_index": "801038自2021-12-13起1164日完整(2014版旧代码待查)",
+  "joinquant": "SDK未装, 免费账号待用户确认",
+  "implication": "方案B(官方历史指数+PIT个股归属)免费数据基础存在; 冻结策略不改, 新数据版本独立研究"
+ }
+}
