@@ -131,5 +131,8 @@
   "SHARED_MISSING_UNRESOLVED": 6,
   "UNKNOWN": 0
  },
- "note": "SUSPECTED≠CONFIRMED(他人有行情不证明801038必发布); 独立来源未接入"
+ "note": "五对照2022日期集合完全相同→非五份独立证据, 同一上游日历过滤的重复表现(证据强度下降, 共同缺失事实不变)",
+ "conclusion_final": "已确认AKShare返回数据中2022年存在跨多个申万指数的共同日期缺失; 原因尚未确定(官方发布规则/上游日历过滤/抓取故障均可能)",
+ "ref_date_sets_identical": true,
+ "audit_closed": "指数缺口内部审计收官(优先级降低); 主瓶颈=申万二级历史归属+幸存者偏差+发布时间vs可交易时间"
 }
