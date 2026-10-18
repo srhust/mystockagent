@@ -1,0 +1,669 @@
+{
+ "monthly_breakpoint": {
+  "2020-04": {
+   "partial": 0,
+   "pre_tax": 24,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2020-05": {
+   "partial": 0,
+   "pre_tax": 10,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2020-06": {
+   "partial": 0,
+   "pre_tax": 28,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2020-07": {
+   "partial": 0,
+   "pre_tax": 20,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2020-10": {
+   "partial": 0,
+   "pre_tax": 3,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2020-11": {
+   "partial": 0,
+   "pre_tax": 1,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2020-12": {
+   "partial": 0,
+   "pre_tax": 8,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2021-01": {
+   "partial": 0,
+   "pre_tax": 17,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2021-02": {
+   "partial": 0,
+   "pre_tax": 9,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2021-03": {
+   "partial": 0,
+   "pre_tax": 8,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2021-04": {
+   "partial": 0,
+   "pre_tax": 15,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2021-05": {
+   "partial": 0,
+   "pre_tax": 20,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2021-06": {
+   "partial": 0,
+   "pre_tax": 22,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2021-07": {
+   "partial": 0,
+   "pre_tax": 24,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2021-08": {
+   "partial": 0,
+   "pre_tax": 30,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2021-10": {
+   "partial": 0,
+   "pre_tax": 8,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2021-11": {
+   "partial": 0,
+   "pre_tax": 39,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2021-12": {
+   "partial": 11,
+   "pre_tax": 5,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2022-01": {
+   "partial": 17,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2022-02": {
+   "partial": 17,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2022-03": {
+   "partial": 10,
+   "pre_tax": 0,
+   "not_in_cur": 4,
+   "src_miss": 0
+  },
+  "2022-04": {
+   "partial": 9,
+   "pre_tax": 0,
+   "not_in_cur": 6,
+   "src_miss": 0
+  },
+  "2022-05": {
+   "partial": 19,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2022-06": {
+   "partial": 34,
+   "pre_tax": 0,
+   "not_in_cur": 5,
+   "src_miss": 0
+  },
+  "2022-07": {
+   "partial": 7,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2022-08": {
+   "partial": 43,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2022-09": {
+   "partial": 21,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2022-10": {
+   "partial": 9,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2022-11": {
+   "partial": 32,
+   "pre_tax": 0,
+   "not_in_cur": 2,
+   "src_miss": 0
+  },
+  "2022-12": {
+   "partial": 21,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2023-01": {
+   "partial": 6,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2023-02": {
+   "partial": 16,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2023-03": {
+   "partial": 3,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2023-04": {
+   "partial": 20,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2023-05": {
+   "partial": 13,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2023-06": {
+   "partial": 51,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2023-07": {
+   "partial": 20,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2023-08": {
+   "partial": 26,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2023-09": {
+   "partial": 22,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2023-10": {
+   "partial": 11,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2023-11": {
+   "partial": 61,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2023-12": {
+   "partial": 14,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2024-01": {
+   "partial": 12,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2024-02": {
+   "partial": 9,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2024-03": {
+   "partial": 25,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2024-04": {
+   "partial": 7,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2024-05": {
+   "partial": 18,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2024-06": {
+   "partial": 6,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2024-07": {
+   "partial": 16,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2024-08": {
+   "partial": 25,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2024-09": {
+   "partial": 16,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2024-10": {
+   "partial": 10,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2024-12": {
+   "partial": 2,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2025-01": {
+   "partial": 9,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2025-02": {
+   "partial": 23,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2025-03": {
+   "partial": 25,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2025-04": {
+   "partial": 9,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2025-05": {
+   "partial": 35,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2025-06": {
+   "partial": 6,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2025-07": {
+   "partial": 9,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2025-09": {
+   "partial": 7,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2025-10": {
+   "partial": 19,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2025-11": {
+   "partial": 6,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2025-12": {
+   "partial": 18,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2026-01": {
+   "partial": 7,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2026-03": {
+   "partial": 18,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2026-04": {
+   "partial": 21,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2026-05": {
+   "partial": 24,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2026-06": {
+   "partial": 5,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2026-07": {
+   "partial": 15,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2026-08": {
+   "partial": 23,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  },
+  "2026-09": {
+   "partial": 7,
+   "pre_tax": 0,
+   "not_in_cur": 0,
+   "src_miss": 0
+  }
+ },
+ "candidate_coverage_by_state": {
+  "ELIGIBLE": {
+   "n": 3498,
+   "partial": 2540,
+   "partial_rate": 0.7261
+  },
+  "S2_GATE": {
+   "n": 1253,
+   "partial": 945,
+   "partial_rate": 0.7542
+  },
+  "HELD": {
+   "n": 2417,
+   "partial": 1746,
+   "partial_rate": 0.7224
+  },
+  "REJ_BELOW_MA20": {
+   "n": 704,
+   "partial": 545,
+   "partial_rate": 0.7741
+  },
+  "REJ_NO_MA20": {
+   "n": 13,
+   "partial": 11,
+   "partial_rate": 0.8462
+  }
+ },
+ "index_dependencies": {
+  "保险": {
+   "n_cons": 5,
+   "in_map": 5,
+   "source": "CURRENT_SNAPSHOT",
+   "in_map_rate": 1.0
+  },
+  "元件": {
+   "n_cons": 10,
+   "in_map": 10,
+   "source": "CURRENT_SNAPSHOT",
+   "in_map_rate": 1.0
+  },
+  "养殖": {
+   "n_cons": 14,
+   "in_map": 14,
+   "source": "CURRENT_SNAPSHOT",
+   "in_map_rate": 1.0
+  },
+  "农化制品": {
+   "n_cons": 9,
+   "in_map": 9,
+   "source": "CURRENT_SNAPSHOT",
+   "in_map_rate": 1.0
+  },
+  "化学原料": {
+   "n_cons": 7,
+   "in_map": 7,
+   "source": "CURRENT_SNAPSHOT",
+   "in_map_rate": 1.0
+  },
+  "化纤": {
+   "n_cons": 6,
+   "in_map": 6,
+   "source": "CURRENT_SNAPSHOT",
+   "in_map_rate": 1.0
+  },
+  "半导体": {
+   "n_cons": 12,
+   "in_map": 12,
+   "source": "CURRENT_SNAPSHOT",
+   "in_map_rate": 1.0
+  },
+  "基建建筑": {
+   "n_cons": 8,
+   "in_map": 8,
+   "source": "CURRENT_SNAPSHOT",
+   "in_map_rate": 1.0
+  },
+  "小金属": {
+   "n_cons": 9,
+   "in_map": 9,
+   "source": "CURRENT_SNAPSHOT",
+   "in_map_rate": 1.0
+  },
+  "工业金属": {
+   "n_cons": 11,
+   "in_map": 11,
+   "source": "CURRENT_SNAPSHOT",
+   "in_map_rate": 1.0
+  },
+  "工程机械": {
+   "n_cons": 9,
+   "in_map": 9,
+   "source": "CURRENT_SNAPSHOT",
+   "in_map_rate": 1.0
+  },
+  "房地产": {
+   "n_cons": 9,
+   "in_map": 8,
+   "source": "CURRENT_SNAPSHOT",
+   "in_map_rate": 0.8889
+  },
+  "水泥建材": {
+   "n_cons": 8,
+   "in_map": 8,
+   "source": "CURRENT_SNAPSHOT",
+   "in_map_rate": 1.0
+  },
+  "汽车整车": {
+   "n_cons": 9,
+   "in_map": 9,
+   "source": "CURRENT_SNAPSHOT",
+   "in_map_rate": 1.0
+  },
+  "油气开采": {
+   "n_cons": 8,
+   "in_map": 8,
+   "source": "CURRENT_SNAPSHOT",
+   "in_map_rate": 1.0
+  },
+  "消费电子": {
+   "n_cons": 8,
+   "in_map": 8,
+   "source": "CURRENT_SNAPSHOT",
+   "in_map_rate": 1.0
+  },
+  "煤炭": {
+   "n_cons": 10,
+   "in_map": 10,
+   "source": "CURRENT_SNAPSHOT",
+   "in_map_rate": 1.0
+  },
+  "玻璃玻纤": {
+   "n_cons": 8,
+   "in_map": 8,
+   "source": "CURRENT_SNAPSHOT",
+   "in_map_rate": 1.0
+  },
+  "电力": {
+   "n_cons": 5,
+   "in_map": 5,
+   "source": "CURRENT_SNAPSHOT",
+   "in_map_rate": 1.0
+  },
+  "石油加工": {
+   "n_cons": 8,
+   "in_map": 8,
+   "source": "CURRENT_SNAPSHOT",
+   "in_map_rate": 1.0
+  },
+  "种植种业": {
+   "n_cons": 6,
+   "in_map": 6,
+   "source": "CURRENT_SNAPSHOT",
+   "in_map_rate": 1.0
+  },
+  "能源金属": {
+   "n_cons": 9,
+   "in_map": 9,
+   "source": "CURRENT_SNAPSHOT",
+   "in_map_rate": 1.0
+  },
+  "航空机场": {
+   "n_cons": 7,
+   "in_map": 7,
+   "source": "CURRENT_SNAPSHOT",
+   "in_map_rate": 1.0
+  },
+  "航运港口": {
+   "n_cons": 8,
+   "in_map": 8,
+   "source": "CURRENT_SNAPSHOT",
+   "in_map_rate": 1.0
+  },
+  "证券": {
+   "n_cons": 10,
+   "in_map": 10,
+   "source": "CURRENT_SNAPSHOT",
+   "in_map_rate": 1.0
+  },
+  "贵金属": {
+   "n_cons": 5,
+   "in_map": 5,
+   "source": "CURRENT_SNAPSHOT",
+   "in_map_rate": 1.0
+  },
+  "造纸": {
+   "n_cons": 8,
+   "in_map": 8,
+   "source": "CURRENT_SNAPSHOT",
+   "in_map_rate": 1.0
+  },
+  "钢铁": {
+   "n_cons": 10,
+   "in_map": 10,
+   "source": "CURRENT_SNAPSHOT",
+   "in_map_rate": 1.0
+  },
+  "面板": {
+   "n_cons": 8,
+   "in_map": 8,
+   "source": "CURRENT_SNAPSHOT",
+   "in_map_rate": 1.0
+  },
+  "饲料加工": {
+   "n_cons": 5,
+   "in_map": 5,
+   "source": "CURRENT_SNAPSHOT",
+   "in_map_rate": 1.0
+  }
+ },
+ "chain": [
+  {
+   "node": "行业分类",
+   "coverage": "PARTIAL 72.0%(全样本月度); 2020-21几乎全PRE_TAXONOMY_VERSION",
+   "source": "CURRENT_SNAPSHOT+in_date(ak.index_component_sw)"
+  },
+  {
+   "node": "行业指数",
+   "coverage": "{\"\\u4fdd\\u9669\": 1.0, \"\\u5143\\u4ef6\": 1.0, \"\\u517b\\u6b96\": 1.0}",
+   "note": "成分=panel sector分组(当前快照), 与分类同源同风险"
+  },
+  {
+   "node": "cycle_stage/门禁/RS20",
+   "coverage": "继承上游; 无独立验证",
+   "note": "信号全部依赖当前快照分组"
+  },
+  {
+   "node": "候选/预算/交易",
+   "coverage": "{\"ELIGIBLE\": {\"n\": 3498, \"partial\": 2540, \"partial_rate\": 0.7261}, \"S2_GATE\": {\"n\": 1253, \"partial\": 945, \"partial_rate\": 0.7542}, \"HELD\": {\"n\": 2417, \"partial\": 1746, \"partial_rate\": 0.7224}, \"REJ_BELOW_MA20\": {\"n\": 704, \"partial\": 545, \"partial_rate\": 0.7741}, \"REJ_NO_MA20\": {\"n\": 13, \"partial\": 11, \"partial_rate\": 0.8462}}",
+   "note": "cand_log 7885条只读审计, 净值复现一致"
+  }
+ ],
+ "acceptance": "F2 nav/交易数/顺序复现一致(nav_identical=true, cand_n=7885); 审计只读",
+ "verdict": "UNKNOWN原因可区分: 版本切换前(PRE_TAXONOMY_VERSION)主导2020-21; Tushare采购决策待R36(依赖链已完整可见)"
+}

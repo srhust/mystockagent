@@ -148,7 +148,8 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
     ledger = ex.Ledger(f"swing_{strategy}_{gate}_{exit_mode}", nav0=20000.0, root=os.path.join(tempfile.gettempdir(), f"m1_{strategy}"), test_mode=False)  # K2: 正式账本模式
     cash, pos, pending = ledger.cash, {}, []  # pending=[(code,action,signal_day)]
     trade_log = []  # R23: 成交事件日志(订单级, 离线归因用)
-    gate_log = []  # R28: Gate拦截事件(信号日可知全量字段, 反事实+归因用)
+    gate_log = []  # R28
+    cand_log = []  # R35: 只读候选审计(不改执行): Gate拦截事件(信号日可知全量字段, 反事实+归因用)
     nav_log, trades, rej = [], {"BUY": 0, "SELL": 0}, {"halted": 0, "limit": 0, "lot": 0, "no_px": 0, "pool": 0, "other": 0}
     month_seen = None
     hold_days, buy_day = [], {}
@@ -288,13 +289,23 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
                 eligible, blocked = [], []  # R29: blocked=Gate拦截(记录用)
                 for c in rank[:n_hold]:
                     s20v = ma20[c].get(day, np.nan)
-                    if c not in pos and s20v == s20v and close_adj[c].get(day, np.nan) > s20v \
-                            and not any(p["code"] == c for p in pending) \
-                            and dix[day] >= reentry_block.get(c, -1):
-                        if risk_mode == "gate" and s2_active is not None and c in s2_active.columns and bool(s2_active.at[day, c]):
-                            blocked.append(c)  # R29: 先收集, 循环外用正确分母记录
-                            continue
-                        eligible.append(c)
+                    _cr = lambda st, c=c: cand_log.append({"day": day_str, "code": c, "sector": sector_of.get(c, "?"), "rank": rank[:n_hold].index(c), "state": st})  # R35只读审计
+                    if c in pos:
+                        _cr("HELD"); continue
+                    if s20v != s20v:
+                        _cr("REJ_NO_MA20"); continue
+                    if close_adj[c].get(day, np.nan) <= s20v:
+                        _cr("REJ_BELOW_MA20"); continue
+                    if any(p["code"] == c for p in pending):
+                        _cr("REJ_PENDING"); continue
+                    if dix[day] < reentry_block.get(c, -1):
+                        _cr("REJ_REENTRY_FROZEN"); continue
+                    if risk_mode == "gate" and s2_active is not None and c in s2_active.columns and bool(s2_active.at[day, c]):
+                        blocked.append(c)  # R29: 循环外用正确分母记录
+                        _cr("S2_GATE")
+                        continue
+                    eligible.append(c)
+                    _cr("ELIGIBLE")
                 _cash_snap[0] = cash - reserved[0]  # R22: 冻结前同一份可用资金快照(整批预算共用)
                 _cs = _cash_snap[0]
                 if alloc_policy in ("score", "score_cap"):
@@ -388,7 +399,7 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
                       "max_pos": max(x["n_pos"] for x in nav_log),  # R20: 最大持仓数
                       "open_pos_tdays": {c: dix[nav.index[-1]] - i for c, i in buy_day.items()},
                      "n_days": len(nav)},
-           "trade_log": trade_log, "nav_log": nav_log, "gate_log": gate_log}
+           "trade_log": trade_log, "nav_log": nav_log, "gate_log": gate_log, "cand_log": cand_log}
     os.makedirs(r"E:\mystockagent\output\ashare", exist_ok=True)
     seg = {}  # 滚动样本外近似: 前段构建参考/后段更晚数据(非严格OOS, 如实标注)
     for a, b, tag in [("2020-01-01", "2022-12-31", "seg_2020_2022"), ("2023-01-01", "2026-12-31", "seg_2023_2026")]:
