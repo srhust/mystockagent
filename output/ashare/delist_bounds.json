@@ -1,0 +1,22 @@
+{
+ "DELISTED_EFFECTIVE_TO_ASOF": 225,
+ "FUTURE_OUTDATE_IN_SOURCE": [
+  {
+   "code": "sh.601059",
+   "name": "信达证券",
+   "ipo": "2023-02-01",
+   "out": "2026-10-19"
+  },
+  {
+   "code": "sh.601198",
+   "name": "东兴证券",
+   "ipo": "2015-02-26",
+   "out": "2026-10-19"
+  }
+ ],
+ "DELISTED_IN_RESEARCH_WINDOW_2020_01_2026_09": 225,
+ "total_source_records": 227,
+ "sha_check": false,
+ "coverage_report_L1_L2": "BLOCKED_BAOSTOCK_SESSION_HANG(两次尝试20min/12min无输出, 按纪律停止; 脚本已入库coverage_gap_report.py待服务恢复)",
+ "anti_lookahead_note": "资格仅用当时可知信息, 不带入退市 hindsight"
+}
