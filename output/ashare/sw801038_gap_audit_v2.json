@@ -1,0 +1,135 @@
+{
+ "candidate_refs": {
+  "801033": {
+   "rows_2022": 236,
+   "valid_2022": true
+  },
+  "801040": {
+   "rows_2022": 236,
+   "valid_2022": true
+  },
+  "801950": {
+   "rows_2022": 236,
+   "valid_2022": true
+  },
+  "801780": {
+   "rows_2022": 236,
+   "valid_2022": true
+  },
+  "801880": {
+   "rows_2022": 236,
+   "valid_2022": true
+  }
+ },
+ "valid_refs": [
+  "801033",
+  "801040",
+  "801950",
+  "801780",
+  "801880"
+ ],
+ "days": [
+  {
+   "date": "2022-03-03",
+   "market_open_local": true,
+   "refs_have": {
+    "801033": false,
+    "801040": false,
+    "801950": false,
+    "801780": false,
+    "801880": false
+   },
+   "verdict": "SHARED_MISSING_UNRESOLVED"
+  },
+  {
+   "date": "2022-03-23",
+   "market_open_local": true,
+   "refs_have": {
+    "801033": false,
+    "801040": false,
+    "801950": false,
+    "801780": false,
+    "801880": false
+   },
+   "verdict": "SHARED_MISSING_UNRESOLVED"
+  },
+  {
+   "date": "2022-03-31",
+   "market_open_local": true,
+   "refs_have": {
+    "801033": false,
+    "801040": false,
+    "801950": false,
+    "801780": false,
+    "801880": false
+   },
+   "verdict": "SHARED_MISSING_UNRESOLVED"
+  },
+  {
+   "date": "2022-04-14",
+   "market_open_local": true,
+   "refs_have": {
+    "801033": false,
+    "801040": false,
+    "801950": false,
+    "801780": false,
+    "801880": false
+   },
+   "verdict": "SHARED_MISSING_UNRESOLVED"
+  },
+  {
+   "date": "2022-05-05",
+   "market_open_local": true,
+   "refs_have": {
+    "801033": false,
+    "801040": false,
+    "801950": false,
+    "801780": false,
+    "801880": false
+   },
+   "verdict": "SHARED_MISSING_UNRESOLVED"
+  },
+  {
+   "date": "2022-05-06",
+   "market_open_local": true,
+   "refs_have": {
+    "801033": true,
+    "801040": true,
+    "801950": true,
+    "801780": true,
+    "801880": true
+   },
+   "verdict": "SUSPECTED_SOURCE_GAP"
+  },
+  {
+   "date": "2022-05-09",
+   "market_open_local": true,
+   "refs_have": {
+    "801033": false,
+    "801040": false,
+    "801950": false,
+    "801780": false,
+    "801880": false
+   },
+   "verdict": "SHARED_MISSING_UNRESOLVED"
+  },
+  {
+   "date": "2022-05-10",
+   "market_open_local": true,
+   "refs_have": {
+    "801033": true,
+    "801040": true,
+    "801950": true,
+    "801780": true,
+    "801880": true
+   },
+   "verdict": "SUSPECTED_SOURCE_GAP"
+  }
+ ],
+ "summary": {
+  "SUSPECTED_SOURCE_GAP": 2,
+  "SHARED_MISSING_UNRESOLVED": 6,
+  "UNKNOWN": 0
+ },
+ "note": "SUSPECTED≠CONFIRMED(他人有行情不证明801038必发布); 独立来源未接入"
+}
