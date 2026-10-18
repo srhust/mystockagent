@@ -49,7 +49,7 @@ def test_E_greedy_insufficient_cash_and_order():
     assert codes[0] == "A", "贪心首购必须是最高分"
     assert plan["cash_conservation"]["ok"] and plan["cash_conservation"]["spent"] <= 7000 + 1e-6
     reasons = {r["code"]: r["reason"] for r in plan["rejects"]}
-    assert reasons.get("C") == "INSUFFICIENT_CASH"
+    assert reasons.get("C") == "INSUFFICIENT_CASH_FOR_ONE_LOT", "剩余资金不足一手须显式拒因(整手对齐)"
     assert len(codes) == 2 and codes[1] == "B"
 
 
@@ -61,7 +61,7 @@ def test_F_swap_edge_and_cost_gate():
     plan1 = K.allocate(weak_edge, holdings, cash=10, nav=20000, ctx=ctx)
     assert plan1["swaps"] == []
     zr = next(r for r in plan1["rejects"] if r["code"] == "Z")
-    assert zr["reason"] == "INSUFFICIENT_CASH" and zr["swap_denied"]["edge"] < C.SWAP_MIN_SCORE_EDGE
+    assert zr["reason"] == "INSUFFICIENT_CASH_FOR_ONE_LOT" and zr["swap_denied"]["edge"] < C.SWAP_MIN_SCORE_EDGE
     strong = [_scored("Y", 9.0)]
     plan2 = K.allocate(strong, holdings, cash=10, nav=20000, ctx=ctx)
     assert len(plan2["swaps"]) == 1

@@ -64,12 +64,21 @@ def allocate(scored: list, holdings: list, cash: float, nav: float, ctx: dict) -
         ind = ind_of.get(code, s.get("industry", ""))
         ind_allowed_val = max(0.0, C.INDUSTRY_CONCENTRATION_ALLOWED * nav - ind_value.get(ind, 0.0)) if ind else float("inf")
         shares = int(min(risk_shares, cash_shares, ind_allowed_val / p))   # 行业60%硬顶=截断至余量(非跳过)
-        if shares <= 0:
+        base, step = (200, 1) if code.startswith("68") else (100, 100)     # 申报规则与冻结执行器同源
+        if shares < base:
             if ind and (ind_value.get(ind, 0.0) / nav) >= C.INDUSTRY_CONCENTRATION_ALLOWED - 1e-9:
                 rejects.append({"code": code, "reason": "INDUSTRY_CONCENTRATION_LIMIT", "industry": ind,
                                 "industry_w_now": round(ind_value.get(ind, 0.0) / nav, 4),
                                 "allowed": C.INDUSTRY_CONCENTRATION_ALLOWED, "score_points": s["score_points"]})
                 continue
+            r = {"code": code, "reason": "INSUFFICIENT_CASH_FOR_ONE_LOT", "score_points": s["score_points"],
+                 "one_lot_cost": round(base * p, 2), "spendable_left": round(spendable, 2)}
+            swap = _try_swap(r, s, holdings, held_by_code, swaps, p, v, nav)
+            if not swap:
+                rejects.append(r)
+            continue
+        shares = base + ((shares - base) // step) * step                   # 整手向下取整(避免执行器批量拒单)
+        if shares <= 0:
             r = {"code": code, "reason": "INSUFFICIENT_CASH", "score_points": s["score_points"]}
             swap = _try_swap(r, s, holdings, held_by_code, swaps, p, v, nav)
             if not swap:

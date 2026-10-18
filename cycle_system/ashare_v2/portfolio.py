@@ -41,6 +41,8 @@ class PortfolioCoordinator:
         self.rejects: list = []
         self.annotations: list = []
         self.px_last: dict = {}             # code → 最近已知收盘价(缺价last口径)
+        self.pos_meta: dict = {}            # position_id → {"opened_px":...} 归因实现盈亏需要
+        self.realized_log: list = []        # 每笔卖出实现损益(引擎归因口径, 非收益宣称)
         self._seq = 0
 
     # ── 辅助 ──
@@ -179,6 +181,20 @@ class PortfolioCoordinator:
                          coverage_note=(f"budget={budget_state} dd={dd:.3f} 峰值口径; "
                                         f"同股双引擎资金单承诺; 卖先于买; {cash_extra_note}"))
 
+    def _rebudget_pending_buys(self, rec, signal_day):
+        """每笔卖出真实入账后, 把尚未执行的买入预算重估到剩余现金内(真实到账资金口径, 防缺口)。"""
+        created = f"{signal_day}T15:05:00+08:00"
+        avail = self.ledger.cash
+        for b in rec["buys"]:
+            if b.get("_executed") or "plan" not in b:
+                continue
+            if b["cash_budget"] > avail:
+                b["cash_budget"] = round(max(avail, 0.0), 2)
+                b["plan"] = ex.create_plan(b["code"], "BUY", signal_day,
+                                           self.px_last.get(b["code"], b["plan"]["signal_px"]),
+                                           cash_budget=b["cash_budget"], created_at=created)
+                self.ledger.register_plan(b["plan"])
+
     # ── 执行(信息日T+1) ──
     def execute_day(self, signal_day: str, px_t1: dict, prev_close: dict, halted: set | None = None):
         halted = halted or set()
@@ -202,6 +218,13 @@ class PortfolioCoordinator:
             self.px_last[code] = px_t1[code]
             v = next((vv for vv in self.virtuals if vv.position_id == s["pos_id"]), None)
             if v is not None:
+                cost = self.pos_meta.get(v.position_id, {}).get("opened_px")
+                if cost is not None:
+                    self.realized_log.append({"pos_id": v.position_id, "engine": v.engine, "code": code,
+                                              "shares": res["shares"],
+                                              "realized": round(res["notional"] - res["fees"]
+                                                                - cost * res["shares"], 2),
+                                              "exec_day": res["execution_date"]})
                 v.shares = max(0, v.shares - res["shares"])
                 if v.shares == 0:
                     self.virtuals.remove(v)
@@ -221,13 +244,17 @@ class PortfolioCoordinator:
             self.ledger.apply(res)
             fills.append(res)
             self.px_last[code] = px_t1[code]
+            # 卖款即时释放: 重设后续买入预算为剩余现金内(真实到账顺序资金, 消除insufficient批量拒)
+            self._rebudget_pending_buys(rec, signal_day)
             lots = self._split_lots(res["shares"], b["plan_weights"], code)
             for eng, sh in zip(b["engines"], lots):
                 if sh <= 0:
                     continue
                 self._seq += 1
+                pid = f"V{self._seq:05d}"
+                self.pos_meta[pid] = {"opened_px": res["price"]}
                 self.virtuals.append(VirtualPosition(
-                    position_id=f"V{self._seq:05d}", code=code, engine=eng, shares=sh,
+                    position_id=pid, code=code, engine=eng, shares=sh,
                     opened_day=rec["exec_day"], entry_kind="ALLOC", thesis=f"score={b['score_points']}",
                     state="OPEN", risk_budget_used=b["score_points"]))
         self.execution_log.append({"signal_day": signal_day, "exec_day": rec["exec_day"],

@@ -1,10 +1,10 @@
 {
  "_provenance": {
-  "code_version": "2361082bd8ea4b3b74219914d8d3d9dc931fa49a",
+  "code_version": "d027ecc74084738ed8afdeb16f2523d3fd5358da",
   "config_hash": "cc5cb7c990c2a499",
   "asof": "2026-06-30",
   "mode": "SYNTHETIC",
-  "generated_at": "2026-10-18T23:13:40.964777+08:00",
+  "generated_at": "2026-10-18T23:44:44.545987+08:00",
   "note": "冒烟=链路可运行验证, 非预测有效; NAV口径=影子基20000"
  },
  "n_candidates": {
@@ -59,224 +59,270 @@
  "plan": {
   "buys": [
    {
-    "code": "002714",
-    "shares": 17,
-    "value": 11762.81,
-    "px": 691.9300142100001,
-    "score_points": 8.011,
-    "engines": [
-     "FAST_V"
-    ],
-    "industry": "养殖",
-    "risk_contrib_nav": 0.0127,
-    "record_ids": [
-     1635907745728
-    ]
-   },
-   {
     "code": "000876",
-    "shares": 2,
-    "value": 207.76,
+    "shares": 100,
+    "value": 10388.0,
     "px": 103.87999940999998,
     "score_points": 7.992,
     "engines": [
      "FAST_V"
     ],
     "industry": "养殖",
-    "risk_contrib_nav": 0.0002,
+    "risk_contrib_nav": 0.0099,
     "record_ids": [
-     1635907745104
+     2270341182800
     ]
    },
    {
     "code": "601127",
-    "shares": 109,
-    "value": 7010.88,
+    "shares": 100,
+    "value": 6432.0,
     "px": 64.3199725,
     "score_points": 7.675,
     "engines": [
      "FAST_V"
     ],
     "industry": "汽车整车",
-    "risk_contrib_nav": 0.0071,
+    "risk_contrib_nav": 0.0065,
     "record_ids": [
-     1635907747456
+     2270341185152
     ]
    },
    {
     "code": "600688",
-    "shares": 2,
-    "value": 15.5,
+    "shares": 200,
+    "value": 1550.0,
     "px": 7.749999430000001,
     "score_points": 7.377,
     "engines": [
      "LONG_CYCLE"
     ],
     "industry": "石油加工",
-    "risk_contrib_nav": 0.0,
+    "risk_contrib_nav": 0.0019,
     "record_ids": [
-     1635907717248
+     2270341154944
     ]
    }
   ],
   "rejects": [
    {
+    "code": "002714",
+    "reason": "INSUFFICIENT_CASH_FOR_ONE_LOT",
+    "score_points": 8.011,
+    "one_lot_cost": 69193.0,
+    "spendable_left": 19000.0
+   },
+   {
     "code": "300498",
-    "reason": "INSUFFICIENT_CASH",
-    "score_points": 7.705
+    "reason": "INSUFFICIENT_CASH_FOR_ONE_LOT",
+    "score_points": 7.705,
+    "one_lot_cost": 2977.0,
+    "spendable_left": 8612.0
    },
    {
     "code": "600989",
-    "reason": "INSUFFICIENT_CASH",
-    "score_points": 7.648
+    "reason": "INSUFFICIENT_CASH_FOR_ONE_LOT",
+    "score_points": 7.648,
+    "one_lot_cost": 2329.0,
+    "spendable_left": 2180.0
    },
    {
     "code": "300761",
-    "reason": "INSUFFICIENT_CASH",
-    "score_points": 7.426
+    "reason": "INSUFFICIENT_CASH_FOR_ONE_LOT",
+    "score_points": 7.426,
+    "one_lot_cost": 3476.0,
+    "spendable_left": 2180.0
    },
    {
     "code": "000703",
-    "reason": "INSUFFICIENT_CASH",
-    "score_points": 7.377
+    "reason": "INSUFFICIENT_CASH_FOR_ONE_LOT",
+    "score_points": 7.377,
+    "one_lot_cost": 9817.0,
+    "spendable_left": 2180.0
    },
    {
     "code": "002493",
-    "reason": "INSUFFICIENT_CASH",
-    "score_points": 7.377
+    "reason": "INSUFFICIENT_CASH_FOR_ONE_LOT",
+    "score_points": 7.377,
+    "one_lot_cost": 15995.0,
+    "spendable_left": 2180.0
    },
    {
     "code": "002648",
-    "reason": "INSUFFICIENT_CASH",
-    "score_points": 7.377
+    "reason": "INSUFFICIENT_CASH_FOR_ONE_LOT",
+    "score_points": 7.377,
+    "one_lot_cost": 28297.0,
+    "spendable_left": 2180.0
    },
    {
     "code": "002353",
-    "reason": "INSUFFICIENT_CASH",
-    "score_points": 7.372
+    "reason": "INSUFFICIENT_CASH_FOR_ONE_LOT",
+    "score_points": 7.372,
+    "one_lot_cost": 122106.0,
+    "spendable_left": 630.0
    },
    {
     "code": "300164",
-    "reason": "INSUFFICIENT_CASH",
-    "score_points": 7.372
+    "reason": "INSUFFICIENT_CASH_FOR_ONE_LOT",
+    "score_points": 7.372,
+    "one_lot_cost": 4887.0,
+    "spendable_left": 630.0
    },
    {
     "code": "000060",
-    "reason": "INSUFFICIENT_CASH",
-    "score_points": 7.363
+    "reason": "INSUFFICIENT_CASH_FOR_ONE_LOT",
+    "score_points": 7.363,
+    "one_lot_cost": 30376.0,
+    "spendable_left": 630.0
    },
    {
     "code": "000960",
-    "reason": "INSUFFICIENT_CASH",
-    "score_points": 7.363
+    "reason": "INSUFFICIENT_CASH_FOR_ONE_LOT",
+    "score_points": 7.363,
+    "one_lot_cost": 10612.0,
+    "spendable_left": 630.0
    },
    {
     "code": "002466",
-    "reason": "INSUFFICIENT_CASH",
-    "score_points": 7.332
+    "reason": "INSUFFICIENT_CASH_FOR_ONE_LOT",
+    "score_points": 7.332,
+    "one_lot_cost": 53731.0,
+    "spendable_left": 630.0
    },
    {
     "code": "300191",
-    "reason": "INSUFFICIENT_CASH",
-    "score_points": 7.328
+    "reason": "INSUFFICIENT_CASH_FOR_ONE_LOT",
+    "score_points": 7.328,
+    "one_lot_cost": 11200.0,
+    "spendable_left": 630.0
    },
    {
     "code": "000301",
-    "reason": "INSUFFICIENT_CASH",
-    "score_points": 7.299
+    "reason": "INSUFFICIENT_CASH_FOR_ONE_LOT",
+    "score_points": 7.299,
+    "one_lot_cost": 2195.0,
+    "spendable_left": 630.0
    },
    {
     "code": "000959",
-    "reason": "INSUFFICIENT_CASH",
-    "score_points": 7.299
+    "reason": "INSUFFICIENT_CASH_FOR_ONE_LOT",
+    "score_points": 7.299,
+    "one_lot_cost": 750.0,
+    "spendable_left": 630.0
    },
    {
     "code": "000831",
-    "reason": "INSUFFICIENT_CASH",
-    "score_points": 7.221
+    "reason": "INSUFFICIENT_CASH_FOR_ONE_LOT",
+    "score_points": 7.221,
+    "one_lot_cost": 19406.0,
+    "spendable_left": 630.0
    },
    {
     "code": "002378",
-    "reason": "INSUFFICIENT_CASH",
-    "score_points": 7.221
+    "reason": "INSUFFICIENT_CASH_FOR_ONE_LOT",
+    "score_points": 7.221,
+    "one_lot_cost": 8930.0,
+    "spendable_left": 630.0
    },
    {
     "code": "601233",
-    "reason": "INSUFFICIENT_CASH",
-    "score_points": 7.128
+    "reason": "INSUFFICIENT_CASH_FOR_ONE_LOT",
+    "score_points": 7.128,
+    "one_lot_cost": 6535.0,
+    "spendable_left": 630.0
    },
    {
     "code": "603225",
-    "reason": "INSUFFICIENT_CASH",
-    "score_points": 7.128
+    "reason": "INSUFFICIENT_CASH_FOR_ONE_LOT",
+    "score_points": 7.128,
+    "one_lot_cost": 4129.0,
+    "spendable_left": 630.0
    },
    {
     "code": "601155",
-    "reason": "INSUFFICIENT_CASH",
-    "score_points": 7.122
+    "reason": "INSUFFICIENT_CASH_FOR_ONE_LOT",
+    "score_points": 7.122,
+    "one_lot_cost": 2175.0,
+    "spendable_left": 630.0
    },
    {
     "code": "600598",
-    "reason": "INSUFFICIENT_CASH",
-    "score_points": 7.097
+    "reason": "INSUFFICIENT_CASH_FOR_ONE_LOT",
+    "score_points": 7.097,
+    "one_lot_cost": 2131.0,
+    "spendable_left": 630.0
    },
    {
     "code": "688051",
-    "reason": "INSUFFICIENT_CASH",
-    "score_points": 6.964
+    "reason": "INSUFFICIENT_CASH_FOR_ONE_LOT",
+    "score_points": 6.964,
+    "one_lot_cost": 4826.0,
+    "spendable_left": 630.0
    },
    {
     "code": "002124",
-    "reason": "INSUFFICIENT_CASH",
-    "score_points": 6.909
+    "reason": "INSUFFICIENT_CASH_FOR_ONE_LOT",
+    "score_points": 6.909,
+    "one_lot_cost": 3967.0,
+    "spendable_left": 630.0
    },
    {
     "code": "002475",
-    "reason": "INSUFFICIENT_CASH",
-    "score_points": 6.829
+    "reason": "INSUFFICIENT_CASH_FOR_ONE_LOT",
+    "score_points": 6.829,
+    "one_lot_cost": 234263.0,
+    "spendable_left": 630.0
    },
    {
     "code": "601138",
-    "reason": "INSUFFICIENT_CASH",
-    "score_points": 6.829
+    "reason": "INSUFFICIENT_CASH_FOR_ONE_LOT",
+    "score_points": 6.829,
+    "one_lot_cost": 7533.0,
+    "spendable_left": 630.0
    },
    {
     "code": "600975",
-    "reason": "INSUFFICIENT_CASH",
-    "score_points": 6.765
+    "reason": "INSUFFICIENT_CASH_FOR_ONE_LOT",
+    "score_points": 6.765,
+    "one_lot_cost": 2271.0,
+    "spendable_left": 630.0
    },
    {
     "code": "000672",
-    "reason": "INSUFFICIENT_CASH",
-    "score_points": 6.587
+    "reason": "INSUFFICIENT_CASH_FOR_ONE_LOT",
+    "score_points": 6.587,
+    "one_lot_cost": 22046.0,
+    "spendable_left": 630.0
    },
    {
     "code": "601872",
-    "reason": "INSUFFICIENT_CASH",
-    "score_points": 6.067
+    "reason": "INSUFFICIENT_CASH_FOR_ONE_LOT",
+    "score_points": 6.067,
+    "one_lot_cost": 2517.0,
+    "spendable_left": 630.0
    }
   ],
   "swaps": [],
   "cash_conservation": {
    "spendable_before": 19000.0,
-   "spent": 18996.95,
-   "spendable_after": 3.05,
+   "spent": 18370.0,
+   "spendable_after": 630.0,
    "ok": true
   },
   "engine_funding": {
-   "FAST_V": 18981.45,
-   "LONG_CYCLE": 15.5
+   "FAST_V": 16820.0,
+   "LONG_CYCLE": 1550.0
   },
   "engine_frac": {
-   "FAST_V": 0.9992,
-   "LONG_CYCLE": 0.0008
+   "FAST_V": 0.9156,
+   "LONG_CYCLE": 0.0844
   },
   "industry_weights_after": {
-   "养殖": 0.5985,
-   "汽车整车": 0.3505,
-   "石油加工": 0.0008
+   "养殖": 0.5194,
+   "汽车整车": 0.3216,
+   "石油加工": 0.0775
   },
-  "position_count": 4,
+  "position_count": 3,
   "risk_budget_state": "NORMAL",
   "note": "贪心=分数序+可行性; 无固定持仓数/引擎占比(§5.1)",
   "calibration_note": "评分未校准: 分配是规则化相对偏好结果, 非收益率优化"

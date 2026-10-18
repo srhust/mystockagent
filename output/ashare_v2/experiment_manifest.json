@@ -2,7 +2,7 @@
  "project": "Ashare Dual-Cycle V2",
  "task_spec": "cycle_system/ashare_v2/TASK_SPEC.md",
  "branch": "ashare-v2",
- "code_version": "2361082bd8ea4b3b74219914d8d3d9dc931fa49a",
+ "code_version": "d027ecc74084738ed8afdeb16f2523d3fd5358da",
  "worktree_dirty": true,
  "config_hash": "cc5cb7c990c2a499",
  "data_anchors": {
@@ -34,13 +34,17 @@
   "C": "完成",
   "D": "完成",
   "E": "完成",
-  "F": "待做",
+  "F": "完成",
   "G": "待做"
  },
  "artifacts": {
+  "output/ashare_v2/_phaseF_run_console.txt": {
+   "sha256": "738783ba0d36a7a04d790d52783ccae92e10cc87ffb770cf24257dd5da626b36",
+   "size": 3244
+  },
   "output/ashare_v2/allocation_smoke_realdata.json": {
-   "sha256": "1070a79484690733e79e1de2a9f377a6fc909912069aaae2c0be0de4ed711355",
-   "size": 5476
+   "sha256": "5c50310e919d966dbc45ddd393d9131514c5e9bab35f3bfa28dff260d564f04f",
+   "size": 7307
   },
   "output/ashare_v2/data_quality_report.json": {
    "sha256": "e8e768c85508df4b7ceee8a5159ccd2a3d14540895c068b275229d8e8c429671",
@@ -59,12 +63,52 @@
    "size": 2280
   },
   "output/ashare_v2/baseline_integrity/baseline_integrity_report.json": {
-   "sha256": "a7c434889f740fa212926cb98dcc990581a4cc49592a68f56b961e14f501e54c",
-   "size": 5409
+   "sha256": "fed90c5f5a888b7ce62bc65b1e04c8249511836246c1e6715cdaa3866834abfe",
+   "size": 5491
   },
   "output/ashare_v2/baseline_integrity/baseline_integrity_report.md": {
-   "sha256": "b292dbafd5c6ec1093fef7d649b16e9ca6c3a9126b29bf16be4c4120a5eaa98f",
+   "sha256": "33263e63e0cb20ba58d77f03e4a2f80fee385b6646df61bf3741745d2cd22f12",
    "size": 420
+  },
+  "output/ashare_v2/diagnostic_run/allocation_plan_log.csv": {
+   "sha256": "b43a67e19322cc793786f65ed140638d6a0c35f274f35449a1a3ca668ba37910",
+   "size": 139
+  },
+  "output/ashare_v2/diagnostic_run/attribution.csv": {
+   "sha256": "8fc2f62d83a17e26328423a1e792d360f080991468ca2611ecd4e4e5b6eefeb3",
+   "size": 134
+  },
+  "output/ashare_v2/diagnostic_run/data_quality_report.json": {
+   "sha256": "e58572c8eefe21ff388ee02c805d1bf9fcdaeaf0ba6d5dc5de20d2b2ee98e96b",
+   "size": 3675
+  },
+  "output/ashare_v2/diagnostic_run/findings.md": {
+   "sha256": "b82de0955f0d7fac88fc0eed569fdee18ab93b8901d3d70df6bde5e13cf90cf3",
+   "size": 1182
+  },
+  "output/ashare_v2/diagnostic_run/industry_stage_snapshot.json": {
+   "sha256": "a4ca3c3f9868315ee85af51e7cf2420ec17823a18ca941e5172fbfe08eb8f93e",
+   "size": 4605
+  },
+  "output/ashare_v2/diagnostic_run/nav_curve.csv": {
+   "sha256": "ef8a4eeded57f4f0049b59910778466d3d96a91d371d939a4f51db7c0ec67ce3",
+   "size": 32
+  },
+  "output/ashare_v2/diagnostic_run/opportunities.csv": {
+   "sha256": "f05fbec301ffa7fb5a8d29c50ff925f4aab63051acfb94defacd8efda4f6dad0",
+   "size": 3331
+  },
+  "output/ashare_v2/diagnostic_run/state_engine.json": {
+   "sha256": "e181e440e5f9c317f2a46ba70777770ee060934868421ed70736a16c2dc6e0b8",
+   "size": 3422
+  },
+  "output/ashare_v2/diagnostic_run/trades.csv": {
+   "sha256": "e3989e236b0a586d3268602a92303fdf53bfce629b128b579a5760f1361492c7",
+   "size": 92
+  },
+  "output/ashare_v2/diagnostic_run/universe_buckets_sample.json": {
+   "sha256": "a853154d1643abde0e8b9e4bc49e4fa1b7a9769314084292905039c83caaeb90",
+   "size": 1540
   },
   "output/ashare_v2/f2_repro/FINDINGS.md": {
    "sha256": "b0b46d9aec2827280c73d345ccd02b2a8a25ac2925566fc419491a53de36633f",
@@ -89,7 +133,95 @@
   "output/ashare_v2/regression/pytest_baseline_20261018.txt": {
    "sha256": "5f0467c6c88ec1845f83fc4e2be39c4779499c4d61928681558fade57934cc8c",
    "size": 1376
+  },
+  "output/ashare_v2/shadow_run/allocation_plan_log.csv": {
+   "sha256": "211dfff1cb02f174412125ce56c8c5869867f84715f1a9b88b769fb1090d8d14",
+   "size": 5402
+  },
+  "output/ashare_v2/shadow_run/attribution.csv": {
+   "sha256": "e03b6afe64fef0b4d9dd1351e59a584eccfa39ade1f84e4b30180029f3f3322d",
+   "size": 188
+  },
+  "output/ashare_v2/shadow_run/data_quality_report.json": {
+   "sha256": "149a89d9a7bb29579f104099aec53f51aab3e47e488175eafafc6795a9124a53",
+   "size": 3709
+  },
+  "output/ashare_v2/shadow_run/findings.md": {
+   "sha256": "d799d5b281f68ea36084a36bd8e24ca17ef22f679dd0c5f931a43e9a709dacf7",
+   "size": 1357
+  },
+  "output/ashare_v2/shadow_run/industry_stage_snapshot.json": {
+   "sha256": "ebd507fdf14baffa057edd67f347f6db07f357053cc1ede20f32083b8c653570",
+   "size": 4639
+  },
+  "output/ashare_v2/shadow_run/nav_curve.csv": {
+   "sha256": "db2f3f26dae03a42c794970d4206b30c909d424a4c03c72db134c97030bacd28",
+   "size": 11486
+  },
+  "output/ashare_v2/shadow_run/opportunities.csv": {
+   "sha256": "912ebb951bfc9fa76c2ec89dae40e8728e53a6eb63f6456284457c1739b3d917",
+   "size": 578478
+  },
+  "output/ashare_v2/shadow_run/state_engine.json": {
+   "sha256": "ba46da9ee0e5079a2db3f5c3154e7ac58edc742155f2b956b49956b9dad65fff",
+   "size": 3456
+  },
+  "output/ashare_v2/shadow_run/trades.csv": {
+   "sha256": "63464393d6400b93c55951f5ba9996933b4b6f1714522286ecf4981630b6eef3",
+   "size": 3421
+  },
+  "output/ashare_v2/shadow_run/universe_buckets_sample.json": {
+   "sha256": "5adc6def554b8e283912d5d5c4aa4527b595be0f55d7ea087eb996764359760b",
+   "size": 1574
+  },
+  "output/ashare_v2/shadow_run/ledger/ledger_dual_cycle_v2_shadow.jsonl": {
+   "sha256": "2762da7bedf6cfae90d08129cc9df673a46d62554a9650a172e1f22910ce66cd",
+   "size": 13687
+  },
+  "output/ashare_v2/synthetic_run/allocation_plan_log.csv": {
+   "sha256": "1d4852eb282f649664428838e97036041a9ae80cbf4109f460c7fa6ae2bc5d09",
+   "size": 58153
+  },
+  "output/ashare_v2/synthetic_run/attribution.csv": {
+   "sha256": "eddbc1ba89b9a94e7a92042638c7d1e00ec78a91c949e156b42e1f336055160e",
+   "size": 191
+  },
+  "output/ashare_v2/synthetic_run/data_quality_report.json": {
+   "sha256": "415757a5f0416dc1e7868a61e8ed4bf3e1c62d975d6dda2025a77fd347500516",
+   "size": 709
+  },
+  "output/ashare_v2/synthetic_run/findings.md": {
+   "sha256": "0a33ed7355acafc5bc5c3112f62758a28d8bfd971086074439ce4cc4c495aec6",
+   "size": 1330
+  },
+  "output/ashare_v2/synthetic_run/industry_stage_snapshot.json": {
+   "sha256": "2bd1503d594e189ced89587c0bdf6b1251656c4ad9cab5f27e99b125357db0a6",
+   "size": 1625
+  },
+  "output/ashare_v2/synthetic_run/nav_curve.csv": {
+   "sha256": "dea584508c8da1822e9227bc669fe736f03b0533868f4f375052e508804f5c48",
+   "size": 34333
+  },
+  "output/ashare_v2/synthetic_run/opportunities.csv": {
+   "sha256": "92326cd04bab2484ed2c8af070be2dcca7de34fbf76baad7ff1ba64b056a4a71",
+   "size": 78522
+  },
+  "output/ashare_v2/synthetic_run/state_engine.json": {
+   "sha256": "f93f00ed24697e4595360c33dd39ab449b8ccd203cc89c53e9a33138796ff3b3",
+   "size": 1354
+  },
+  "output/ashare_v2/synthetic_run/trades.csv": {
+   "sha256": "74e1289fb10ee42c31ad15f795062fe23cd23e1be467962d7b002f22ec3c8918",
+   "size": 808
+  },
+  "output/ashare_v2/synthetic_run/universe_buckets_sample.json": {
+   "sha256": "a15ab15a0498df96db803a012e4adb3695921671d73a138f4a97935e8f9df9e5",
+   "size": 714
+  },
+  "output/ashare_v2/synthetic_run/ledger/ledger_dual_cycle_v2_synth.jsonl": {
+   "sha256": "ff181ae651f8eed0130868500d7b7a5e228205b4e9fb627a5001b92e76bf41ed",
+   "size": 5209
   }
  },
- "generated_at": "2026-10-18T23:15:17.391510+08:00"
+ "generated_at": "2026-10-18T23:47:40.531152+08:00"
 }
