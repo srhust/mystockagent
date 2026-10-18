@@ -1,0 +1,1720 @@
+{
+ "survey": [
+  {
+   "code": "801016",
+   "name": "种植业",
+   "n": 19,
+   "date_valid": 19,
+   "distinct_dates": 3,
+   "non_switchdate_n": 2,
+   "non_switchdate_sample": [
+    "2022-08-01",
+    "2025-05-13"
+   ]
+  },
+  {
+   "code": "801015",
+   "name": "渔业",
+   "n": 6,
+   "date_valid": 6,
+   "distinct_dates": 1,
+   "non_switchdate_n": 0,
+   "non_switchdate_sample": []
+  },
+  {
+   "code": "801011",
+   "name": "林业Ⅱ",
+   "n": 4,
+   "date_valid": 4,
+   "distinct_dates": 2,
+   "non_switchdate_n": 1,
+   "non_switchdate_sample": [
+    "2022-08-01"
+   ]
+  },
+  {
+   "code": "801014",
+   "name": "饲料",
+   "n": 18,
+   "date_valid": 18,
+   "distinct_dates": 8,
+   "non_switchdate_n": 7,
+   "non_switchdate_sample": [
+    "2022-02-16",
+    "2022-08-01",
+    "2022-10-19",
+    "2023-03-07",
+    "2023-08-16"
+   ]
+  },
+  {
+   "code": "801012",
+   "name": "农产品加工",
+   "n": 23,
+   "date_valid": 23,
+   "distinct_dates": 5,
+   "non_switchdate_n": 4,
+   "non_switchdate_sample": [
+    "2022-09-09",
+    "2022-11-16",
+    "2023-12-01",
+    "2026-07-02"
+   ]
+  },
+  {
+   "code": "801017",
+   "name": "养殖业",
+   "n": 22,
+   "date_valid": 22,
+   "distinct_dates": 4,
+   "non_switchdate_n": 4,
+   "non_switchdate_sample": [
+    "2022-01-18",
+    "2022-01-25",
+    "2025-08-13"
+   ]
+  },
+  {
+   "code": "801018",
+   "name": "动物保健Ⅱ",
+   "n": 9,
+   "date_valid": 9,
+   "distinct_dates": 1,
+   "non_switchdate_n": 0,
+   "non_switchdate_sample": []
+  },
+  {
+   "code": "801019",
+   "name": "农业综合Ⅱ",
+   "n": 2,
+   "date_valid": 2,
+   "distinct_dates": 1,
+   "non_switchdate_n": 0,
+   "non_switchdate_sample": []
+  },
+  {
+   "code": "801033",
+   "name": "化学原料",
+   "n": 57,
+   "date_valid": 57,
+   "distinct_dates": 7,
+   "non_switchdate_n": 12,
+   "non_switchdate_sample": [
+    "2022-03-22",
+    "2022-08-01",
+    "2023-04-10",
+    "2024-05-22",
+    "2024-07-31"
+   ]
+  },
+  {
+   "code": "801034",
+   "name": "化学制品",
+   "n": 172,
+   "date_valid": 172,
+   "distinct_dates": 39,
+   "non_switchdate_n": 53,
+   "non_switchdate_sample": [
+    "2022-02-10",
+    "2022-02-16",
+    "2022-03-25",
+    "2022-04-19",
+    "2022-06-14"
+   ]
+  },
+  {
+   "code": "801032",
+   "name": "化学纤维",
+   "n": 26,
+   "date_valid": 26,
+   "distinct_dates": 10,
+   "non_switchdate_n": 10,
+   "non_switchdate_sample": [
+    "2022-04-06",
+    "2022-08-01",
+    "2023-03-15",
+    "2023-07-06",
+    "2024-07-31"
+   ]
+  },
+  {
+   "code": "801036",
+   "name": "塑料",
+   "n": 73,
+   "date_valid": 73,
+   "distinct_dates": 21,
+   "non_switchdate_n": 24,
+   "non_switchdate_sample": [
+    "2022-01-11",
+    "2022-01-24",
+    "2022-03-14",
+    "2022-03-23",
+    "2022-08-01"
+   ]
+  },
+  {
+   "code": "801037",
+   "name": "橡胶",
+   "n": 17,
+   "date_valid": 17,
+   "distinct_dates": 4,
+   "non_switchdate_n": 3,
+   "non_switchdate_sample": [
+    "2022-08-19",
+    "2023-12-01",
+    "2025-12-18"
+   ]
+  },
+  {
+   "code": "801038",
+   "name": "农化制品",
+   "n": 59,
+   "date_valid": 59,
+   "distinct_dates": 9,
+   "non_switchdate_n": 13,
+   "non_switchdate_sample": [
+    "2022-08-01",
+    "2022-08-19",
+    "2023-06-27",
+    "2023-07-06",
+    "2024-11-26"
+   ]
+  },
+  {
+   "code": "801039",
+   "name": "非金属材料Ⅱ",
+   "n": 8,
+   "date_valid": 8,
+   "distinct_dates": 3,
+   "non_switchdate_n": 2,
+   "non_switchdate_sample": [
+    "2021-12-24",
+    "2026-07-02"
+   ]
+  },
+  {
+   "code": "801043",
+   "name": "冶钢原料",
+   "n": 10,
+   "date_valid": 10,
+   "distinct_dates": 4,
+   "non_switchdate_n": 3,
+   "non_switchdate_sample": [
+    "2022-08-01",
+    "2023-03-10",
+    "2026-09-01"
+   ]
+  },
+  {
+   "code": "801044",
+   "name": "普钢",
+   "n": 22,
+   "date_valid": 22,
+   "distinct_dates": 1,
+   "non_switchdate_n": 0,
+   "non_switchdate_sample": []
+  },
+  {
+   "code": "801045",
+   "name": "特钢Ⅱ",
+   "n": 12,
+   "date_valid": 12,
+   "distinct_dates": 2,
+   "non_switchdate_n": 1,
+   "non_switchdate_sample": [
+    "2026-07-02"
+   ]
+  },
+  {
+   "code": "801051",
+   "name": "金属新材料",
+   "n": 32,
+   "date_valid": 32,
+   "distinct_dates": 12,
+   "non_switchdate_n": 13,
+   "non_switchdate_sample": [
+    "2022-07-22",
+    "2022-08-01",
+    "2023-04-03",
+    "2023-06-06",
+    "2023-07-06"
+   ]
+  },
+  {
+   "code": "801055",
+   "name": "工业金属",
+   "n": 59,
+   "date_valid": 59,
+   "distinct_dates": 8,
+   "non_switchdate_n": 11,
+   "non_switchdate_sample": [
+    "2022-02-22",
+    "2022-08-01",
+    "2023-07-06",
+    "2023-10-18",
+    "2024-11-19"
+   ]
+  },
+  {
+   "code": "801053",
+   "name": "贵金属",
+   "n": 11,
+   "date_valid": 11,
+   "distinct_dates": 3,
+   "non_switchdate_n": 3,
+   "non_switchdate_sample": [
+    "2022-08-01",
+    "2023-03-03"
+   ]
+  },
+  {
+   "code": "801054",
+   "name": "小金属",
+   "n": 27,
+   "date_valid": 27,
+   "distinct_dates": 7,
+   "non_switchdate_n": 6,
+   "non_switchdate_sample": [
+    "2024-07-31",
+    "2024-11-20",
+    "2025-12-03",
+    "2026-03-31",
+    "2026-05-11"
+   ]
+  },
+  {
+   "code": "801056",
+   "name": "能源金属",
+   "n": 12,
+   "date_valid": 12,
+   "distinct_dates": 6,
+   "non_switchdate_n": 6,
+   "non_switchdate_sample": [
+    "2022-03-17",
+    "2022-04-07",
+    "2022-08-01",
+    "2023-07-06",
+    "2026-09-30"
+   ]
+  },
+  {
+   "code": "801081",
+   "name": "半导体",
+   "n": 182,
+   "date_valid": 182,
+   "distinct_dates": 96,
+   "non_switchdate_n": 106,
+   "non_switchdate_sample": [
+    "2022-01-06",
+    "2022-01-12",
+    "2022-01-14",
+    "2022-01-21",
+    "2022-01-27"
+   ]
+  },
+  {
+   "code": "801083",
+   "name": "元件",
+   "n": 61,
+   "date_valid": 61,
+   "distinct_dates": 16,
+   "non_switchdate_n": 16,
+   "non_switchdate_sample": [
+    "2022-08-01",
+    "2022-08-10",
+    "2022-08-26",
+    "2022-09-26",
+    "2022-09-28"
+   ]
+  },
+  {
+   "code": "801084",
+   "name": "光学光电子",
+   "n": 93,
+   "date_valid": 93,
+   "distinct_dates": 17,
+   "non_switchdate_n": 22,
+   "non_switchdate_sample": [
+    "2022-01-28",
+    "2022-03-18",
+    "2022-05-24",
+    "2022-07-12",
+    "2022-08-01"
+   ]
+  },
+  {
+   "code": "801082",
+   "name": "其他电子Ⅱ",
+   "n": 33,
+   "date_valid": 33,
+   "distinct_dates": 9,
+   "non_switchdate_n": 13,
+   "non_switchdate_sample": [
+    "2022-05-24",
+    "2022-08-01",
+    "2022-09-08",
+    "2022-10-31",
+    "2022-11-09"
+   ]
+  },
+  {
+   "code": "801085",
+   "name": "消费电子",
+   "n": 91,
+   "date_valid": 91,
+   "distinct_dates": 25,
+   "non_switchdate_n": 27,
+   "non_switchdate_sample": [
+    "2021-12-27",
+    "2021-12-28",
+    "2022-01-25",
+    "2022-08-01",
+    "2022-09-21"
+   ]
+  },
+  {
+   "code": "801086",
+   "name": "电子化学品Ⅱ",
+   "n": 36,
+   "date_valid": 36,
+   "distinct_dates": 15,
+   "non_switchdate_n": 16,
+   "non_switchdate_sample": [
+    "2022-03-18",
+    "2022-08-01",
+    "2022-08-02",
+    "2022-09-19",
+    "2022-09-29"
+   ]
+  },
+  {
+   "code": "801093",
+   "name": "汽车零部件",
+   "n": 244,
+   "date_valid": 244,
+   "distinct_dates": 57,
+   "non_switchdate_n": 75,
+   "non_switchdate_sample": [
+    "2021-12-23",
+    "2022-02-21",
+    "2022-02-23",
+    "2022-06-06",
+    "2022-07-06"
+   ]
+  },
+  {
+   "code": "801092",
+   "name": "汽车服务",
+   "n": 9,
+   "date_valid": 9,
+   "distinct_dates": 3,
+   "non_switchdate_n": 2,
+   "non_switchdate_sample": [
+    "2022-03-08",
+    "2024-07-31"
+   ]
+  },
+  {
+   "code": "801881",
+   "name": "摩托车及其他",
+   "n": 16,
+   "date_valid": 16,
+   "distinct_dates": 5,
+   "non_switchdate_n": 4,
+   "non_switchdate_sample": [
+    "2022-08-01",
+    "2023-03-06",
+    "2023-03-20",
+    "2026-08-06"
+   ]
+  },
+  {
+   "code": "801095",
+   "name": "乘用车",
+   "n": 8,
+   "date_valid": 8,
+   "distinct_dates": 3,
+   "non_switchdate_n": 2,
+   "non_switchdate_sample": [
+    "2022-08-01",
+    "2024-07-31"
+   ]
+  },
+  {
+   "code": "801096",
+   "name": "商用车",
+   "n": 13,
+   "date_valid": 13,
+   "distinct_dates": 2,
+   "non_switchdate_n": 1,
+   "non_switchdate_sample": [
+    "2023-07-06"
+   ]
+  },
+  {
+   "code": "801111",
+   "name": "白色家电",
+   "n": 11,
+   "date_valid": 11,
+   "distinct_dates": 4,
+   "non_switchdate_n": 3,
+   "non_switchdate_sample": [
+    "2024-01-11",
+    "2024-07-31",
+    "2026-07-02"
+   ]
+  },
+  {
+   "code": "801112",
+   "name": "黑色家电",
+   "n": 9,
+   "date_valid": 9,
+   "distinct_dates": 3,
+   "non_switchdate_n": 3,
+   "non_switchdate_sample": [
+    "2023-12-28",
+    "2024-07-31"
+   ]
+  },
+  {
+   "code": "801113",
+   "name": "小家电",
+   "n": 20,
+   "date_valid": 20,
+   "distinct_dates": 7,
+   "non_switchdate_n": 6,
+   "non_switchdate_sample": [
+    "2022-02-18",
+    "2022-04-22",
+    "2022-08-31",
+    "2023-05-18",
+    "2024-05-22"
+   ]
+  },
+  {
+   "code": "801114",
+   "name": "厨卫电器",
+   "n": 9,
+   "date_valid": 9,
+   "distinct_dates": 1,
+   "non_switchdate_n": 0,
+   "non_switchdate_sample": []
+  },
+  {
+   "code": "801115",
+   "name": "照明设备Ⅱ",
+   "n": 12,
+   "date_valid": 12,
+   "distinct_dates": 4,
+   "non_switchdate_n": 4,
+   "non_switchdate_sample": [
+    "2023-08-04",
+    "2023-11-09",
+    "2024-07-31"
+   ]
+  },
+  {
+   "code": "801116",
+   "name": "家电零部件Ⅱ",
+   "n": 29,
+   "date_valid": 29,
+   "distinct_dates": 5,
+   "non_switchdate_n": 8,
+   "non_switchdate_sample": [
+    "2022-06-30",
+    "2023-05-25",
+    "2023-09-11",
+    "2024-07-31"
+   ]
+  },
+  {
+   "code": "801117",
+   "name": "其他家电Ⅱ",
+   "n": 3,
+   "date_valid": 3,
+   "distinct_dates": 1,
+   "non_switchdate_n": 0,
+   "non_switchdate_sample": []
+  },
+  {
+   "code": "801124",
+   "name": "食品加工",
+   "n": 25,
+   "date_valid": 25,
+   "distinct_dates": 7,
+   "non_switchdate_n": 6,
+   "non_switchdate_sample": [
+    "2022-01-25",
+    "2022-08-31",
+    "2023-04-04",
+    "2023-05-18",
+    "2024-07-31"
+   ]
+  },
+  {
+   "code": "801125",
+   "name": "白酒Ⅱ",
+   "n": 19,
+   "date_valid": 19,
+   "distinct_dates": 1,
+   "non_switchdate_n": 0,
+   "non_switchdate_sample": []
+  },
+  {
+   "code": "801126",
+   "name": "非白酒",
+   "n": 16,
+   "date_valid": 16,
+   "distinct_dates": 1,
+   "non_switchdate_n": 0,
+   "non_switchdate_sample": []
+  },
+  {
+   "code": "801127",
+   "name": "饮料乳品",
+   "n": 26,
+   "date_valid": 26,
+   "distinct_dates": 3,
+   "non_switchdate_n": 2,
+   "non_switchdate_sample": [
+    "2022-05-20",
+    "2022-08-01"
+   ]
+  },
+  {
+   "code": "801128",
+   "name": "休闲食品",
+   "n": 22,
+   "date_valid": 22,
+   "distinct_dates": 4,
+   "non_switchdate_n": 3,
+   "non_switchdate_sample": [
+    "2022-08-01",
+    "2022-09-26",
+    "2024-07-31"
+   ]
+  },
+  {
+   "code": "801129",
+   "name": "调味发酵品Ⅱ",
+   "n": 14,
+   "date_valid": 14,
+   "distinct_dates": 2,
+   "non_switchdate_n": 1,
+   "non_switchdate_sample": [
+    "2022-07-15"
+   ]
+  },
+  {
+   "code": "801131",
+   "name": "纺织制造",
+   "n": 32,
+   "date_valid": 32,
+   "distinct_dates": 6,
+   "non_switchdate_n": 5,
+   "non_switchdate_sample": [
+    "2022-08-01",
+    "2022-11-18",
+    "2025-05-29",
+    "2025-08-13",
+    "2026-04-21"
+   ]
+  },
+  {
+   "code": "801132",
+   "name": "服装家纺",
+   "n": 59,
+   "date_valid": 59,
+   "distinct_dates": 4,
+   "non_switchdate_n": 10,
+   "non_switchdate_sample": [
+    "2022-09-09",
+    "2023-02-16",
+    "2024-07-31"
+   ]
+  },
+  {
+   "code": "801133",
+   "name": "饰品",
+   "n": 15,
+   "date_valid": 15,
+   "distinct_dates": 3,
+   "non_switchdate_n": 2,
+   "non_switchdate_sample": [
+    "2021-12-15",
+    "2022-08-01"
+   ]
+  },
+  {
+   "code": "801143",
+   "name": "造纸",
+   "n": 23,
+   "date_valid": 23,
+   "distinct_dates": 3,
+   "non_switchdate_n": 2,
+   "non_switchdate_sample": [
+    "2023-08-22",
+    "2026-02-10"
+   ]
+  },
+  {
+   "code": "801141",
+   "name": "包装印刷",
+   "n": 40,
+   "date_valid": 40,
+   "distinct_dates": 7,
+   "non_switchdate_n": 6,
+   "non_switchdate_sample": [
+    "2022-08-01",
+    "2022-09-02",
+    "2022-10-26",
+    "2023-06-12",
+    "2024-08-30"
+   ]
+  },
+  {
+   "code": "801142",
+   "name": "家居用品",
+   "n": 73,
+   "date_valid": 73,
+   "distinct_dates": 20,
+   "non_switchdate_n": 19,
+   "non_switchdate_sample": [
+    "2021-12-15",
+    "2022-05-20",
+    "2022-08-01",
+    "2022-08-09",
+    "2022-08-12"
+   ]
+  },
+  {
+   "code": "801145",
+   "name": "文娱用品",
+   "n": 20,
+   "date_valid": 20,
+   "distinct_dates": 10,
+   "non_switchdate_n": 10,
+   "non_switchdate_sample": [
+    "2021-12-16",
+    "2022-08-01",
+    "2022-08-18",
+    "2022-09-19",
+    "2022-10-19"
+   ]
+  },
+  {
+   "code": "801151",
+   "name": "化学制药",
+   "n": 150,
+   "date_valid": 150,
+   "distinct_dates": 26,
+   "non_switchdate_n": 41,
+   "non_switchdate_sample": [
+    "2022-01-07",
+    "2022-01-18",
+    "2022-02-23",
+    "2022-03-23",
+    "2022-03-29"
+   ]
+  },
+  {
+   "code": "801155",
+   "name": "中药Ⅱ",
+   "n": 66,
+   "date_valid": 66,
+   "distinct_dates": 4,
+   "non_switchdate_n": 5,
+   "non_switchdate_sample": [
+    "2022-08-01",
+    "2022-09-21",
+    "2023-07-06"
+   ]
+  },
+  {
+   "code": "801152",
+   "name": "生物制品",
+   "n": 52,
+   "date_valid": 52,
+   "distinct_dates": 15,
+   "non_switchdate_n": 18,
+   "non_switchdate_sample": [
+    "2021-12-28",
+    "2022-02-18",
+    "2022-03-11",
+    "2022-03-31",
+    "2022-08-01"
+   ]
+  },
+  {
+   "code": "801154",
+   "name": "医药商业",
+   "n": 32,
+   "date_valid": 32,
+   "distinct_dates": 5,
+   "non_switchdate_n": 4,
+   "non_switchdate_sample": [
+    "2022-02-16",
+    "2022-08-01",
+    "2023-03-01",
+    "2025-09-25"
+   ]
+  },
+  {
+   "code": "801153",
+   "name": "医疗器械",
+   "n": 129,
+   "date_valid": 129,
+   "distinct_dates": 33,
+   "non_switchdate_n": 36,
+   "non_switchdate_sample": [
+    "2021-12-30",
+    "2022-01-26",
+    "2022-01-28",
+    "2022-03-30",
+    "2022-04-07"
+   ]
+  },
+  {
+   "code": "801156",
+   "name": "医疗服务",
+   "n": 51,
+   "date_valid": 51,
+   "distinct_dates": 20,
+   "non_switchdate_n": 24,
+   "non_switchdate_sample": [
+    "2021-12-20",
+    "2021-12-28",
+    "2022-01-20",
+    "2022-03-22",
+    "2022-04-25"
+   ]
+  },
+  {
+   "code": "801161",
+   "name": "电力",
+   "n": 109,
+   "date_valid": 109,
+   "distinct_dates": 12,
+   "non_switchdate_n": 26,
+   "non_switchdate_sample": [
+    "2022-02-09",
+    "2022-07-27",
+    "2022-08-01",
+    "2022-08-29",
+    "2023-05-08"
+   ]
+  },
+  {
+   "code": "801163",
+   "name": "燃气Ⅱ",
+   "n": 28,
+   "date_valid": 28,
+   "distinct_dates": 3,
+   "non_switchdate_n": 2,
+   "non_switchdate_sample": [
+    "2022-09-08",
+    "2022-10-31"
+   ]
+  },
+  {
+   "code": "801178",
+   "name": "物流",
+   "n": 47,
+   "date_valid": 47,
+   "distinct_dates": 7,
+   "non_switchdate_n": 7,
+   "non_switchdate_sample": [
+    "2022-04-29",
+    "2022-08-01",
+    "2025-01-07",
+    "2025-08-13",
+    "2026-02-03"
+   ]
+  },
+  {
+   "code": "801179",
+   "name": "铁路公路",
+   "n": 33,
+   "date_valid": 33,
+   "distinct_dates": 2,
+   "non_switchdate_n": 1,
+   "non_switchdate_sample": [
+    "2025-08-13"
+   ]
+  },
+  {
+   "code": "801991",
+   "name": "航空机场",
+   "n": 12,
+   "date_valid": 12,
+   "distinct_dates": 1,
+   "non_switchdate_n": 0,
+   "non_switchdate_sample": []
+  },
+  {
+   "code": "801992",
+   "name": "航运港口",
+   "n": 34,
+   "date_valid": 34,
+   "distinct_dates": 6,
+   "non_switchdate_n": 5,
+   "non_switchdate_sample": [
+    "2022-03-24",
+    "2022-12-08",
+    "2023-03-29",
+    "2023-12-05",
+    "2024-07-31"
+   ]
+  },
+  {
+   "code": "801181",
+   "name": "房地产开发",
+   "n": 83,
+   "date_valid": 83,
+   "distinct_dates": 3,
+   "non_switchdate_n": 3,
+   "non_switchdate_sample": [
+    "2023-07-06",
+    "2024-07-31"
+   ]
+  },
+  {
+   "code": "801183",
+   "name": "房地产服务",
+   "n": 12,
+   "date_valid": 12,
+   "distinct_dates": 6,
+   "non_switchdate_n": 5,
+   "non_switchdate_sample": [
+    "2022-08-01",
+    "2024-03-04",
+    "2024-07-31",
+    "2025-08-13",
+    "2026-07-02"
+   ]
+  },
+  {
+   "code": "801202",
+   "name": "贸易Ⅱ",
+   "n": 12,
+   "date_valid": 12,
+   "distinct_dates": 5,
+   "non_switchdate_n": 4,
+   "non_switchdate_sample": [
+    "2023-04-10",
+    "2023-07-06",
+    "2024-07-31",
+    "2026-07-02"
+   ]
+  },
+  {
+   "code": "801203",
+   "name": "一般零售",
+   "n": 60,
+   "date_valid": 60,
+   "distinct_dates": 5,
+   "non_switchdate_n": 8,
+   "non_switchdate_sample": [
+    "2022-08-01",
+    "2023-07-06",
+    "2026-03-06",
+    "2026-07-02"
+   ]
+  },
+  {
+   "code": "801204",
+   "name": "专业连锁Ⅱ",
+   "n": 7,
+   "date_valid": 7,
+   "distinct_dates": 1,
+   "non_switchdate_n": 0,
+   "non_switchdate_sample": []
+  },
+  {
+   "code": "801206",
+   "name": "互联网电商",
+   "n": 18,
+   "date_valid": 18,
+   "distinct_dates": 5,
+   "non_switchdate_n": 7,
+   "non_switchdate_sample": [
+    "2022-03-11",
+    "2022-08-01",
+    "2023-07-12",
+    "2023-09-28"
+   ]
+  },
+  {
+   "code": "801207",
+   "name": "旅游零售Ⅱ",
+   "n": 2,
+   "date_valid": 2,
+   "distinct_dates": 2,
+   "non_switchdate_n": 1,
+   "non_switchdate_sample": [
+    "2026-03-06"
+   ]
+  },
+  {
+   "code": "801216",
+   "name": "体育Ⅱ",
+   "n": 2,
+   "date_valid": 2,
+   "distinct_dates": 1,
+   "non_switchdate_n": 0,
+   "non_switchdate_sample": []
+  },
+  {
+   "code": "801218",
+   "name": "专业服务",
+   "n": 29,
+   "date_valid": 29,
+   "distinct_dates": 14,
+   "non_switchdate_n": 15,
+   "non_switchdate_sample": [
+    "2022-01-28",
+    "2022-06-22",
+    "2022-08-01",
+    "2022-08-31",
+    "2023-06-19"
+   ]
+  },
+  {
+   "code": "801219",
+   "name": "酒店餐饮",
+   "n": 9,
+   "date_valid": 9,
+   "distinct_dates": 2,
+   "non_switchdate_n": 1,
+   "non_switchdate_sample": [
+    "2023-07-06"
+   ]
+  },
+  {
+   "code": "801993",
+   "name": "旅游及景区",
+   "n": 25,
+   "date_valid": 25,
+   "distinct_dates": 8,
+   "non_switchdate_n": 7,
+   "non_switchdate_sample": [
+    "2022-08-01",
+    "2023-07-06",
+    "2024-07-31",
+    "2025-03-10",
+    "2025-09-29"
+   ]
+  },
+  {
+   "code": "801994",
+   "name": "教育",
+   "n": 17,
+   "date_valid": 17,
+   "distinct_dates": 4,
+   "non_switchdate_n": 5,
+   "non_switchdate_sample": [
+    "2022-08-01",
+    "2024-07-31",
+    "2026-07-02"
+   ]
+  },
+  {
+   "code": "801782",
+   "name": "国有大型银行Ⅱ",
+   "n": 6,
+   "date_valid": 6,
+   "distinct_dates": 1,
+   "non_switchdate_n": 0,
+   "non_switchdate_sample": []
+  },
+  {
+   "code": "801783",
+   "name": "股份制银行Ⅱ",
+   "n": 9,
+   "date_valid": 9,
+   "distinct_dates": 1,
+   "non_switchdate_n": 0,
+   "non_switchdate_sample": []
+  },
+  {
+   "code": "801784",
+   "name": "城商行Ⅱ",
+   "n": 17,
+   "date_valid": 17,
+   "distinct_dates": 2,
+   "non_switchdate_n": 1,
+   "non_switchdate_sample": [
+    "2022-01-17"
+   ]
+  },
+  {
+   "code": "801785",
+   "name": "农商行Ⅱ",
+   "n": 10,
+   "date_valid": 10,
+   "distinct_dates": 1,
+   "non_switchdate_n": 0,
+   "non_switchdate_sample": []
+  },
+  {
+   "code": "801193",
+   "name": "证券Ⅱ",
+   "n": 50,
+   "date_valid": 50,
+   "distinct_dates": 4,
+   "non_switchdate_n": 3,
+   "non_switchdate_sample": [
+    "2022-12-22",
+    "2023-02-01",
+    "2025-08-13"
+   ]
+  },
+  {
+   "code": "801194",
+   "name": "保险Ⅱ",
+   "n": 5,
+   "date_valid": 5,
+   "distinct_dates": 1,
+   "non_switchdate_n": 0,
+   "non_switchdate_sample": []
+  },
+  {
+   "code": "801191",
+   "name": "多元金融",
+   "n": 24,
+   "date_valid": 24,
+   "distinct_dates": 5,
+   "non_switchdate_n": 4,
+   "non_switchdate_sample": [
+    "2021-12-23",
+    "2022-08-01",
+    "2022-08-05",
+    "2023-07-06"
+   ]
+  },
+  {
+   "code": "801231",
+   "name": "综合Ⅱ",
+   "n": 20,
+   "date_valid": 20,
+   "distinct_dates": 5,
+   "non_switchdate_n": 11,
+   "non_switchdate_sample": [
+    "2022-08-01",
+    "2023-07-06",
+    "2024-07-31",
+    "2026-07-02"
+   ]
+  },
+  {
+   "code": "801711",
+   "name": "水泥",
+   "n": 21,
+   "date_valid": 21,
+   "distinct_dates": 3,
+   "non_switchdate_n": 3,
+   "non_switchdate_sample": [
+    "2022-08-01",
+    "2023-07-06"
+   ]
+  },
+  {
+   "code": "801712",
+   "name": "玻璃玻纤",
+   "n": 16,
+   "date_valid": 16,
+   "distinct_dates": 3,
+   "non_switchdate_n": 2,
+   "non_switchdate_sample": [
+    "2023-12-26",
+    "2026-01-29"
+   ]
+  },
+  {
+   "code": "801713",
+   "name": "装修建材",
+   "n": 35,
+   "date_valid": 35,
+   "distinct_dates": 4,
+   "non_switchdate_n": 3,
+   "non_switchdate_sample": [
+    "2022-06-06",
+    "2022-08-01",
+    "2023-04-17"
+   ]
+  },
+  {
+   "code": "801721",
+   "name": "房屋建设Ⅱ",
+   "n": 8,
+   "date_valid": 8,
+   "distinct_dates": 1,
+   "non_switchdate_n": 0,
+   "non_switchdate_sample": []
+  },
+  {
+   "code": "801722",
+   "name": "装修装饰Ⅱ",
+   "n": 22,
+   "date_valid": 22,
+   "distinct_dates": 4,
+   "non_switchdate_n": 3,
+   "non_switchdate_sample": [
+    "2022-08-01",
+    "2023-04-19",
+    "2023-07-06"
+   ]
+  },
+  {
+   "code": "801723",
+   "name": "基础建设",
+   "n": 40,
+   "date_valid": 40,
+   "distinct_dates": 5,
+   "non_switchdate_n": 4,
+   "non_switchdate_sample": [
+    "2021-12-31",
+    "2022-08-01",
+    "2025-12-30",
+    "2026-07-02"
+   ]
+  },
+  {
+   "code": "801724",
+   "name": "专业工程",
+   "n": 37,
+   "date_valid": 37,
+   "distinct_dates": 6,
+   "non_switchdate_n": 7,
+   "non_switchdate_sample": [
+    "2022-07-28",
+    "2022-08-01",
+    "2022-10-13",
+    "2023-04-10",
+    "2023-12-22"
+   ]
+  },
+  {
+   "code": "801726",
+   "name": "工程咨询服务Ⅱ",
+   "n": 40,
+   "date_valid": 40,
+   "distinct_dates": 10,
+   "non_switchdate_n": 9,
+   "non_switchdate_sample": [
+    "2022-01-11",
+    "2022-08-01",
+    "2022-11-22",
+    "2023-03-13",
+    "2023-07-06"
+   ]
+  },
+  {
+   "code": "801731",
+   "name": "电机Ⅱ",
+   "n": 26,
+   "date_valid": 26,
+   "distinct_dates": 8,
+   "non_switchdate_n": 8,
+   "non_switchdate_sample": [
+    "2022-03-25",
+    "2024-02-02",
+    "2024-03-20",
+    "2024-07-03",
+    "2024-07-31"
+   ]
+  },
+  {
+   "code": "801733",
+   "name": "其他电源设备Ⅱ",
+   "n": 32,
+   "date_valid": 32,
+   "distinct_dates": 11,
+   "non_switchdate_n": 12,
+   "non_switchdate_sample": [
+    "2022-08-01",
+    "2023-03-13",
+    "2023-07-06",
+    "2023-09-28",
+    "2023-12-08"
+   ]
+  },
+  {
+   "code": "801735",
+   "name": "光伏设备",
+   "n": 67,
+   "date_valid": 67,
+   "distinct_dates": 20,
+   "non_switchdate_n": 35,
+   "non_switchdate_sample": [
+    "2021-12-20",
+    "2022-01-26",
+    "2022-06-08",
+    "2022-08-01",
+    "2022-09-30"
+   ]
+  },
+  {
+   "code": "801736",
+   "name": "风电设备",
+   "n": 31,
+   "date_valid": 31,
+   "distinct_dates": 13,
+   "non_switchdate_n": 13,
+   "non_switchdate_sample": [
+    "2022-06-22",
+    "2022-08-01",
+    "2023-06-15",
+    "2023-07-14",
+    "2023-08-09"
+   ]
+  },
+  {
+   "code": "801737",
+   "name": "电池",
+   "n": 97,
+   "date_valid": 97,
+   "distinct_dates": 29,
+   "non_switchdate_n": 44,
+   "non_switchdate_sample": [
+    "2022-03-09",
+    "2022-06-17",
+    "2022-07-13",
+    "2022-08-01",
+    "2022-08-08"
+   ]
+  },
+  {
+   "code": "801738",
+   "name": "电网设备",
+   "n": 126,
+   "date_valid": 126,
+   "distinct_dates": 22,
+   "non_switchdate_n": 27,
+   "non_switchdate_sample": [
+    "2022-03-10",
+    "2022-04-19",
+    "2022-04-28",
+    "2022-05-12",
+    "2022-08-01"
+   ]
+  },
+  {
+   "code": "801072",
+   "name": "通用设备",
+   "n": 220,
+   "date_valid": 220,
+   "distinct_dates": 52,
+   "non_switchdate_n": 67,
+   "non_switchdate_sample": [
+    "2022-03-14",
+    "2022-03-22",
+    "2022-04-07",
+    "2022-04-08",
+    "2022-04-11"
+   ]
+  },
+  {
+   "code": "801074",
+   "name": "专用设备",
+   "n": 181,
+   "date_valid": 181,
+   "distinct_dates": 27,
+   "non_switchdate_n": 44,
+   "non_switchdate_sample": [
+    "2022-01-17",
+    "2022-02-28",
+    "2022-07-12",
+    "2022-08-01",
+    "2022-08-16"
+   ]
+  },
+  {
+   "code": "801076",
+   "name": "轨交设备Ⅱ",
+   "n": 30,
+   "date_valid": 30,
+   "distinct_dates": 5,
+   "non_switchdate_n": 4,
+   "non_switchdate_sample": [
+    "2022-03-30",
+    "2022-10-12",
+    "2023-01-18",
+    "2023-05-22"
+   ]
+  },
+  {
+   "code": "801077",
+   "name": "工程机械",
+   "n": 28,
+   "date_valid": 28,
+   "distinct_dates": 10,
+   "non_switchdate_n": 10,
+   "non_switchdate_sample": [
+    "2022-04-13",
+    "2022-06-22",
+    "2022-09-14",
+    "2022-11-09",
+    "2023-07-25"
+   ]
+  },
+  {
+   "code": "801078",
+   "name": "自动化设备",
+   "n": 82,
+   "date_valid": 82,
+   "distinct_dates": 27,
+   "non_switchdate_n": 27,
+   "non_switchdate_sample": [
+    "2022-02-28",
+    "2022-03-22",
+    "2022-04-15",
+    "2022-04-28",
+    "2022-04-29"
+   ]
+  },
+  {
+   "code": "801741",
+   "name": "航天装备Ⅱ",
+   "n": 9,
+   "date_valid": 9,
+   "distinct_dates": 4,
+   "non_switchdate_n": 3,
+   "non_switchdate_sample": [
+    "2022-03-18",
+    "2023-06-02",
+    "2026-02-10"
+   ]
+  },
+  {
+   "code": "801742",
+   "name": "航空装备Ⅱ",
+   "n": 46,
+   "date_valid": 46,
+   "distinct_dates": 11,
+   "non_switchdate_n": 10,
+   "non_switchdate_sample": [
+    "2022-03-07",
+    "2022-03-15",
+    "2022-06-29",
+    "2022-07-01",
+    "2022-08-01"
+   ]
+  },
+  {
+   "code": "801743",
+   "name": "地面兵装Ⅱ",
+   "n": 12,
+   "date_valid": 12,
+   "distinct_dates": 4,
+   "non_switchdate_n": 3,
+   "non_switchdate_sample": [
+    "2023-04-18",
+    "2023-06-21",
+    "2023-08-24"
+   ]
+  },
+  {
+   "code": "801744",
+   "name": "航海装备Ⅱ",
+   "n": 10,
+   "date_valid": 10,
+   "distinct_dates": 2,
+   "non_switchdate_n": 1,
+   "non_switchdate_sample": [
+    "2026-02-03"
+   ]
+  },
+  {
+   "code": "801745",
+   "name": "军工电子Ⅱ",
+   "n": 60,
+   "date_valid": 60,
+   "distinct_dates": 20,
+   "non_switchdate_n": 20,
+   "non_switchdate_sample": [
+    "2022-03-15",
+    "2022-06-06",
+    "2022-06-23",
+    "2022-07-12",
+    "2022-07-22"
+   ]
+  },
+  {
+   "code": "801101",
+   "name": "计算机设备",
+   "n": 82,
+   "date_valid": 82,
+   "distinct_dates": 18,
+   "non_switchdate_n": 19,
+   "non_switchdate_sample": [
+    "2022-01-17",
+    "2022-08-01",
+    "2022-08-08",
+    "2022-08-10",
+    "2022-08-15"
+   ]
+  },
+  {
+   "code": "801103",
+   "name": "IT服务Ⅱ",
+   "n": 122,
+   "date_valid": 122,
+   "distinct_dates": 20,
+   "non_switchdate_n": 23,
+   "non_switchdate_sample": [
+    "2021-12-30",
+    "2022-03-07",
+    "2022-03-15",
+    "2022-03-17",
+    "2022-04-20"
+   ]
+  },
+  {
+   "code": "801104",
+   "name": "软件开发",
+   "n": 130,
+   "date_valid": 130,
+   "distinct_dates": 33,
+   "non_switchdate_n": 32,
+   "non_switchdate_sample": [
+    "2021-12-14",
+    "2021-12-28",
+    "2022-01-07",
+    "2022-01-25",
+    "2022-01-27"
+   ]
+  },
+  {
+   "code": "801764",
+   "name": "游戏Ⅱ",
+   "n": 26,
+   "date_valid": 26,
+   "distinct_dates": 2,
+   "non_switchdate_n": 1,
+   "non_switchdate_sample": [
+    "2023-09-19"
+   ]
+  },
+  {
+   "code": "801765",
+   "name": "广告营销",
+   "n": 28,
+   "date_valid": 28,
+   "distinct_dates": 7,
+   "non_switchdate_n": 6,
+   "non_switchdate_sample": [
+    "2022-03-28",
+    "2022-08-01",
+    "2022-08-19",
+    "2023-07-06",
+    "2023-12-11"
+   ]
+  },
+  {
+   "code": "801766",
+   "name": "影视院线",
+   "n": 19,
+   "date_valid": 19,
+   "distinct_dates": 3,
+   "non_switchdate_n": 2,
+   "non_switchdate_sample": [
+    "2022-08-01",
+    "2022-08-18"
+   ]
+  },
+  {
+   "code": "801767",
+   "name": "数字媒体",
+   "n": 14,
+   "date_valid": 14,
+   "distinct_dates": 5,
+   "non_switchdate_n": 4,
+   "non_switchdate_sample": [
+    "2022-01-18",
+    "2022-09-30",
+    "2022-10-19",
+    "2025-09-29"
+   ]
+  },
+  {
+   "code": "801769",
+   "name": "出版",
+   "n": 29,
+   "date_valid": 29,
+   "distinct_dates": 3,
+   "non_switchdate_n": 3,
+   "non_switchdate_sample": [
+    "2022-09-08",
+    "2023-07-06"
+   ]
+  },
+  {
+   "code": "801995",
+   "name": "电视广播Ⅱ",
+   "n": 14,
+   "date_valid": 14,
+   "distinct_dates": 3,
+   "non_switchdate_n": 2,
+   "non_switchdate_sample": [
+    "2023-06-20",
+    "2024-09-26"
+   ]
+  },
+  {
+   "code": "801223",
+   "name": "通信服务",
+   "n": 36,
+   "date_valid": 36,
+   "distinct_dates": 9,
+   "non_switchdate_n": 12,
+   "non_switchdate_sample": [
+    "2022-01-05",
+    "2022-05-06",
+    "2022-08-01",
+    "2022-08-09",
+    "2022-10-25"
+   ]
+  },
+  {
+   "code": "801102",
+   "name": "通信设备",
+   "n": 85,
+   "date_valid": 85,
+   "distinct_dates": 17,
+   "non_switchdate_n": 18,
+   "non_switchdate_sample": [
+    "2022-02-15",
+    "2022-05-26",
+    "2022-08-01",
+    "2022-08-09",
+    "2022-09-13"
+   ]
+  },
+  {
+   "code": "801951",
+   "name": "煤炭开采",
+   "n": 26,
+   "date_valid": 26,
+   "distinct_dates": 3,
+   "non_switchdate_n": 2,
+   "non_switchdate_sample": [
+    "2023-03-29",
+    "2023-07-06"
+   ]
+  },
+  {
+   "code": "801952",
+   "name": "焦炭Ⅱ",
+   "n": 7,
+   "date_valid": 7,
+   "distinct_dates": 1,
+   "non_switchdate_n": 0,
+   "non_switchdate_sample": []
+  },
+  {
+   "code": "801961",
+   "name": "油气开采Ⅱ",
+   "n": 4,
+   "date_valid": 4,
+   "distinct_dates": 2,
+   "non_switchdate_n": 1,
+   "non_switchdate_sample": [
+    "2022-04-21"
+   ]
+  },
+  {
+   "code": "801962",
+   "name": "油服工程",
+   "n": 13,
+   "date_valid": 13,
+   "distinct_dates": 1,
+   "non_switchdate_n": 0,
+   "non_switchdate_sample": []
+  },
+  {
+   "code": "801963",
+   "name": "炼化及贸易",
+   "n": 30,
+   "date_valid": 30,
+   "distinct_dates": 4,
+   "non_switchdate_n": 5,
+   "non_switchdate_sample": [
+    "2022-06-24",
+    "2022-08-01",
+    "2024-07-31"
+   ]
+  },
+  {
+   "code": "801971",
+   "name": "环境治理",
+   "n": 104,
+   "date_valid": 104,
+   "distinct_dates": 22,
+   "non_switchdate_n": 31,
+   "non_switchdate_sample": [
+    "2021-12-30",
+    "2022-04-13",
+    "2022-04-21",
+    "2022-04-26",
+    "2022-07-08"
+   ]
+  },
+  {
+   "code": "801972",
+   "name": "环保设备Ⅱ",
+   "n": 26,
+   "date_valid": 26,
+   "distinct_dates": 9,
+   "non_switchdate_n": 12,
+   "non_switchdate_sample": [
+    "2022-04-22",
+    "2022-07-25",
+    "2022-08-01",
+    "2022-11-18",
+    "2023-03-15"
+   ]
+  },
+  {
+   "code": "801981",
+   "name": "个护用品",
+   "n": 12,
+   "date_valid": 12,
+   "distinct_dates": 3,
+   "non_switchdate_n": 2,
+   "non_switchdate_sample": [
+    "2023-04-10",
+    "2023-10-17"
+   ]
+  },
+  {
+   "code": "801982",
+   "name": "化妆品",
+   "n": 13,
+   "date_valid": 13,
+   "distinct_dates": 3,
+   "non_switchdate_n": 2,
+   "non_switchdate_sample": [
+    "2023-08-01",
+    "2024-02-06"
+   ]
+  },
+  {
+   "code": "801983",
+   "name": "医疗美容",
+   "n": 3,
+   "date_valid": 3,
+   "distinct_dates": 1,
+   "non_switchdate_n": 0,
+   "non_switchdate_sample": []
+  }
+ ],
+ "summary": {
+  "n_industries": 131,
+  "err": 0,
+  "total_cons": 5222,
+  "cons_with_non_switchdate": 1332,
+  "pct_non_switchdate": 0.2551
+ },
+ "verdict": "PARTIAL_PIT: 计入日期含版本切换后调整记录(>5%非切换日)——纳入方向可追溯, 但仍无out_date(剔除不可见)"
+}

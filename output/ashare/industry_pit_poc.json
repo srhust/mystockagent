@@ -1336,6 +1336,159 @@
   "industry_change_detected_in_backtest_window": 10,
   "taxonomy_ambiguity": "申万2021版分类+当前成分纳入时间; 无out_date→被剔除历史成员不可见; in_date≤T不能证明分类名称当时已存在(版本歧义待查)"
  },
- "conclusion": "AKShare不满足PIT重建: ①无sw_index_second_cons(农化/工业金属/房地产开发等二级行业成分不可得, 801125等AttributeError) ②三级成分'纳入时间'列实际为空(851931证券50只成分dropna后0值)→历史时点归属不可重建; 被拦截股票的历史行业保持UNKNOWN",
- "limitation": "只读POC, 不修改回测行业映射, 不重跑策略; 下一步=评估Tushare index_member_all(需2000积分凭据, 经本地环境变量配置)或申万官方历史成分文件"
+ "conclusion": "AKSHARE_POC_FAILED(仅此源不满足PIT; 非ALL_FREE_SOURCES_UNAVAILABLE——申万官方文件/Tushare待查)",
+ "limitation": "只读POC, 不修改回测行业映射, 不重跑策略; 下一步=评估Tushare index_member_all(需2000积分凭据, 经本地环境变量配置)或申万官方历史成分文件",
+ "frozen_sample_30": [
+  {
+   "code": "000422",
+   "sector_snapshot": "农化制品",
+   "reason": "priority_sector"
+  },
+  {
+   "code": "000776",
+   "sector_snapshot": "证券",
+   "reason": "priority_sector"
+  },
+  {
+   "code": "000060",
+   "sector_snapshot": "工业金属",
+   "reason": "priority_sector"
+  },
+  {
+   "code": "000683",
+   "sector_snapshot": "化学原料",
+   "reason": "priority_sector"
+  },
+  {
+   "code": "000002",
+   "sector_snapshot": "房地产",
+   "reason": "diversifier"
+  },
+  {
+   "code": "000012",
+   "sector_snapshot": "玻璃玻纤",
+   "reason": "diversifier"
+  },
+  {
+   "code": "000050",
+   "sector_snapshot": "面板",
+   "reason": "diversifier"
+  },
+  {
+   "code": "000059",
+   "sector_snapshot": "石油加工",
+   "reason": "diversifier"
+  },
+  {
+   "code": "000069",
+   "sector_snapshot": "房地产",
+   "reason": "diversifier"
+  },
+  {
+   "code": "000100",
+   "sector_snapshot": "面板",
+   "reason": "diversifier"
+  },
+  {
+   "code": "000157",
+   "sector_snapshot": "工程机械",
+   "reason": "diversifier"
+  },
+  {
+   "code": "000301",
+   "sector_snapshot": "石油加工",
+   "reason": "diversifier"
+  },
+  {
+   "code": "000401",
+   "sector_snapshot": "水泥建材",
+   "reason": "diversifier"
+  },
+  {
+   "code": "000408",
+   "sector_snapshot": "能源金属",
+   "reason": "diversifier"
+  },
+  {
+   "code": "000420",
+   "sector_snapshot": "化纤",
+   "reason": "diversifier"
+  },
+  {
+   "code": "000425",
+   "sector_snapshot": "工程机械",
+   "reason": "diversifier"
+  },
+  {
+   "code": "000488",
+   "sector_snapshot": "造纸",
+   "reason": "diversifier"
+  },
+  {
+   "code": "000520",
+   "sector_snapshot": "航运港口",
+   "reason": "diversifier"
+  },
+  {
+   "code": "000528",
+   "sector_snapshot": "工程机械",
+   "reason": "diversifier"
+  },
+  {
+   "code": "000625",
+   "sector_snapshot": "汽车整车",
+   "reason": "diversifier"
+  },
+  {
+   "code": "000630",
+   "sector_snapshot": "工业金属",
+   "reason": "diversifier"
+  },
+  {
+   "code": "000636",
+   "sector_snapshot": "元件",
+   "reason": "diversifier"
+  },
+  {
+   "code": "000672",
+   "sector_snapshot": "水泥建材",
+   "reason": "diversifier"
+  },
+  {
+   "code": "000680",
+   "sector_snapshot": "工程机械",
+   "reason": "diversifier"
+  },
+  {
+   "code": "000703",
+   "sector_snapshot": "石油加工",
+   "reason": "diversifier"
+  },
+  {
+   "code": "000708",
+   "sector_snapshot": "钢铁",
+   "reason": "diversifier"
+  },
+  {
+   "code": "000725",
+   "sector_snapshot": "面板",
+   "reason": "diversifier"
+  },
+  {
+   "code": "000733",
+   "sector_snapshot": "元件",
+   "reason": "diversifier"
+  },
+  {
+   "code": "000789",
+   "sector_snapshot": "水泥建材",
+   "reason": "diversifier"
+  },
+  {
+   "code": "000792",
+   "sector_snapshot": "能源金属",
+   "reason": "diversifier"
+  }
+ ],
+ "sample_note": "R33: 冻结清单先于数据源查询(修复R32b样本被源可用性污染问题)"
 }
