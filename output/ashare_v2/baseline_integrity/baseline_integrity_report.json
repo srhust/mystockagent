@@ -87,7 +87,7 @@
    "id": "C4_worktree_frozen",
    "status": "PASS",
    "dirty_lines_on_frozen_paths": [],
-   "all_porcelain": "?? .acl-recovery/\n?? cycle_system/ashare_v2/DATA_CONTRACT.md\n?? cycle_system/ashare_v2/DESIGN.md\n?? cycle_system/ashare_v2/__init__.py\n?? cycle_system/ashare_v2/config.py\n?? cycle_system/ashare_v2/schemas.py\n?? cycle_system/ashare_v2/tools/\n?? cycle_system/today_view.py\n?? output/ashare/_panel_cache.parquet\n?? output/ashare/swing_m1_m1_True_daily_3f_monthly_cap0.json\n?? output/ashare/today_view.json\n?? output/ashare_v2/"
+   "all_porcelain": "M cycle_system/ashare_v2/exit_manager.py\n M cycle_system/ashare_v2/fast_v.py\n M cycle_system/ashare_v2/long_cycle.py\n M cycle_system/ashare_v2/tools/make_experiment_manifest.py\n M output/ashare_v2/experiment_manifest.json\n?? .acl-recovery/\n?? cycle_system/ashare_v2/tools/phaseC_smoke.py\n?? cycle_system/today_view.py\n?? output/ashare/_panel_cache.parquet\n?? output/ashare/swing_m1_m1_True_daily_3f_monthly_cap0.json\n?? output/ashare/today_view.json\n?? output/ashare_v2/engine_smoke_realdata.json\n?? tests/ashare_v2/test_phaseC.py"
   },
   {
    "id": "C5_swing_m1_untouched",
@@ -128,7 +128,7 @@
   "C7_frozen_code_hashes"
  ],
  "_provenance": {
-  "code_version": "be2537eb0b66764132bcc74d37db17093a66565f",
+  "code_version": "20d31db65b6bde38051252fcc4c820e72c75f52f",
   "branch": "ashare-v2",
   "worktree_dirty": true,
   "config_hash": "688b9475a4172bbb",
@@ -136,7 +136,7 @@
    "manifest_sha256": "90dd925b61c4ba96b625715e010ade8127d0ff9e72ef8b3a7240097fb1d80abf"
   },
   "asof": "2026-10-18",
-  "generated_at": "2026-10-18T21:43:36.438315+08:00",
+  "generated_at": "2026-10-18T22:38:06.631765+08:00",
   "mode": "SYNTHETIC",
   "pit_notes": [
    "本工具为工程验证, 非绩效声明"

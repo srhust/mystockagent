@@ -1,0 +1,578 @@
+{
+ "_provenance": {
+  "code_version": "20d31db65b6bde38051252fcc4c820e72c75f52f",
+  "branch": "ashare-v2",
+  "config_hash": "688b9475a4172bbb",
+  "asof": "2026-06-30",
+  "mode": "SYNTHETIC",
+  "note": "冒烟=编译/运行验证, 非预测有效",
+  "generated_at": "2026-10-18T22:36:29.800529+08:00"
+ },
+ "industry_state_dist": {
+  "BOTTOM_WATCH": 9,
+  "EXPANSION": 9,
+  "DOWNTREND": 8,
+  "EARLY_RECOVERY": 4
+ },
+ "industry_states": {
+  "保险": "BOTTOM_WATCH",
+  "元件": "EXPANSION",
+  "养殖": "BOTTOM_WATCH",
+  "农化制品": "DOWNTREND",
+  "化学原料": "EARLY_RECOVERY",
+  "化纤": "EXPANSION",
+  "半导体": "EXPANSION",
+  "基建建筑": "DOWNTREND",
+  "小金属": "EXPANSION",
+  "工业金属": "EXPANSION",
+  "工程机械": "DOWNTREND",
+  "房地产": "BOTTOM_WATCH",
+  "水泥建材": "EARLY_RECOVERY",
+  "汽车整车": "BOTTOM_WATCH",
+  "油气开采": "EARLY_RECOVERY",
+  "消费电子": "EXPANSION",
+  "煤炭": "DOWNTREND",
+  "玻璃玻纤": "EXPANSION",
+  "电力": "DOWNTREND",
+  "石油加工": "EARLY_RECOVERY",
+  "种植种业": "BOTTOM_WATCH",
+  "能源金属": "EXPANSION",
+  "航空机场": "BOTTOM_WATCH",
+  "航运港口": "EXPANSION",
+  "证券": "DOWNTREND",
+  "贵金属": "BOTTOM_WATCH",
+  "造纸": "DOWNTREND",
+  "钢铁": "BOTTOM_WATCH",
+  "面板": "DOWNTREND",
+  "饲料加工": "BOTTOM_WATCH"
+ },
+ "fast_v_state_dist": {
+  "NO_SETUP": 168,
+  "REVERSAL_FAILED": 43,
+  "BOTTOM_SEARCH": 14,
+  "ENTRY_CONFIRMED": 5,
+  "SHOCK_DETECTED": 10,
+  "REVERSAL_CANDIDATE": 7,
+  "REBOUND_ACTIVE": 3
+ },
+ "candidates": {
+  "long_cycle": {
+   "n": 20,
+   "entry_kinds": {
+    "TREND_CONTINUATION": 10,
+    "EARLY_REVERSAL": 9,
+    "BREAKOUT_CONFIRM": 1
+   },
+   "sample": [
+    {
+     "industry": "工业金属",
+     "industry_taxonomy_version": "SECTOR_SNAPSHOT_CURRENT_ONLY",
+     "membership_trust": "CURRENT_SNAPSHOT_ONLY",
+     "code": "000060",
+     "engine": "LONG_CYCLE",
+     "cycle_stage": "EXPANSION",
+     "key_evidence": [
+      {
+       "name": "ind_rp250",
+       "value": 0.4669,
+       "asof": "2026-06-30",
+       "source": "industry_cycle(PROXY:snapshot成分)",
+       "availability": "PROXY_ONLY",
+       "note": ""
+      },
+      {
+       "name": "ind_trend250",
+       "value": 0.6515,
+       "asof": "2026-06-30",
+       "source": "industry_cycle(PROXY:snapshot成分)",
+       "availability": "PROXY_ONLY",
+       "note": ""
+      },
+      {
+       "name": "ind_mom12",
+       "value": 0.6497,
+       "asof": "2026-06-30",
+       "source": "industry_cycle(PROXY:snapshot成分)",
+       "availability": "PROXY_ONLY",
+       "note": ""
+      },
+      {
+       "name": "ind_dd500",
+       "value": -0.3161,
+       "asof": "2026-06-30",
+       "source": "industry_cycle(PROXY:snapshot成分)",
+       "availability": "PROXY_ONLY",
+       "note": ""
+      },
+      {
+       "name": "ind_vol120",
+       "value": 0.482,
+       "asof": "2026-06-30",
+       "source": "industry_cycle(PROXY:snapshot成分)",
+       "availability": "PROXY_ONLY",
+       "note": ""
+      },
+      {
+       "name": "ind_rel_mkt_250",
+       "value": 0.3069,
+       "asof": "2026-06-30",
+       "source": "industry_cycle(PROXY:snapshot成分)",
+       "availability": "PROXY_ONLY",
+       "note": ""
+      },
+      {
+       "name": "stk_rp120",
+       "value": 0.5921,
+       "asof": "2026-06-30",
+       "source": "stock_table",
+       "availability": "CONFIRMED",
+       "note": ""
+      },
+      {
+       "name": "stk_trend250",
+       "value": 0.5651,
+       "asof": "2026-06-30",
+       "source": "stock_table",
+       "availability": "CONFIRMED",
+       "note": ""
+      },
+      {
+       "name": "industry_fundamentals",
+       "value": null,
+       "asof": "2026-06-30",
+       "source": "adapter-catalog",
+       "availability": "DATA_BLOCKED",
+       "note": "A层产业指标未接入,不编造"
+      }
+     ],
+     "first_signal_day": "2026-06-30",
+     "features_at_signal": {
+      "rp120": 0.5921,
+      "trend60": 0.2019,
+      "trend250": 0.5651,
+      "ma60": 293.1097,
+      "ma120": 287.4003
+     },
+     "entry_kind": "TREND_CONTINUATION",
+     "entry_condition": "扩张期正常回撤后趋势延续(px>MA120且250趋势为正)",
+     "invalidation_condition": "底部假设被否定(收盘跌破确认低点93%)/趋势实质破坏(MA250下方持续20日且长趋势下行)/个股持续显著弱于行业/风险预算触发",
+     "research_horizon_m": 6,
+     "risk_estimate": null,
+     "data_credibility": "DATA_LIMITED",
+     "score": null,
+     "score_breakdown": {},
+     "decision": "NO_TRADE",
+     "decision_reason": "阶段C仅产出候选; 交易与否由D段评分+资金竞争决定",
+     "forbidden_claims_note": "评分未校准, 不构成预期收益率或胜率"
+    },
+    {
+     "industry": "石油加工",
+     "industry_taxonomy_version": "SECTOR_SNAPSHOT_CURRENT_ONLY",
+     "membership_trust": "CURRENT_SNAPSHOT_ONLY",
+     "code": "000301",
+     "engine": "LONG_CYCLE",
+     "cycle_stage": "EARLY_RECOVERY",
+     "key_evidence": [
+      {
+       "name": "ind_rp250",
+       "value": 0.4757,
+       "asof": "2026-06-30",
+       "source": "industry_cycle(PROXY:snapshot成分)",
+       "availability": "PROXY_ONLY",
+       "note": ""
+      },
+      {
+       "name": "ind_trend250",
+       "value": 0.2398,
+       "asof": "2026-06-30",
+       "source": "industry_cycle(PROXY:snapshot成分)",
+       "availability": "PROXY_ONLY",
+       "note": ""
+      },
+      {
+       "name": "ind_mom12",
+       "value": 0.2328,
+       "asof": "2026-06-30",
+       "source": "industry_cycle(PROXY:snapshot成分)",
+       "availability": "PROXY_ONLY",
+       "note": ""
+      },
+      {
+       "name": "ind_dd500",
+       "value": -0.1833,
+       "asof": "2026-06-30",
+       "source": "industry_cycle(PROXY:snapshot成分)",
+       "availability": "PROXY_ONLY",
+       "note": ""
+      },
+      {
+       "name": "ind_vol120",
+       "value": 0.3082,
+       "asof": "2026-06-30",
+       "source": "industry_cycle(PROXY:snapshot成分)",
+       "availability": "PROXY_ONLY",
+       "note": ""
+      },
+      {
+       "name": "ind_rel_mkt_250",
+       "value": -0.1047,
+       "asof": "2026-06-30",
+       "source": "industry_cycle(PROXY:snapshot成分)",
+       "availability": "PROXY_ONLY",
+       "note": ""
+      },
+      {
+       "name": "stk_rp120",
+       "value": 0.2821,
+       "asof": "2026-06-30",
+       "source": "stock_table",
+       "availability": "CONFIRMED",
+       "note": ""
+      },
+      {
+       "name": "stk_trend250",
+       "value": 0.3352,
+       "asof": "2026-06-30",
+       "source": "stock_table",
+       "availability": "CONFIRMED",
+       "note": ""
+      },
+      {
+       "name": "industry_fundamentals",
+       "value": null,
+       "asof": "2026-06-30",
+       "source": "adapter-catalog",
+       "availability": "DATA_BLOCKED",
+       "note": "A层产业指标未接入,不编造"
+      }
+     ],
+     "first_signal_day": "2026-06-30",
+     "features_at_signal": {
+      "rp120": 0.2821,
+      "trend60": 0.0661,
+      "trend250": 0.3352,
+      "ma60": 23.1293,
+      "ma120": 22.8393
+     },
+     "entry_kind": "EARLY_REVERSAL",
+     "entry_condition": "行业底部形成+个股率先企稳(前缀可知)",
+     "invalidation_condition": "底部假设被否定(收盘跌破确认低点93%)/趋势实质破坏(MA250下方持续20日且长趋势下行)/个股持续显著弱于行业/风险预算触发",
+     "research_horizon_m": 12,
+     "risk_estimate": null,
+     "data_credibility": "PROXY_ONLY",
+     "score": null,
+     "score_breakdown": {},
+     "decision": "NO_TRADE",
+     "decision_reason": "阶段C仅产出候选; 交易与否由D段评分+资金竞争决定",
+     "forbidden_claims_note": "评分未校准, 不构成预期收益率或胜率"
+    },
+    {
+     "industry": "水泥建材",
+     "industry_taxonomy_version": "SECTOR_SNAPSHOT_CURRENT_ONLY",
+     "membership_trust": "CURRENT_SNAPSHOT_ONLY",
+     "code": "000672",
+     "engine": "LONG_CYCLE",
+     "cycle_stage": "EARLY_RECOVERY",
+     "key_evidence": [
+      {
+       "name": "ind_rp250",
+       "value": 0.3317,
+       "asof": "2026-06-30",
+       "source": "industry_cycle(PROXY:snapshot成分)",
+       "availability": "PROXY_ONLY",
+       "note": ""
+      },
+      {
+       "name": "ind_trend250",
+       "value": 0.0805,
+       "asof": "2026-06-30",
+       "source": "industry_cycle(PROXY:snapshot成分)",
+       "availability": "PROXY_ONLY",
+       "note": ""
+      },
+      {
+       "name": "ind_mom12",
+       "value": 0.0792,
+       "asof": "2026-06-30",
+       "source": "industry_cycle(PROXY:snapshot成分)",
+       "availability": "PROXY_ONLY",
+       "note": ""
+      },
+      {
+       "name": "ind_dd500",
+       "value": -0.1405,
+       "asof": "2026-06-30",
+       "source": "industry_cycle(PROXY:snapshot成分)",
+       "availability": "PROXY_ONLY",
+       "note": ""
+      },
+      {
+       "name": "ind_vol120",
+       "value": 0.1446,
+       "asof": "2026-06-30",
+       "source": "industry_cycle(PROXY:snapshot成分)",
+       "availability": "PROXY_ONLY",
+       "note": ""
+      },
+      {
+       "name": "ind_rel_mkt_250",
+       "value": -0.264,
+       "asof": "2026-06-30",
+       "source": "industry_cycle(PROXY:snapshot成分)",
+       "availability": "PROXY_ONLY",
+       "note": ""
+      },
+      {
+       "name": "stk_rp120",
+       "value": 1.0,
+       "asof": "2026-06-30",
+       "source": "stock_table",
+       "availability": "CONFIRMED",
+       "note": ""
+      },
+      {
+       "name": "stk_trend250",
+       "value": 1.4922,
+       "asof": "2026-06-30",
+       "source": "stock_table",
+       "availability": "CONFIRMED",
+       "note": ""
+      },
+      {
+       "name": "industry_fundamentals",
+       "value": null,
+       "asof": "2026-06-30",
+       "source": "adapter-catalog",
+       "availability": "DATA_BLOCKED",
+       "note": "A层产业指标未接入,不编造"
+      }
+     ],
+     "first_signal_day": "2026-06-30",
+     "features_at_signal": {
+      "rp120": 1.0,
+      "trend60": 0.6974,
+      "trend250": 1.4922,
+      "ma60": 158.151,
+      "ma120": 147.3958
+     },
+     "entry_kind": "BREAKOUT_CONFIRM",
+     "entry_condition": "早期复苏中个股突破120日平台高点",
+     "invalidation_condition": "底部假设被否定(收盘跌破确认低点93%)/趋势实质破坏(MA250下方持续20日且长趋势下行)/个股持续显著弱于行业/风险预算触发",
+     "research_horizon_m": 12,
+     "risk_estimate": null,
+     "data_credibility": "PROXY_ONLY",
+     "score": null,
+     "score_breakdown": {},
+     "decision": "NO_TRADE",
+     "decision_reason": "阶段C仅产出候选; 交易与否由D段评分+资金竞争决定",
+     "forbidden_claims_note": "评分未校准, 不构成预期收益率或胜率"
+    }
+   ]
+  },
+  "fast_v": {
+   "n": 12,
+   "stages": {
+    "ENTRY_CONFIRMED": 5,
+    "REVERSAL_CANDIDATE": 7
+   },
+   "sample": [
+    {
+     "industry": "",
+     "industry_taxonomy_version": "N/A_STOCK_LEVEL",
+     "membership_trust": "UNKNOWN",
+     "code": "000876",
+     "engine": "FAST_V",
+     "cycle_stage": "ENTRY_CONFIRMED",
+     "key_evidence": [
+      {
+       "name": "dd_from_high_250",
+       "value": -0.3597,
+       "asof": "2026-06-30",
+       "source": "fast_v_panel",
+       "availability": "CONFIRMED",
+       "note": ""
+      },
+      {
+       "name": "drop_20d",
+       "value": -0.1808,
+       "asof": "2026-06-30",
+       "source": "fast_v_panel",
+       "availability": "CONFIRMED",
+       "note": ""
+      },
+      {
+       "name": "vol_z_20d_vs_250d",
+       "value": 1.94,
+       "asof": "2026-06-30",
+       "source": "fast_v_panel",
+       "availability": "CONFIRMED",
+       "note": ""
+      },
+      {
+       "name": "rebound_vs_running_low_prefix_min",
+       "value": 0.0441,
+       "asof": "2026-06-30",
+       "source": "fast_v_panel",
+       "availability": "CONFIRMED",
+       "note": "运行最低=前缀min, 当日可知, 非事后最低价"
+      }
+     ],
+     "first_signal_day": "2026-06-30",
+     "features_at_signal": {
+      "drop5": 0.0106,
+      "drop10": -0.0394,
+      "drop20": -0.1808,
+      "accel": 0.0601
+     },
+     "entry_kind": "REVERSAL_CANDIDATE/ENTRY_CONFIRMED",
+     "entry_condition": "恐慌冲击后企稳(低点不再下移≥3日)+反弹确认(收盘较运行低点≥3%且上穿MA5), 当日收盘可判",
+     "invalidation_condition": "再创新低/自反弹高点衰竭6%修复失败/波动环境改变触发风险失效",
+     "research_horizon_m": null,
+     "risk_estimate": null,
+     "data_credibility": "CONFIRMED",
+     "score": null,
+     "score_breakdown": {},
+     "decision": "NO_TRADE",
+     "decision_reason": "阶段C仅产出候选; 交易与否由D段统一资金竞争决定",
+     "forbidden_claims_note": "评分未校准, 不构成预期收益率或胜率"
+    },
+    {
+     "industry": "",
+     "industry_taxonomy_version": "N/A_STOCK_LEVEL",
+     "membership_trust": "UNKNOWN",
+     "code": "000959",
+     "engine": "FAST_V",
+     "cycle_stage": "ENTRY_CONFIRMED",
+     "key_evidence": [
+      {
+       "name": "dd_from_high_250",
+       "value": -0.2733,
+       "asof": "2026-06-30",
+       "source": "fast_v_panel",
+       "availability": "CONFIRMED",
+       "note": ""
+      },
+      {
+       "name": "drop_20d",
+       "value": -0.0222,
+       "asof": "2026-06-30",
+       "source": "fast_v_panel",
+       "availability": "CONFIRMED",
+       "note": ""
+      },
+      {
+       "name": "vol_z_20d_vs_250d",
+       "value": 1.343,
+       "asof": "2026-06-30",
+       "source": "fast_v_panel",
+       "availability": "CONFIRMED",
+       "note": ""
+      },
+      {
+       "name": "rebound_vs_running_low_prefix_min",
+       "value": 0.0684,
+       "asof": "2026-06-30",
+       "source": "fast_v_panel",
+       "availability": "CONFIRMED",
+       "note": "运行最低=前缀min, 当日可知, 非事后最低价"
+      }
+     ],
+     "first_signal_day": "2026-06-30",
+     "features_at_signal": {
+      "drop5": 0.0563,
+      "drop10": 0.0163,
+      "drop20": -0.0222,
+      "accel": 0.0943
+     },
+     "entry_kind": "REVERSAL_CANDIDATE/ENTRY_CONFIRMED",
+     "entry_condition": "恐慌冲击后企稳(低点不再下移≥3日)+反弹确认(收盘较运行低点≥3%且上穿MA5), 当日收盘可判",
+     "invalidation_condition": "再创新低/自反弹高点衰竭6%修复失败/波动环境改变触发风险失效",
+     "research_horizon_m": null,
+     "risk_estimate": null,
+     "data_credibility": "CONFIRMED",
+     "score": null,
+     "score_breakdown": {},
+     "decision": "NO_TRADE",
+     "decision_reason": "阶段C仅产出候选; 交易与否由D段统一资金竞争决定",
+     "forbidden_claims_note": "评分未校准, 不构成预期收益率或胜率"
+    },
+    {
+     "industry": "",
+     "industry_taxonomy_version": "N/A_STOCK_LEVEL",
+     "membership_trust": "UNKNOWN",
+     "code": "002124",
+     "engine": "FAST_V",
+     "cycle_stage": "REVERSAL_CANDIDATE",
+     "key_evidence": [
+      {
+       "name": "dd_from_high_250",
+       "value": -0.2777,
+       "asof": "2026-06-30",
+       "source": "fast_v_panel",
+       "availability": "CONFIRMED",
+       "note": ""
+      },
+      {
+       "name": "drop_20d",
+       "value": -0.1538,
+       "asof": "2026-06-30",
+       "source": "fast_v_panel",
+       "availability": "CONFIRMED",
+       "note": ""
+      },
+      {
+       "name": "vol_z_20d_vs_250d",
+       "value": 1.223,
+       "asof": "2026-06-30",
+       "source": "fast_v_panel",
+       "availability": "CONFIRMED",
+       "note": ""
+      },
+      {
+       "name": "rebound_vs_running_low_prefix_min",
+       "value": 0.0214,
+       "asof": "2026-06-30",
+       "source": "fast_v_panel",
+       "availability": "CONFIRMED",
+       "note": "运行最低=前缀min, 当日可知, 非事后最低价"
+      }
+     ],
+     "first_signal_day": "2026-06-30",
+     "features_at_signal": {
+      "drop5": -0.0339,
+      "drop10": -0.0774,
+      "drop20": -0.1538,
+      "accel": 0.0113
+     },
+     "entry_kind": "REVERSAL_CANDIDATE/ENTRY_CONFIRMED",
+     "entry_condition": "恐慌冲击后企稳(低点不再下移≥3日)+反弹确认(收盘较运行低点≥3%且上穿MA5), 当日收盘可判",
+     "invalidation_condition": "再创新低/自反弹高点衰竭6%修复失败/波动环境改变触发风险失效",
+     "research_horizon_m": null,
+     "risk_estimate": null,
+     "data_credibility": "CONFIRMED",
+     "score": null,
+     "score_breakdown": {},
+     "decision": "NO_TRADE",
+     "decision_reason": "阶段C仅产出候选; 交易与否由D段统一资金竞争决定",
+     "forbidden_claims_note": "评分未校准, 不构成预期收益率或胜率"
+    }
+   ]
+  }
+ },
+ "strict_gate": {
+  "long_cycle_candidates": 0,
+  "report_tail": {
+   "day": "2026-06-30",
+   "gate": "industry_membership",
+   "status": "DATA_BLOCKED",
+   "reason": "申万历史成员=UNKNOWN(SW_PIT_VERIFIED不可得), 快照成分=CURRENT_SNAPSHOT_ONLY → Strict模式拒绝正式Long-Cycle信号(§7.2/§7.4)"
+  }
+ },
+ "engine_build_secs": "见运行日志",
+ "discipline": {
+  "no_hindsight": "状态=单程时序前缀函数(test_prefix_determinism锁)",
+  "lc_no_fixed_day_exit": true,
+  "fv_expire_engine_only": true,
+  "claims": "候选≠预测有效; 评分未校准(D段前不排名)"
+ }
+}
