@@ -1,0 +1,34 @@
+{
+ "index_daily_by_period": {
+  "2020-2021": {
+   "PRE_TAXONOMY_VERSION": 1488,
+   "SOURCE_MISSING": 7,
+   "PARTIAL": 229,
+   "NOT_IN_CURRENT_MEMBERSHIP": 19
+  },
+  "2022-2023": {
+   "PARTIAL": 1901,
+   "SOURCE_MISSING": 8,
+   "NOT_IN_CURRENT_MEMBERSHIP": 83
+  },
+  "2024-2026": {
+   "PARTIAL": 2689,
+   "SOURCE_MISSING": 11,
+   "NOT_IN_CURRENT_MEMBERSHIP": 39
+  }
+ },
+ "index_note": "成分=当前快照分组(CURRENT_SNAPSHOT); PRE_TAXONOMY_VERSION=版本切换前不可知; 无out_date仍是结构性缺口",
+ "ind_filter_pre_rej": {
+  "n": 193455,
+  "states": {
+   "PRE_TAXONOMY_VERSION": 48825,
+   "SOURCE_MISSING": 647,
+   "PARTIAL": 140116,
+   "NOT_IN_CURRENT_MEMBERSHIP": 3867
+  },
+  "partial_rate": 0.7243,
+  "note": "被行业good过滤排除的193455候选(此前完全不可见)——其中版本切换前不可知占比即该阶段筛选的穿越暴露"
+ },
+ "cand_log_v2_semantics": "ELIGIBLE=通过行业过滤+可交易(先于MA20/pending后筛); 与v1(Top5)口径不同",
+ "verdict": "依赖链最后一盲区(行业过滤前)已量化; 工程审计到此关闭, 后续=历史成员数据源验证(Tushare/官方档案)"
+}

@@ -284,7 +284,10 @@ def run(strategy: str = "m1", n_hold: int = 5, gate: str = "auto", exit_mode: st
                 except RuntimeError:
                     prev_tradeable = prev_tradeable  # 日历未知→沿用(fail-closed不猜)
                 today_scores = stock_scores(panel, day, rank_kind) if alloc_policy in ("score", "score_cap") else None
-                rank = [c for c in stock_rank(panel, day, rank_kind) if sector_of.get(c) in good and c in prev_tradeable]
+                _all_rank = stock_rank(panel, day, rank_kind)
+                for _c in _all_rank:  # R36只读: 行业过滤前候选(含被good排除者)
+                    cand_log.append({"day": day_str, "code": _c, "sector": sector_of.get(_c, "?"), "rank": _all_rank.index(_c), "state": "ELIGIBLE" if (sector_of.get(_c) in good and _c in prev_tradeable) else ("REJ_IND_FILTER" if sector_of.get(_c) not in good else "REJ_NOT_TRADEABLE")})
+                rank = [c for c in _all_rank if sector_of.get(c) in good and c in prev_tradeable]
                 # R22/P0修复: eligible=实际可入场集(rank[:n_hold]中未持仓+MA20确认+非冷却非在途), 分母只含它
                 eligible, blocked = [], []  # R29: blocked=Gate拦截(记录用)
                 for c in rank[:n_hold]:
