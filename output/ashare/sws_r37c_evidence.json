@@ -1,0 +1,29 @@
+{
+ "findings": {
+  "history_endpoint": "HTTP 500(三参数形态)——放弃, 按审查者裁定不投入",
+  "announcements_filter": "无效: swindexcode/keyword均返回全站count=2054, 三行业(801038/801055/801181)响应同构——公告端点不支持行业过滤",
+  "umi_evidence": "26端点提取+调用上下文参数对象未含行业过滤键(alt=code待深挖)"
+ },
+ "status": "UNVERIFIED_PARAM(端点存在, 行业过滤参数未知; 公告路线需全量标题自筛或另一code端点)",
+ "raw_evidence": {
+  "index_publish/history/?{'swindexcode': '801038', 'page': '1', 'page_size': '10'}": {
+   "status": 500,
+   "sha256_16": "fd62a53afdd49595",
+   "count": null,
+   "head": "\n<!doctype html>\n<html lang=\"en\">\n<head>\n  <title>Server Error (500)</title>\n</head>\n<body>\n  <h1>Se"
+  },
+  "index_announcements/index/?{'swindexcode': '801038', 'page': '1', 'page_size': '50'}": {
+   "status": 200,
+   "sha256_16": "1bf257cdc36279d7",
+   "count": 2054,
+   "head": "{\"code\":\"200\",\"message\":\"ok\",\"data\":{\"count\":2054,\"next\":\"http://www.swsresearch.com/api/index_annou"
+  },
+  "index_announcements/index/?{'keyword': '801038', 'page': '1', 'page_size': '50'}": {
+   "status": 200,
+   "sha256_16": "30e24bc501c441c2",
+   "count": 2054,
+   "head": "{\"code\":\"200\",\"message\":\"ok\",\"data\":{\"count\":2054,\"next\":\"http://www.swsresearch.com/api/index_annou"
+  }
+ },
+ "discipline": "不猜测不回填; R37c无PARTIAL_HISTORY证据——未找到行业成员调整原始文件"
+}
