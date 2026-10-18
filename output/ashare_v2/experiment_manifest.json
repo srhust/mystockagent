@@ -2,7 +2,7 @@
  "project": "Ashare Dual-Cycle V2",
  "task_spec": "cycle_system/ashare_v2/TASK_SPEC.md",
  "branch": "ashare-v2",
- "code_version": "20d31db65b6bde38051252fcc4c820e72c75f52f",
+ "code_version": "580c07e8a0aa3ec2a73745a2583d93564ee65e01",
  "worktree_dirty": true,
  "config_hash": "688b9475a4172bbb",
  "data_anchors": {
@@ -32,12 +32,16 @@
   "A": "完成",
   "B": "完成",
   "C": "完成",
-  "D": "待做",
+  "D": "完成",
   "E": "待做",
   "F": "待做",
   "G": "待做"
  },
  "artifacts": {
+  "output/ashare_v2/allocation_smoke_realdata.json": {
+   "sha256": "6d2c2b380f19a535da62538b587fbe123b0bf2fff4bd9653d5a2fc6c4f768cb2",
+   "size": 5476
+  },
   "output/ashare_v2/data_quality_report.json": {
    "sha256": "5f376f3c6e3826455ec6b3d961ad58f114ee324302154888a31f3b074c89a4b4",
    "size": 3361
@@ -55,11 +59,11 @@
    "size": 2280
   },
   "output/ashare_v2/baseline_integrity/baseline_integrity_report.json": {
-   "sha256": "0fc6cf8f9de398d8559965ccdf3d799d656ada49e12c7fa94f5133a3100e7c39",
-   "size": 5278
+   "sha256": "543de3a47b3b2297aadf390c0821117b5a5efc0894dde8ea989908714d8607e8",
+   "size": 5386
   },
   "output/ashare_v2/baseline_integrity/baseline_integrity_report.md": {
-   "sha256": "600971dd06da103edf6b963812da6cef2c86f295efc1ee1ad0da990e2717d508",
+   "sha256": "e2504a4ca1fd1ccd27c6fb49a0bf3635a83ed00cd790b6d8b0879476318280af",
    "size": 420
   },
   "output/ashare_v2/f2_repro/FINDINGS.md": {
@@ -87,5 +91,5 @@
    "size": 1376
   }
  },
- "generated_at": "2026-10-18T22:38:04.396532+08:00"
+ "generated_at": "2026-10-18T22:59:37.839939+08:00"
 }

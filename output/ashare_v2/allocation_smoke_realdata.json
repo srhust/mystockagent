@@ -1,0 +1,284 @@
+{
+ "_provenance": {
+  "code_version": "580c07e8a0aa3ec2a73745a2583d93564ee65e01",
+  "config_hash": "688b9475a4172bbb",
+  "asof": "2026-06-30",
+  "mode": "SYNTHETIC",
+  "generated_at": "2026-10-18T22:57:22.446823+08:00",
+  "note": "冒烟=链路可运行验证, 非预测有效; NAV口径=影子基20000"
+ },
+ "n_candidates": {
+  "merged": 31,
+  "scored_with_pxvol": 31
+ },
+ "top_scores": [
+  {
+   "code": "002714",
+   "pts": 8.011,
+   "engines": [
+    "FAST_V"
+   ]
+  },
+  {
+   "code": "000876",
+   "pts": 7.992,
+   "engines": [
+    "FAST_V"
+   ]
+  },
+  {
+   "code": "300498",
+   "pts": 7.705,
+   "engines": [
+    "FAST_V"
+   ]
+  },
+  {
+   "code": "601127",
+   "pts": 7.675,
+   "engines": [
+    "FAST_V"
+   ]
+  },
+  {
+   "code": "600989",
+   "pts": 7.648,
+   "engines": [
+    "FAST_V",
+    "LONG_CYCLE"
+   ]
+  },
+  {
+   "code": "300761",
+   "pts": 7.426,
+   "engines": [
+    "FAST_V"
+   ]
+  }
+ ],
+ "plan": {
+  "buys": [
+   {
+    "code": "002714",
+    "shares": 17,
+    "value": 11762.81,
+    "px": 691.9300142100001,
+    "score_points": 8.011,
+    "engines": [
+     "FAST_V"
+    ],
+    "industry": "养殖",
+    "risk_contrib_nav": 0.0127,
+    "record_ids": [
+     2271083313088
+    ]
+   },
+   {
+    "code": "000876",
+    "shares": 2,
+    "value": 207.76,
+    "px": 103.87999940999998,
+    "score_points": 7.992,
+    "engines": [
+     "FAST_V"
+    ],
+    "industry": "养殖",
+    "risk_contrib_nav": 0.0002,
+    "record_ids": [
+     2271083312464
+    ]
+   },
+   {
+    "code": "601127",
+    "shares": 109,
+    "value": 7010.88,
+    "px": 64.3199725,
+    "score_points": 7.675,
+    "engines": [
+     "FAST_V"
+    ],
+    "industry": "汽车整车",
+    "risk_contrib_nav": 0.0071,
+    "record_ids": [
+     2271083314816
+    ]
+   },
+   {
+    "code": "600688",
+    "shares": 2,
+    "value": 15.5,
+    "px": 7.749999430000001,
+    "score_points": 7.377,
+    "engines": [
+     "LONG_CYCLE"
+    ],
+    "industry": "石油加工",
+    "risk_contrib_nav": 0.0,
+    "record_ids": [
+     2271083284608
+    ]
+   }
+  ],
+  "rejects": [
+   {
+    "code": "300498",
+    "reason": "INSUFFICIENT_CASH",
+    "score_points": 7.705
+   },
+   {
+    "code": "600989",
+    "reason": "INSUFFICIENT_CASH",
+    "score_points": 7.648
+   },
+   {
+    "code": "300761",
+    "reason": "INSUFFICIENT_CASH",
+    "score_points": 7.426
+   },
+   {
+    "code": "000703",
+    "reason": "INSUFFICIENT_CASH",
+    "score_points": 7.377
+   },
+   {
+    "code": "002493",
+    "reason": "INSUFFICIENT_CASH",
+    "score_points": 7.377
+   },
+   {
+    "code": "002648",
+    "reason": "INSUFFICIENT_CASH",
+    "score_points": 7.377
+   },
+   {
+    "code": "002353",
+    "reason": "INSUFFICIENT_CASH",
+    "score_points": 7.372
+   },
+   {
+    "code": "300164",
+    "reason": "INSUFFICIENT_CASH",
+    "score_points": 7.372
+   },
+   {
+    "code": "000060",
+    "reason": "INSUFFICIENT_CASH",
+    "score_points": 7.363
+   },
+   {
+    "code": "000960",
+    "reason": "INSUFFICIENT_CASH",
+    "score_points": 7.363
+   },
+   {
+    "code": "002466",
+    "reason": "INSUFFICIENT_CASH",
+    "score_points": 7.332
+   },
+   {
+    "code": "300191",
+    "reason": "INSUFFICIENT_CASH",
+    "score_points": 7.328
+   },
+   {
+    "code": "000301",
+    "reason": "INSUFFICIENT_CASH",
+    "score_points": 7.299
+   },
+   {
+    "code": "000959",
+    "reason": "INSUFFICIENT_CASH",
+    "score_points": 7.299
+   },
+   {
+    "code": "000831",
+    "reason": "INSUFFICIENT_CASH",
+    "score_points": 7.221
+   },
+   {
+    "code": "002378",
+    "reason": "INSUFFICIENT_CASH",
+    "score_points": 7.221
+   },
+   {
+    "code": "601233",
+    "reason": "INSUFFICIENT_CASH",
+    "score_points": 7.128
+   },
+   {
+    "code": "603225",
+    "reason": "INSUFFICIENT_CASH",
+    "score_points": 7.128
+   },
+   {
+    "code": "601155",
+    "reason": "INSUFFICIENT_CASH",
+    "score_points": 7.122
+   },
+   {
+    "code": "600598",
+    "reason": "INSUFFICIENT_CASH",
+    "score_points": 7.097
+   },
+   {
+    "code": "688051",
+    "reason": "INSUFFICIENT_CASH",
+    "score_points": 6.964
+   },
+   {
+    "code": "002124",
+    "reason": "INSUFFICIENT_CASH",
+    "score_points": 6.909
+   },
+   {
+    "code": "002475",
+    "reason": "INSUFFICIENT_CASH",
+    "score_points": 6.829
+   },
+   {
+    "code": "601138",
+    "reason": "INSUFFICIENT_CASH",
+    "score_points": 6.829
+   },
+   {
+    "code": "600975",
+    "reason": "INSUFFICIENT_CASH",
+    "score_points": 6.765
+   },
+   {
+    "code": "000672",
+    "reason": "INSUFFICIENT_CASH",
+    "score_points": 6.587
+   },
+   {
+    "code": "601872",
+    "reason": "INSUFFICIENT_CASH",
+    "score_points": 6.067
+   }
+  ],
+  "swaps": [],
+  "cash_conservation": {
+   "spendable_before": 19000.0,
+   "spent": 18996.95,
+   "spendable_after": 3.05,
+   "ok": true
+  },
+  "engine_funding": {
+   "FAST_V": 18981.45,
+   "LONG_CYCLE": 15.5
+  },
+  "engine_frac": {
+   "FAST_V": 0.9992,
+   "LONG_CYCLE": 0.0008
+  },
+  "industry_weights_after": {
+   "养殖": 0.5985,
+   "汽车整车": 0.3505,
+   "石油加工": 0.0008
+  },
+  "position_count": 4,
+  "risk_budget_state": "NORMAL",
+  "note": "贪心=分数序+可行性; 无固定持仓数/引擎占比(§5.1)",
+  "calibration_note": "评分未校准: 分配是规则化相对偏好结果, 非收益率优化"
+ }
+}
