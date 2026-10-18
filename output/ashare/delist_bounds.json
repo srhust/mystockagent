@@ -16,7 +16,10 @@
  ],
  "DELISTED_IN_RESEARCH_WINDOW_2020_01_2026_09": 225,
  "total_source_records": 227,
- "sha_check": false,
+ "sha_check": "MISMATCH(R47首次校验False——顺序敏感差异); erratum修正: 提交信息曾误称通过, 现更正",
  "coverage_report_L1_L2": "BLOCKED_BAOSTOCK_SESSION_HANG(两次尝试20min/12min无输出, 按纪律停止; 脚本已入库coverage_gap_report.py待服务恢复)",
- "anti_lookahead_note": "资格仅用当时可知信息, 不带入退市 hindsight"
+ "anti_lookahead_note": "资格仅用当时可知信息, 不带入退市 hindsight",
+ "sha_order_independent_16": "a89854f7e22371c8",
+ "sha_sorted_alt_16": "028fbdfd411e8c5a",
+ "sha_r46_record": "0572b0795fff90ff00e3f9aca105733559c9f6d7285a24f18d33bf8d39f3f873"
 }
