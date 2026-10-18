@@ -1,10 +1,10 @@
 {
  "_provenance": {
-  "code_version": "580c07e8a0aa3ec2a73745a2583d93564ee65e01",
-  "config_hash": "688b9475a4172bbb",
+  "code_version": "2361082bd8ea4b3b74219914d8d3d9dc931fa49a",
+  "config_hash": "cc5cb7c990c2a499",
   "asof": "2026-06-30",
   "mode": "SYNTHETIC",
-  "generated_at": "2026-10-18T22:57:22.446823+08:00",
+  "generated_at": "2026-10-18T23:13:40.964777+08:00",
   "note": "冒烟=链路可运行验证, 非预测有效; NAV口径=影子基20000"
  },
  "n_candidates": {
@@ -70,7 +70,7 @@
     "industry": "养殖",
     "risk_contrib_nav": 0.0127,
     "record_ids": [
-     2271083313088
+     1635907745728
     ]
    },
    {
@@ -85,7 +85,7 @@
     "industry": "养殖",
     "risk_contrib_nav": 0.0002,
     "record_ids": [
-     2271083312464
+     1635907745104
     ]
    },
    {
@@ -100,7 +100,7 @@
     "industry": "汽车整车",
     "risk_contrib_nav": 0.0071,
     "record_ids": [
-     2271083314816
+     1635907747456
     ]
    },
    {
@@ -115,7 +115,7 @@
     "industry": "石油加工",
     "risk_contrib_nav": 0.0,
     "record_ids": [
-     2271083284608
+     1635907717248
     ]
    }
   ],

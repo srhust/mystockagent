@@ -1,12 +1,12 @@
 {
  "_provenance": {
-  "code_version": "20d31db65b6bde38051252fcc4c820e72c75f52f",
+  "code_version": "2361082bd8ea4b3b74219914d8d3d9dc931fa49a",
   "branch": "ashare-v2",
-  "config_hash": "688b9475a4172bbb",
+  "config_hash": "cc5cb7c990c2a499",
   "asof": "2026-06-30",
   "mode": "SYNTHETIC",
   "note": "冒烟=编译/运行验证, 非预测有效",
-  "generated_at": "2026-10-18T22:36:29.800529+08:00"
+  "generated_at": "2026-10-18T23:13:16.516704+08:00"
  },
  "industry_state_dist": {
   "BOTTOM_WATCH": 9,

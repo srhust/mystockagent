@@ -47,10 +47,10 @@
   }
  },
  "_provenance": {
-  "code_version": "ebb35c548ca20aed79cae7569420c0061002a6b1",
+  "code_version": "2361082bd8ea4b3b74219914d8d3d9dc931fa49a",
   "branch": "ashare-v2",
-  "config_hash": "688b9475a4172bbb",
-  "generated_at": "2026-10-18T22:00:02.937634+08:00",
+  "config_hash": "cc5cb7c990c2a499",
+  "generated_at": "2026-10-18T23:12:42.586120+08:00",
   "mode": "SYNTHETIC",
   "asof": "2026-06-30"
  },

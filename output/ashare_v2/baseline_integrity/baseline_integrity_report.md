@@ -8,4 +8,4 @@
 - **C5_swing_m1_untouched**: PASS
 - **C7_frozen_code_hashes**: PASS_ANNOTATED
 
-代码版本 `580c07e8a0aa3ec2a73745a2583d93564ee65e01` (ashare-v2), config_hash `688b9475a4172bbb`, 生成于 2026-10-18T22:59:43.567674+08:00
+代码版本 `2361082bd8ea4b3b74219914d8d3d9dc931fa49a` (ashare-v2), config_hash `cc5cb7c990c2a499`, 生成于 2026-10-18T23:15:19.167406+08:00

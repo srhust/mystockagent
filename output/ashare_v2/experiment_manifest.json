@@ -2,9 +2,9 @@
  "project": "Ashare Dual-Cycle V2",
  "task_spec": "cycle_system/ashare_v2/TASK_SPEC.md",
  "branch": "ashare-v2",
- "code_version": "580c07e8a0aa3ec2a73745a2583d93564ee65e01",
+ "code_version": "2361082bd8ea4b3b74219914d8d3d9dc931fa49a",
  "worktree_dirty": true,
- "config_hash": "688b9475a4172bbb",
+ "config_hash": "cc5cb7c990c2a499",
  "data_anchors": {
   "stocks_manifest_sha256": "90dd925b61c4ba96b625715e010ade8127d0ff9e72ef8b3a7240097fb1d80abf",
   "n_csv": 250,
@@ -33,37 +33,37 @@
   "B": "完成",
   "C": "完成",
   "D": "完成",
-  "E": "待做",
+  "E": "完成",
   "F": "待做",
   "G": "待做"
  },
  "artifacts": {
   "output/ashare_v2/allocation_smoke_realdata.json": {
-   "sha256": "6d2c2b380f19a535da62538b587fbe123b0bf2fff4bd9653d5a2fc6c4f768cb2",
+   "sha256": "1070a79484690733e79e1de2a9f377a6fc909912069aaae2c0be0de4ed711355",
    "size": 5476
   },
   "output/ashare_v2/data_quality_report.json": {
-   "sha256": "5f376f3c6e3826455ec6b3d961ad58f114ee324302154888a31f3b074c89a4b4",
+   "sha256": "e8e768c85508df4b7ceee8a5159ccd2a3d14540895c068b275229d8e8c429671",
    "size": 3361
   },
   "output/ashare_v2/engine_smoke_realdata.json": {
-   "sha256": "acf167b1f8ad5b45b83d39129fd698553951766cf4d24bda18546d6ab10e37b2",
+   "sha256": "113b31629c7d8ca33708f112c9642ef622e62f36b8ebf6f95f27ad3a55cd6833",
    "size": 17874
   },
   "output/ashare_v2/industry_stage_snapshot.json": {
-   "sha256": "4f0fe17b6b77a099814a2be4da5354ef9d7d045a50b21270752178d3eac1c047",
+   "sha256": "31bebaae82accfb8c43a7ac8aa80a97437f1a32cecb5f07279435af62749457e",
    "size": 7732
   },
   "output/ashare_v2/universe_buckets_sample.json": {
-   "sha256": "e854a75313638ae180cf326cccb151babd53946fcc1361d75c0aac07764a625f",
+   "sha256": "b7ff84a3c16b658c9326e867fce460a91666b8ed6343074ed8caa8e53a9fc8d4",
    "size": 2280
   },
   "output/ashare_v2/baseline_integrity/baseline_integrity_report.json": {
-   "sha256": "543de3a47b3b2297aadf390c0821117b5a5efc0894dde8ea989908714d8607e8",
-   "size": 5386
+   "sha256": "a7c434889f740fa212926cb98dcc990581a4cc49592a68f56b961e14f501e54c",
+   "size": 5409
   },
   "output/ashare_v2/baseline_integrity/baseline_integrity_report.md": {
-   "sha256": "e2504a4ca1fd1ccd27c6fb49a0bf3635a83ed00cd790b6d8b0879476318280af",
+   "sha256": "b292dbafd5c6ec1093fef7d649b16e9ca6c3a9126b29bf16be4c4120a5eaa98f",
    "size": 420
   },
   "output/ashare_v2/f2_repro/FINDINGS.md": {
@@ -91,5 +91,5 @@
    "size": 1376
   }
  },
- "generated_at": "2026-10-18T22:59:37.839939+08:00"
+ "generated_at": "2026-10-18T23:15:17.391510+08:00"
 }

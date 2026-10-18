@@ -67,6 +67,7 @@ CASH_RESERVE_FRAC = 0.05                # 现金预留(费用/流动性)
 NAME_RISK_FRAC_OF_NAV = 0.10            # 单名风险预算: 该仓位对NAV的"日波动"贡献上限(由σ折算, 非固定市值占比)
 PORT_DAILY_RISK_FRAC = 0.20             # 组合层日风险预算(σ口径)占NAV上限, 超出→停止贪心
 SWAP_MIN_SCORE_EDGE = 0.5               # 换仓最小优势差距(评分单位, 预设)
+RISK_BUDGET_DRAWDOWN = 0.20             # 组合回撤预算: 距峰值NAV跌20%(预设)→冻结新增+风险强卖优先(§5.4)
 SWAP_COST_MULT = 2.0                    # 换仓需覆盖 预估费用×倍数(预设)
 SWAP_DAILY_LIMIT = 2                    # 换手抑制: 单日换仓笔数上限(预设)
 PRESSURE_SCENARIOS = {"index_down_8pct_5d": 0.08, "vol_x2": 2.0}  # 压力情景(§5.4)
