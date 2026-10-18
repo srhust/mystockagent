@@ -1,0 +1,22 @@
+{
+ "project_status": "ENGINEERING_FROZEN / DATA_VALIDATION_PENDING",
+ "marked": "2026-10-18",
+ "git_head": "eff6886c392f",
+ "remote_verified": "eff6886(审查者独立确认+ls-remote一致)",
+ "frozen": {
+  "candidates": "B0/B1/F2(F2不升级默认)",
+  "ashare_experiments": "PAUSED",
+  "us_hold": "90/120",
+  "engineering": "NO_MORE_ROUNDS"
+ },
+ "next_trigger": "真实历史行业成员数据或明确权限结论(本地TUSHARE_TOKEN; 查积分→3股pilot→版本/区间/退出成员核实→才扩30)",
+ "pending": {
+  "3stock_poc": "NO_CREDENTIAL",
+  "official_channel": "BLOCKED_TIMEOUT_SUSPECTED_RATE_LIMIT"
+ },
+ "three_standards": {
+  "工程可复现": "已证",
+  "历史信息时点正确": "待真实数据",
+  "样本外预测有效": "未证"
+ }
+}
