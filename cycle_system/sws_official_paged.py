@@ -41,13 +41,18 @@ while new < PAGE_BUDGET:
             atomic_save()
             break
         st["total_count"] = d.get("count", st["total_count"])  # 动态count
-        st["raw_pages"][str(p)] = {"sha256": hashlib.sha256(r.text.encode()).hexdigest(), "raw": r.text}  # 完整原始响应
+        st["raw_pages"][str(p)] = {"sha256_bytes": hashlib.sha256(r.content).hexdigest(), "sha_note": "原始字节哈希(R39c修正; 原为解码文本哈希)", "raw": r.text}  # 完整原始响应
         st["records"] += [{"id": x.get("id"), "declaredate": x.get("declaredate"), "title": x.get("title"), "page": p} for x in d["results"]]
         st["pages_done"] = sorted(done | {p})
         atomic_save()  # 每页原子checkpoint
         done.add(p)
         new += 1
         p += 1
+        uniq = len({x["id"] for x in st["records"]})  # R39c: 唯一公告ID数与count对账(处理空页/重复页/末页不足50)
+        if st["total_count"] and uniq >= st["total_count"]:
+            st["status"] = "COMPLETE_PAGED"
+            atomic_save()
+            break
         if st["total_count"] and p * 50 >= st["total_count"] + 50:
             st["status"] = "COMPLETE_PAGED"
             atomic_save()
