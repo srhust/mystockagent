@@ -1,0 +1,80 @@
+﻿[
+    {
+        "path":  "output/ashare/swing_m1_expt_True_monthly_3f_daily_cap0.json",
+        "size":  53218361,
+        "mtime":  "2026-10-18 11:57:07",
+        "sha256":  "632F3893F675F7A9D10B50254EB3C3196AFE5C8C1E98B5038EE0089B3FBCF31C"
+    },
+    {
+        "path":  "output/ashare/swing_m1_F2_realloc_full.json",
+        "size":  41681789,
+        "mtime":  "2026-10-18 11:57:11",
+        "sha256":  "C47E714230DC46727099D58AF8E3DF21EF8862C50790322AE1D4A21E0F6D11B7"
+    },
+    {
+        "path":  "output/ashare/swing_m1_B0_full.json",
+        "size":  274259,
+        "mtime":  "2026-10-17 17:28:59",
+        "sha256":  "910B1118BFD6200D5D3B8483309C5FFC212538F0DE49D6AAC58EECBD17FC1AB0"
+    },
+    {
+        "path":  "output/ashare/swing_m1_B1_full.json",
+        "size":  227601,
+        "mtime":  "2026-10-17 17:29:26",
+        "sha256":  "C6EE5CA0BA9EE7E7595D199F4EE9A77802BA223BCB8B368E70751F79B1B08F65"
+    },
+    {
+        "path":  "output/ashare/data_audit.json",
+        "size":  8326,
+        "mtime":  "2026-10-18 14:04:00",
+        "sha256":  "FB3DFF9E53B5B69F7E764448A300081597DD507864922416E7D1FE250A277CB1"
+    },
+    {
+        "path":  "output/ashare/data_audit.md",
+        "size":  2349,
+        "mtime":  "2026-10-18 14:04:00",
+        "sha256":  "C40EE42BFA88ED67F00A26733728E093C7CABA12EC74E2FC58B2F787CE457A28"
+    },
+    {
+        "path":  "output/ashare/swing_dd_attribution_v2.json",
+        "size":  2,
+        "mtime":  "2026-10-17 20:29:47",
+        "sha256":  "44136FA355B3678A1146AD16F7E8649E94FB4FC21FE77E8310C060F61CAAFF8A"
+    },
+    {
+        "path":  "output/ashare/swing_flow_audit.json",
+        "size":  5831,
+        "mtime":  "2026-10-17 21:07:41",
+        "sha256":  "C0AA791CF771405682320B32142D94F81C74E701C50BF8D759C2811343A15E45"
+    },
+    {
+        "path":  "output/ashare/manifest.json",
+        "size":  22738,
+        "mtime":  "2026-10-18 09:40:46",
+        "sha256":  "90DD925B61C4BA96B625715E010ADE8127D0FF9E72EF8B3A7240097FB1D80ABF"
+    },
+    {
+        "path":  "output/ashare/swing_m1_m1_True_daily_3f_monthly_cap0.json",
+        "size":  2871008,
+        "mtime":  "2026-10-18 19:29:25",
+        "sha256":  "034DC70EBF54D2DD123B6032AC3FF580E753916DEEDF188C91F53BAE8A8CF93C"
+    },
+    {
+        "path":  "output/ashare/today_view.json",
+        "size":  2457,
+        "mtime":  "2026-10-18 19:22:58",
+        "sha256":  "215E552D126493410CBA1E9E093F80C3B0C62EFA8FEFA707748270790080FC1B"
+    },
+    {
+        "path":  "output/ashare/_panel_cache.parquet",
+        "size":  7942219,
+        "mtime":  "2026-10-17 15:33:49",
+        "sha256":  "1BE305820A2CCB66F59DE28AA65D9AF2D055FA1BE8566C350E527800694909CD"
+    },
+    {
+        "path":  "output/ashare/project_status.json",
+        "size":  785,
+        "mtime":  "2026-10-18 14:22:20",
+        "sha256":  "B76EDE8223C49EC81696C384F8DC2006AFAE6F195A3DD5D06EFA3F09B0C36405"
+    }
+]

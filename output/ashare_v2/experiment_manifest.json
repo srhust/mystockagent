@@ -1,0 +1,75 @@
+{
+ "project": "Ashare Dual-Cycle V2",
+ "task_spec": "cycle_system/ashare_v2/TASK_SPEC.md",
+ "branch": "ashare-v2",
+ "code_version": "be2537eb0b66764132bcc74d37db17093a66565f",
+ "worktree_dirty": true,
+ "config_hash": "688b9475a4172bbb",
+ "data_anchors": {
+  "stocks_manifest_sha256": "90dd925b61c4ba96b625715e010ade8127d0ff9e72ef8b3a7240097fb1d80abf",
+  "n_csv": 250,
+  "csv_vs_manifest": "250/250 PASS (baseline_integrity C1)",
+  "frozen_code_hashes": "C7: PASS_ANNOTATED(swing_m1 R35/R36只读演进, F2重放逐字段一致) 其余PASS"
+ },
+ "f2_baseline": {
+  "status": "BASELINE_REPRODUCED",
+  "ref": "output/ashare_v2/f2_repro/f2_repro_resolution.json"
+ },
+ "regression": {
+  "existing_suite": "48 passed (pytest tests -q, 2026-10-18 21:30)",
+  "note": "data_audit.* 时间戳为测试副作用, 已复位并标注",
+  "ref": "output/ashare_v2/regression/"
+ },
+ "explicit_annotations": [
+  "SURVIVORSHIP_BIAS_PARTIAL: 当前249/250池未消除幸存者偏差, 正式回测资格受限",
+  "PIT: 申万二级历史成员=UNKNOWN; sector列=CURRENT_SNAPSHOT_ONLY; Strict模式行业级正式信号DATA_BLOCKED(阶段B落地)",
+  "ST_FLAG_UNVERIFIED: 历史ST不可得; suspension以缺行近似",
+  "CALIBRATED=False: 评分未校准, 禁称预期收益率/胜率",
+  "RESEARCH_WINDOW: 2020-2026非OOS; 未经独立样本外验证不声明预测有效",
+  "core.autocrlf=true无.gitattributes: 磁盘哈希行尾脆弱, 完整性用git-blob+CRLF双口径"
+ ],
+ "phases": {
+  "A": "完成",
+  "B": "待做",
+  "C": "待做",
+  "D": "待做",
+  "E": "待做",
+  "F": "待做",
+  "G": "待做"
+ },
+ "artifacts": {
+  "output/ashare_v2/baseline_integrity/baseline_integrity_report.json": {
+   "sha256": "0fc6cf8f9de398d8559965ccdf3d799d656ada49e12c7fa94f5133a3100e7c39",
+   "size": 5278
+  },
+  "output/ashare_v2/baseline_integrity/baseline_integrity_report.md": {
+   "sha256": "600971dd06da103edf6b963812da6cef2c86f295efc1ee1ad0da990e2717d508",
+   "size": 420
+  },
+  "output/ashare_v2/f2_repro/FINDINGS.md": {
+   "sha256": "b0b46d9aec2827280c73d345ccd02b2a8a25ac2925566fc419491a53de36633f",
+   "size": 2807
+  },
+  "output/ashare_v2/f2_repro/f2_repro_resolution.json": {
+   "sha256": "c81f59f09c0a3d78744c5944a1b7e149d3eaa5e4a283adafdd169e8ee6a5755e",
+   "size": 2502
+  },
+  "output/ashare_v2/phaseA_evidence/cap0_20261018T1157_stats_extract.json": {
+   "sha256": "a923e248bc22d4e45c0bfea3c4fa331d9922fb11cd7f8e41659bf0e4fb5298c1",
+   "size": 5128
+  },
+  "output/ashare_v2/phaseA_evidence/dirty_and_frozen_file_hashes.json": {
+   "sha256": "51122d698975a8d6068a98a12bb0b77119d66c2c37dc5caa1ab7b67b3222900e",
+   "size": 2978
+  },
+  "output/ashare_v2/regression/phaseA_notes.md": {
+   "sha256": "a911705ff28bc5ee5bc2a1ef4dd4fa199d111d62ae00bdf708904a436aadcaf6",
+   "size": 1919
+  },
+  "output/ashare_v2/regression/pytest_baseline_20261018.txt": {
+   "sha256": "5f0467c6c88ec1845f83fc4e2be39c4779499c4d61928681558fade57934cc8c",
+   "size": 1376
+  }
+ },
+ "generated_at": "2026-10-18T21:52:06.443223+08:00"
+}
