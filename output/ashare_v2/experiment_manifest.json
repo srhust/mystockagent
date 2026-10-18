@@ -2,7 +2,7 @@
  "project": "Ashare Dual-Cycle V2",
  "task_spec": "cycle_system/ashare_v2/TASK_SPEC.md",
  "branch": "ashare-v2",
- "code_version": "d027ecc74084738ed8afdeb16f2523d3fd5358da",
+ "code_version": "a886974e3dd8612e802af97d4caa4ab74d3918ed",
  "worktree_dirty": true,
  "config_hash": "cc5cb7c990c2a499",
  "data_anchors": {
@@ -35,13 +35,9 @@
   "D": "完成",
   "E": "完成",
   "F": "完成",
-  "G": "待做"
+  "G": "完成(统一验收通过)"
  },
  "artifacts": {
-  "output/ashare_v2/_phaseF_run_console.txt": {
-   "sha256": "738783ba0d36a7a04d790d52783ccae92e10cc87ffb770cf24257dd5da626b36",
-   "size": 3244
-  },
   "output/ashare_v2/allocation_smoke_realdata.json": {
    "sha256": "5c50310e919d966dbc45ddd393d9131514c5e9bab35f3bfa28dff260d564f04f",
    "size": 7307
@@ -62,12 +58,20 @@
    "sha256": "b7ff84a3c16b658c9326e867fce460a91666b8ed6343074ed8caa8e53a9fc8d4",
    "size": 2280
   },
+  "output/ashare_v2/acceptance/acceptance.json": {
+   "sha256": "ef56b5e3f72186f4022ffc2b2636e494403c3be804b1c4db1c009e90377950a4",
+   "size": 1997
+  },
+  "output/ashare_v2/acceptance/acceptance_report.md": {
+   "sha256": "7870f1157febbe4b003ff60fe08bf3209c4a30a96e3a302d520256f530435039",
+   "size": 2005
+  },
   "output/ashare_v2/baseline_integrity/baseline_integrity_report.json": {
-   "sha256": "fed90c5f5a888b7ce62bc65b1e04c8249511836246c1e6715cdaa3866834abfe",
-   "size": 5491
+   "sha256": "9d7fc200ee2b9688eaba7f999282ea53fb7dde5b0fe6f61b0f95f5fa3c7588f3",
+   "size": 5408
   },
   "output/ashare_v2/baseline_integrity/baseline_integrity_report.md": {
-   "sha256": "33263e63e0cb20ba58d77f03e4a2f80fee385b6646df61bf3741745d2cd22f12",
+   "sha256": "cd8cae4d47a4565e4565e2bd733dd25d86bc9c3cc78c8e14056589e1cd2de884",
    "size": 420
   },
   "output/ashare_v2/diagnostic_run/allocation_plan_log.csv": {
@@ -115,7 +119,7 @@
    "size": 2807
   },
   "output/ashare_v2/f2_repro/f2_repro_resolution.json": {
-   "sha256": "c81f59f09c0a3d78744c5944a1b7e149d3eaa5e4a283adafdd169e8ee6a5755e",
+   "sha256": "53f0bfa6c16629585363efad862b6ec4ea081ca3906687d1ababb535901f9a29",
    "size": 2502
   },
   "output/ashare_v2/phaseA_evidence/cap0_20261018T1157_stats_extract.json": {
@@ -223,5 +227,5 @@
    "size": 5209
   }
  },
- "generated_at": "2026-10-18T23:47:40.531152+08:00"
+ "generated_at": "2026-10-19T00:18:52.516135+08:00"
 }

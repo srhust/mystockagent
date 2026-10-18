@@ -1,0 +1,50 @@
+{
+ "generated_at": "2026-10-19T00:14:57.871282+08:00",
+ "code_version": "a886974e3dd8612e802af97d4caa4ab74d3918ed",
+ "branch": "ashare-v2",
+ "config_hash": "cc5cb7c990c2a499",
+ "tests_v2": {
+  "target": "tests\\ashare_v2",
+  "rc": 0,
+  "passed": 66,
+  "failed": 0,
+  "tail": "66 passed, 3 warnings in 27.06s"
+ },
+ "tests_all": {
+  "target": "tests",
+  "rc": 0,
+  "passed": 114,
+  "failed": 0,
+  "tail": "114 passed, 4 warnings in 42.33s"
+ },
+ "baseline_verdict": 0,
+ "baseline_checks": {
+  "C1_csv_manifest": "PASS",
+  "C6_tamper_selftest": "PASS",
+  "C2_frozen_artifacts": "PASS",
+  "C3_us_frozen": "PASS",
+  "C4_worktree_frozen": "PASS",
+  "C5_swing_m1_untouched": "PASS",
+  "C7_frozen_code_hashes": "PASS_ANNOTATED"
+ },
+ "f2_verdict": 0,
+ "f2_status": "F2_REPRO_RESOLVED",
+ "frozen_files_touched_in_v2_branch": [],
+ "engine_split_none": true,
+ "lc_exit_no_dayrule": {
+  "long_cycle_no_held_days": true,
+  "lc_exit_branch_no_held_days": true
+ },
+ "phrase_violations": [],
+ "blockers_annotated": [
+  "SW历史成员in_date无out_date→信任层封顶SW_PARTIAL; 行业指数PROXY_ONLY; STRICT模式无正式信号(闸门由test_phaseC锁)",
+  "F2复现P0: 第三次独立重放8字段全一致→F2_REPRO_RESOLVED(f2_repro_resolution.json); 历史f2_repro_p0.json原件保留不改作为过程证据, 未静默绕过",
+  "9011只股票六重过滤原始行未落盘→市场全域统计DATA_BLOCKED(universe显式标注)",
+  "603603 sector为空→行业特征缺失即不参选(非静默)",
+  "C7代码锚=PASS_ANNOTATED: B0/B1产物生成后执行器/管线有已授权修复提交, 哈希漂移显式标注而非伪PASS",
+  "ST历史标记不可得; 停牌=缺行近似(执行器按halted参数)",
+  "swap记录仅诊断输出, 未接入执行通道(E层不自动换仓, §5.4保守)",
+  "评分权重/阈值全部为未校准预设(CALIBRATED=False), 2020-2026非样本外→不声明预测有效"
+ ],
+ "acceptance": "PASS_WITH_ANNOTATIONS"
+}
