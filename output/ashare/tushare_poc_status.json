@@ -1,6 +1,6 @@
 {
- "status": "NO_CREDENTIAL",
- "stage": "3",
+ "status": "PILOT_NOT_VERIFIED",
+ "stage": "30",
  "checked": "2026-10-18",
- "endpoint": "index_member_all(doc_id=335, 2000积分门槛不消耗)"
+ "reason": "pilot_not_run_or_not_ok"
 }
