@@ -1,0 +1,32 @@
+{
+ "term_fix": "non_switchdate_membership_rate(非行业变更率——含新上市首纳/成分调整/分类修订/回填, 未区分事件类型)",
+ "decision_coverage": {
+  "gate": {
+   "n_decisions": 1253,
+   "known_partial": 945,
+   "unknown": 308,
+   "coverage_pit": 0.7542
+  },
+  "buy": {
+   "n_decisions": 163,
+   "known_partial": 116,
+   "unknown": 47,
+   "coverage_pit": 0.7117
+  },
+  "sell": {
+   "n_decisions": 154,
+   "known_partial": 113,
+   "unknown": 41,
+   "coverage_pit": 0.7338
+  }
+ },
+ "mapping_n": 5222,
+ "status_rule": {
+  "VERIFIED": "可追溯历史来源+版本+有效时间明确且无冲突",
+  "PARTIAL": "有in_date但无out_date/版本不完整(本次known即此级)",
+  "CONFLICT": "多源同日不同归属",
+  "UNKNOWN": "无法确定T日有效归属"
+ },
+ "verdict": "决策级Coverage_PIT见上; known=PARTIAL级(当前成分+in_date), 严格VERIFIED需Tushare/官方档案",
+ "limitation": "映射=2026当前成分快照; 历史退出成员整体不可见(转型股尤其周期股可能系统性缺失)"
+}
