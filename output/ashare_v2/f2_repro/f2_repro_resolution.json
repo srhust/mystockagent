@@ -71,9 +71,9 @@
  "corroborating_disk_evidence": "output/ashare_v2/phaseA_evidence/cap0_20261018T1157_stats_extract.json (2026-10-18 11:57 重跑, F2产物与HEAD逐字节一致但未留档参数)",
  "implication": "阶段A(1)冻结基线未变+本重放一致 → '工程可复现'恢复成立, V2对照基线=此参数集重放产物; f2_repro_p0.json 原件保留不改(历史证据), 其 OPEN_P0 状态由本文件解决。",
  "_provenance": {
-  "code_version": "f1a322f64fd55b8a87bc516a9f085c4db7ea2531",
+  "code_version": "99401efe01c85097b7ddcd90fec6b70097726ebe",
   "config_hash": "cc5cb7c990c2a499",
-  "generated_at": "2026-10-19T11:49:33.706758+08:00",
+  "generated_at": "2026-10-19T14:00:19.411035+08:00",
   "mode": "SYNTHETIC",
   "asof": "2026-10-19",
   "pit_notes": [

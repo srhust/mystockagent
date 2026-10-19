@@ -2,7 +2,7 @@
  "project": "Ashare Dual-Cycle V2",
  "task_spec": "cycle_system/ashare_v2/TASK_SPEC.md",
  "branch": "ashare-v2",
- "code_version": "f1a322f64fd55b8a87bc516a9f085c4db7ea2531",
+ "code_version": "99401efe01c85097b7ddcd90fec6b70097726ebe",
  "worktree_dirty": true,
  "config_hash": "cc5cb7c990c2a499",
  "data_anchors": {
@@ -59,19 +59,19 @@
    "size": 2280
   },
   "output/ashare_v2/acceptance/acceptance.json": {
-   "sha256": "4ed33731acdb0786fc3bcc19d086e4f52e9a6cb3c87481b747d9b7bcd12df6de",
-   "size": 2239
+   "sha256": "02be568b0f24f591cf19e62c87245306b7d7aee66681ae14775477d36d818cba",
+   "size": 2263
   },
   "output/ashare_v2/acceptance/acceptance_report.md": {
-   "sha256": "4203042c059ea9e10f394c1555ba0cb75113718af0d3bb4222dc13e97b21d5e9",
-   "size": 2004
+   "sha256": "9bfd1e2192cac7f62acb800f954bd0a032a5aba61bd9861ce45ffa0b1d0d558c",
+   "size": 2243
   },
   "output/ashare_v2/baseline_integrity/baseline_integrity_report.json": {
-   "sha256": "bbdddc8978b648fd23d0962f7a88af18b809447d1d975c8cb1f0a5ee0c4d5cac",
-   "size": 6276
+   "sha256": "eca46c3f6077f9169a8153103a199d6eb21e4f00ec03cc73bfc49cc4af2aa4ce",
+   "size": 5398
   },
   "output/ashare_v2/baseline_integrity/baseline_integrity_report.md": {
-   "sha256": "e76b319ee240518bb42182cc7bdf4f5e84d6ed74bfad0fbf9a76434e290bb037",
+   "sha256": "d520666be97dd6ed9a798c7efcf1b2b26a2346660030208e413f31ccc6a40f81",
    "size": 420
   },
   "output/ashare_v2/diagnostic_run/allocation_plan_log.csv": {
@@ -119,12 +119,28 @@
    "size": 2807
   },
   "output/ashare_v2/f2_repro/f2_repro_resolution.json": {
-   "sha256": "8e3abe3df0a904b78ab4da9c0fbe3aaeb8d85232715f70d1c131a267ce5197e7",
+   "sha256": "7659adf88a52880286c4a984611a82ae014719f550f62e5d3864251ec24b6b81",
    "size": 2502
   },
   "output/ashare_v2/forward/FREEZE.json": {
    "sha256": "df669d82cabb81d8a6fe4619417b7fdaacd7d92583dded07a2bb13bb2a5022f5",
    "size": 6575
+  },
+  "output/ashare_v2/forward/FREEZE_ADDENDUM_R0.1.json": {
+   "sha256": "c9b071f0f44dd37f26182455ad5a2ab46fb1b676d17d9cc8ce48201a0a9d56ca",
+   "size": 5275
+  },
+  "output/ashare_v2/forward/FREEZE_ADDENDUM_R0.2.json": {
+   "sha256": "e1e0c6916dd8d371ff892cffe24f7b167d3aa82f762e5f9f2747460a3a42a316",
+   "size": 5134
+  },
+  "output/ashare_v2/forward/FREEZE_ADDENDUM_R0.3.json": {
+   "sha256": "b40fa7749a1c690ce6bbb60e31cb84426a132513576dc30806c61718e52eee45",
+   "size": 5219
+  },
+  "output/ashare_v2/forward/chain_head.json": {
+   "sha256": "0c90149068c868c7107ac0ed4ada8a6fe1d058d3d274a19d396de608889144ab",
+   "size": 161
   },
   "output/ashare_v2/forward/coord_state.json": {
    "sha256": "ad85aff766122fddefd5ec80e86ddeb3b9521421fb1fca2a61f3b5dac11e20b8",
@@ -145,6 +161,10 @@
   "output/ashare_v2/independent/independent_review.md": {
    "sha256": "bfd9cb1620c3ca0cf2a89dd076efc730fe4b99b7dfbfaa5105f1c6343d0c4a10",
    "size": 10879
+  },
+  "output/ashare_v2/independent/round2_disposition.md": {
+   "sha256": "84debe5d6d0b75040a84ab7e3d8fafae94e2e6257efb71544eb045132fbec5bc",
+   "size": 7661
   },
   "output/ashare_v2/independent/strict_gate.json": {
    "sha256": "927c90000330cd1dc3fd94c51ce4b22969cd533500bb4e4a795fd58785565d05",
@@ -255,5 +275,5 @@
    "size": 12157
   }
  },
- "generated_at": "2026-10-19T11:49:37.690312+08:00"
+ "generated_at": "2026-10-19T14:00:22.884439+08:00"
 }
