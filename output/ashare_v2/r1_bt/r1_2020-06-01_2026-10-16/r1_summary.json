@@ -1,0 +1,327 @@
+{
+ "version": "R1.0-PREREG",
+ "tag": "r1_2020-06-01_2026-10-16",
+ "disclaimer": "STATE-MACHINE-BEHAVIOR-VERIFICATION ONLY: 状态迁移活性/防跳变/守恒验证; 非收益改善宣称; REPLAY+RESEARCH+企业行动未入账(CORPORATE_ACTION_UNVERIFIED)",
+ "state_day_counts": {
+  "ACTIVE": 1090,
+  "LOCKOUT": 26,
+  "COOLDOWN": 177,
+  "PROBE_REENTRY": 252
+ },
+ "transition_timeline": [
+  {
+   "day": "2020-09-11",
+   "from_state": "ACTIVE",
+   "to_state": "LOCKOUT",
+   "rule": "dd_period<=-0.2",
+   "dd_period": -0.2115755876894715,
+   "dd_global": -0.2115755876894715,
+   "breadth5": 0.3296,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2020-09-15",
+   "from_state": "LOCKOUT",
+   "to_state": "COOLDOWN",
+   "rule": "liquidated -> cooldown 20d (NAV-independent)",
+   "dd_period": -0.19907490523041538,
+   "dd_global": -0.19907490523041538,
+   "breadth5": 0.2672,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2020-10-21",
+   "from_state": "COOLDOWN",
+   "to_state": "PROBE_REENTRY",
+   "rule": "cooldown done & breadth5>=0.45",
+   "dd_period": -0.19907490523041538,
+   "dd_global": -0.19907490523041538,
+   "breadth5": 0.476,
+   "reanchor_peak_nav": 16283.52
+  },
+  {
+   "day": "2020-12-16",
+   "from_state": "PROBE_REENTRY",
+   "to_state": "ACTIVE",
+   "rule": "probe 40d complete & intact",
+   "dd_period": -0.007631117732354364,
+   "dd_global": -0.11603181169147037,
+   "breadth5": 0.4016,
+   "reanchor_peak_nav": 17971.86
+  },
+  {
+   "day": "2021-02-04",
+   "from_state": "ACTIVE",
+   "to_state": "LOCKOUT",
+   "rule": "dd_period<=-0.2",
+   "dd_period": -0.2100990792952946,
+   "dd_global": -0.26827994249145015,
+   "breadth5": 0.36479999999999996,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2021-02-10",
+   "from_state": "LOCKOUT",
+   "to_state": "COOLDOWN",
+   "rule": "liquidated -> cooldown 20d (NAV-independent)",
+   "dd_period": -0.18086059872354443,
+   "dd_global": -0.2411950485197647,
+   "breadth5": 0.36239999999999994,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2021-03-17",
+   "from_state": "COOLDOWN",
+   "to_state": "PROBE_REENTRY",
+   "rule": "cooldown done & breadth5>=0.45",
+   "dd_period": -0.18086059872354443,
+   "dd_global": -0.2411950485197647,
+   "breadth5": 0.6144000000000001,
+   "reanchor_peak_nav": 15427.18
+  },
+  {
+   "day": "2021-05-18",
+   "from_state": "PROBE_REENTRY",
+   "to_state": "ACTIVE",
+   "rule": "probe 40d complete & intact",
+   "dd_period": -0.06883386314841522,
+   "dd_global": -0.27831737813740565,
+   "breadth5": 0.5224,
+   "reanchor_peak_nav": 14672.45
+  },
+  {
+   "day": "2022-01-25",
+   "from_state": "ACTIVE",
+   "to_state": "LOCKOUT",
+   "rule": "dd_period<=-0.2",
+   "dd_period": -0.20534163027449315,
+   "dd_global": -0.28594960673143177,
+   "breadth5": 0.3928,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2022-02-07",
+   "from_state": "LOCKOUT",
+   "to_state": "COOLDOWN",
+   "rule": "liquidated -> cooldown 20d (NAV-independent)",
+   "dd_period": -0.1895856163971147,
+   "dd_global": -0.2717918399046967,
+   "breadth5": 0.2808,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2022-03-07",
+   "from_state": "COOLDOWN",
+   "to_state": "PROBE_REENTRY",
+   "rule": "cooldown done & breadth5>=0.45",
+   "dd_period": -0.1895856163971147,
+   "dd_global": -0.2717918399046967,
+   "breadth5": 0.6192,
+   "reanchor_peak_nav": 14805.12
+  },
+  {
+   "day": "2022-03-15",
+   "from_state": "PROBE_REENTRY",
+   "to_state": "LOCKOUT",
+   "rule": "probe FAIL dd_probe=-0.103",
+   "dd_period": -0.1034871720053604,
+   "dd_global": -0.34715204302418634,
+   "breadth5": 0.19680000000000003,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2022-03-16",
+   "from_state": "LOCKOUT",
+   "to_state": "COOLDOWN",
+   "rule": "liquidated -> cooldown 20d (NAV-independent)",
+   "dd_period": -0.0795461299874638,
+   "dd_global": -0.3297179808655696,
+   "breadth5": 0.1672,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2022-04-15",
+   "from_state": "COOLDOWN",
+   "to_state": "PROBE_REENTRY",
+   "rule": "cooldown done & breadth5>=0.45",
+   "dd_period": -0.0795461299874638,
+   "dd_global": -0.3297179808655696,
+   "breadth5": 0.5208,
+   "reanchor_peak_nav": 13627.43
+  },
+  {
+   "day": "2022-04-25",
+   "from_state": "PROBE_REENTRY",
+   "to_state": "LOCKOUT",
+   "rule": "probe FAIL dd_probe=-0.140",
+   "dd_period": -0.15697401771663166,
+   "dd_global": -0.4234949871845256,
+   "breadth5": 0.28959999999999997,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2022-04-26",
+   "from_state": "LOCKOUT",
+   "to_state": "COOLDOWN",
+   "rule": "liquidated -> cooldown 20d (NAV-independent)",
+   "dd_period": -0.1547213183613697,
+   "dd_global": -0.42195447420157206,
+   "breadth5": 0.21679999999999996,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2022-05-27",
+   "from_state": "COOLDOWN",
+   "to_state": "PROBE_REENTRY",
+   "rule": "cooldown done & breadth5>=0.45",
+   "dd_period": -0.1547213183613697,
+   "dd_global": -0.42195447420157206,
+   "breadth5": 0.6032,
+   "reanchor_peak_nav": 11752.18
+  },
+  {
+   "day": "2022-07-25",
+   "from_state": "PROBE_REENTRY",
+   "to_state": "ACTIVE",
+   "rule": "probe 40d complete & intact",
+   "dd_period": -0.11754724575444953,
+   "dd_global": -0.4101276432069624,
+   "breadth5": 0.35760000000000003,
+   "reanchor_peak_nav": 11992.63
+  },
+  {
+   "day": "2023-05-26",
+   "from_state": "ACTIVE",
+   "to_state": "LOCKOUT",
+   "rule": "dd_period<=-0.2",
+   "dd_period": -0.20501157900601819,
+   "dd_global": -0.5017212724086353,
+   "breadth5": 0.2144,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2023-06-09",
+   "from_state": "LOCKOUT",
+   "to_state": "COOLDOWN",
+   "rule": "liquidated -> cooldown 20d (NAV-independent)",
+   "dd_period": -0.21810280085600675,
+   "dd_global": -0.5099265206786323,
+   "breadth5": 0.248,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2023-07-11",
+   "from_state": "COOLDOWN",
+   "to_state": "PROBE_REENTRY",
+   "rule": "cooldown done & breadth5>=0.45",
+   "dd_period": -0.21810280085600675,
+   "dd_global": -0.5099265206786323,
+   "breadth5": 0.6856,
+   "reanchor_peak_nav": 9963.63
+  },
+  {
+   "day": "2023-09-05",
+   "from_state": "PROBE_REENTRY",
+   "to_state": "ACTIVE",
+   "rule": "probe 40d complete & intact",
+   "dd_period": -0.01662023989146444,
+   "dd_global": -0.4976648833376207,
+   "breadth5": 0.2184,
+   "reanchor_peak_nav": 10212.92
+  },
+  {
+   "day": "2024-02-05",
+   "from_state": "ACTIVE",
+   "to_state": "LOCKOUT",
+   "rule": "dd_period<=-0.2",
+   "dd_period": -0.2078958201349741,
+   "dd_global": -0.5750451652633013,
+   "breadth5": 0.2008,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2024-02-07",
+   "from_state": "LOCKOUT",
+   "to_state": "COOLDOWN",
+   "rule": "liquidated -> cooldown 20d (NAV-independent)",
+   "dd_period": -0.1667646133915941,
+   "dd_global": -0.5529787431834021,
+   "breadth5": 0.2664,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2024-03-14",
+   "from_state": "COOLDOWN",
+   "to_state": "PROBE_REENTRY",
+   "rule": "cooldown done & breadth5>=0.45",
+   "dd_period": -0.1667646133915941,
+   "dd_global": -0.5529787431834021,
+   "breadth5": 0.9023999999999999,
+   "reanchor_peak_nav": 9088.34
+  },
+  {
+   "day": "2024-05-16",
+   "from_state": "PROBE_REENTRY",
+   "to_state": "ACTIVE",
+   "rule": "probe 40d complete & intact",
+   "dd_period": -0.01992884142292939,
+   "dd_global": -0.5222658722761275,
+   "breadth5": 0.604,
+   "reanchor_peak_nav": 9712.76
+  },
+  {
+   "day": "2026-05-29",
+   "from_state": "ACTIVE",
+   "to_state": "LOCKOUT",
+   "rule": "dd_period<=-0.2",
+   "dd_period": -0.2004305612786602,
+   "dd_global": -0.4769825620029423,
+   "breadth5": 0.30319999999999997,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2026-06-02",
+   "from_state": "LOCKOUT",
+   "to_state": "COOLDOWN",
+   "rule": "liquidated -> cooldown 20d (NAV-independent)",
+   "dd_period": -0.19367738132119006,
+   "dd_global": -0.47256514594294696,
+   "breadth5": 0.2984,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2026-07-24",
+   "from_state": "COOLDOWN",
+   "to_state": "PROBE_REENTRY",
+   "rule": "cooldown done & breadth5>=0.45",
+   "dd_period": -0.19367738132119006,
+   "dd_global": -0.47256514594294696,
+   "breadth5": 0.45600000000000007,
+   "reanchor_peak_nav": 10723.22
+  },
+  {
+   "day": "2026-09-18",
+   "from_state": "PROBE_REENTRY",
+   "to_state": "ACTIVE",
+   "rule": "probe 40d complete & intact",
+   "dd_period": -0.11593247944855811,
+   "dd_global": -0.5076924817359201,
+   "breadth5": 0.3656,
+   "reanchor_peak_nav": 10009.05
+  }
+ ],
+ "n_transitions": 30,
+ "activity_check": {
+  "ever_recovered_after_first_lock": true,
+  "reached_active_again": true,
+  "days_in_terminal_flatline": 26
+ },
+ "final_nav_r1": 9396.05,
+ "r0_comparison_behavior_only": {
+  "r0_final_nav": 15840.76,
+  "r0_frozen_from": "2020-09-14",
+  "r0_days_locked": 1453
+ },
+ "fills": 836,
+ "mode": "SHADOW"
+}

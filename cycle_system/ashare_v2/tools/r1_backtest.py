@@ -139,6 +139,8 @@ class R1Runner(RawRunner):
                                   "n_sells": len(rec["sells"]), "budget_state": rec["budget_state"],
                                   "r1_state": r1["state"], "dd": rec["dd"], "dd_global": round(dd_global, 4),
                                   "n_rejects_alloc": len(rec["alloc"]["rejects"]),
+                                  "engine_funding": rec["alloc"]["engine_funding"],
+                                  "cash_conservation": rec["alloc"]["cash_conservation"],
                                   "n_exec_rejects": len(rejects),
                                   "n_fills": len(fills)})
         res = super_run_tail(self, days)

@@ -67,6 +67,7 @@ def check(run_dir: str, price_basis: str = "adj", tol: float = 0.51) -> dict:
         if diff:
             bad_c4.append({"day": d, "diff": diff})
     bad_c2 = []
+    last_px = {}          # 停牌携带价缓存(校验侧, 与账本px_last同源语义)
     cash2 = C.NAV0
     for _, row in nav.iterrows():
         d = str(row["day"])
@@ -80,9 +81,15 @@ def check(run_dir: str, price_basis: str = "adj", tol: float = 0.51) -> dict:
             try:
                 p = float(px.loc[pd.Timestamp(d), code])
                 if pd.isna(p):
-                    continue
+                    p = last_px.get(code)     # 停牌: 与coord.nav的px_last估值语义同源
+                    if p is None:
+                        continue
             except KeyError:
-                continue
+                p = last_px.get(code)         # 停牌整行缺失: 同上(校验侧盲区修复, 非账本缺陷)
+                if p is None:
+                    continue
+            else:
+                last_px[code] = p
             mv += sh * p
         if abs(float(row["nav"]) - (cash2 + mv)) > 1.0:
             bad_c2.append({"day": d, "nav": float(row["nav"]), "recomputed": round(cash2 + mv, 2)})

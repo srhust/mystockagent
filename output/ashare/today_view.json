@@ -1,0 +1,110 @@
+{
+ "last_day": "2026-10-16",
+ "stage_lines": [
+  "保险\t筑底\tGATE停开",
+  "元件\t筑底\tGATE停开",
+  "养殖\t筑底\tGATE停开",
+  "农化制品\t筑底\tGATE停开",
+  "化学原料\t筑底\tGATE停开",
+  "化纤\t筑底\tGATE停开",
+  "半导体\t筑底\tGATE停开",
+  "基建建筑\t扩张\tGATE停开",
+  "小金属\t筑底\tGATE停开",
+  "工业金属\t筑底\tGATE停开",
+  "工程机械\t筑底\tGATE停开",
+  "房地产\t扩张\tGATE停开",
+  "水泥建材\t筑底\tGATE停开",
+  "汽车整车\t筑底\tGATE停开",
+  "油气开采\t筑底\tGATE停开",
+  "消费电子\t筑底\tGATE停开",
+  "煤炭\t走弱\tGATE停开",
+  "玻璃玻纤\t筑底\tGATE停开",
+  "电力\t扩张\t-",
+  "石油加工\t走弱\tGATE停开",
+  "种植种业\t走弱\tGATE停开",
+  "能源金属\t筑底\tGATE停开",
+  "航空机场\t筑底\tGATE停开",
+  "航运港口\t扩张\t-",
+  "证券\t筑底\tGATE停开",
+  "贵金属\t走弱\tGATE停开",
+  "造纸\t筑底\tGATE停开",
+  "钢铁\t筑底\tGATE停开",
+  "面板\t筑底\tGATE停开",
+  "饲料加工\t筑底\tGATE停开"
+ ],
+ "cand": [
+  {
+   "code": "601919",
+   "sector": "航运港口",
+   "score": 2.5363,
+   "gate_block": false,
+   "above_ma20": true
+  },
+  {
+   "code": "600011",
+   "sector": "电力",
+   "score": 2.4839,
+   "gate_block": false,
+   "above_ma20": true
+  },
+  {
+   "code": "600795",
+   "sector": "电力",
+   "score": 2.3871,
+   "gate_block": false,
+   "above_ma20": true
+  },
+  {
+   "code": "600027",
+   "sector": "电力",
+   "score": 2.3065,
+   "gate_block": false,
+   "above_ma20": true
+  },
+  {
+   "code": "600023",
+   "sector": "电力",
+   "score": 2.2742,
+   "gate_block": false,
+   "above_ma20": true
+  }
+ ],
+ "blocked": [
+  {
+   "code": "601088",
+   "sector": "煤炭",
+   "score": 2.6855,
+   "gate_block": true,
+   "above_ma20": true
+  },
+  {
+   "code": "601857",
+   "sector": "油气开采",
+   "score": 2.6411,
+   "gate_block": true,
+   "above_ma20": true
+  },
+  {
+   "code": "601668",
+   "sector": "基建建筑",
+   "score": 2.6008,
+   "gate_block": true,
+   "above_ma20": true
+  },
+  {
+   "code": "601225",
+   "sector": "煤炭",
+   "score": 2.5887,
+   "gate_block": true,
+   "above_ma20": true
+  },
+  {
+   "code": "601318",
+   "sector": "保险",
+   "score": 2.4879,
+   "gate_block": true,
+   "above_ma20": false
+  }
+ ],
+ "noma": []
+}

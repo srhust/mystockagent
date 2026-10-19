@@ -1,0 +1,154 @@
+{
+ "_provenance": {
+  "code_version": "770f362d9c25b49626113dcd29da5c823e2c1cb4",
+  "branch": "ashare-v2",
+  "config_hash": "cc5cb7c990c2a499",
+  "manifest_sha256": "90dd925b61c4ba96b625715e010ade8127d0ff9e72ef8b3a7240097fb1d80abf",
+  "mode": "SHADOW",
+  "asof": "2026-06-30",
+  "generated_at": "2026-10-19T21:16:32.693945+08:00",
+  "four_state": {
+   "compile": "PASS(pytest)",
+   "sync_data_anchor": "PASS(250/250 C1)",
+   "test": "见tests/ashare_v2",
+   "prediction_valid_claimed": "NOT_CLAIMED"
+  },
+  "window": [
+   "2026-03-02",
+   "2026-06-30"
+  ],
+  "days_simulated": 81
+ },
+ "long_cycle": {
+  "保险": {
+   "state_at_day": "BOTTOM_WATCH",
+   "n_transitions": 173
+  },
+  "元件": {
+   "state_at_day": "EXPANSION",
+   "n_transitions": 171
+  },
+  "养殖": {
+   "state_at_day": "BOTTOM_WATCH",
+   "n_transitions": 117
+  },
+  "农化制品": {
+   "state_at_day": "DOWNTREND",
+   "n_transitions": 175
+  },
+  "化学原料": {
+   "state_at_day": "EARLY_RECOVERY",
+   "n_transitions": 120
+  },
+  "化纤": {
+   "state_at_day": "EXPANSION",
+   "n_transitions": 148
+  },
+  "半导体": {
+   "state_at_day": "EXPANSION",
+   "n_transitions": 153
+  },
+  "基建建筑": {
+   "state_at_day": "DOWNTREND",
+   "n_transitions": 127
+  },
+  "小金属": {
+   "state_at_day": "EXPANSION",
+   "n_transitions": 71
+  },
+  "工业金属": {
+   "state_at_day": "EXPANSION",
+   "n_transitions": 180
+  },
+  "工程机械": {
+   "state_at_day": "DOWNTREND",
+   "n_transitions": 101
+  },
+  "房地产": {
+   "state_at_day": "BOTTOM_WATCH",
+   "n_transitions": 67
+  },
+  "水泥建材": {
+   "state_at_day": "EARLY_RECOVERY",
+   "n_transitions": 124
+  },
+  "汽车整车": {
+   "state_at_day": "BOTTOM_WATCH",
+   "n_transitions": 173
+  },
+  "油气开采": {
+   "state_at_day": "EARLY_RECOVERY",
+   "n_transitions": 87
+  },
+  "消费电子": {
+   "state_at_day": "EXPANSION",
+   "n_transitions": 235
+  },
+  "煤炭": {
+   "state_at_day": "DOWNTREND",
+   "n_transitions": 138
+  },
+  "玻璃玻纤": {
+   "state_at_day": "EXPANSION",
+   "n_transitions": 121
+  },
+  "电力": {
+   "state_at_day": "DOWNTREND",
+   "n_transitions": 1
+  },
+  "石油加工": {
+   "state_at_day": "EARLY_RECOVERY",
+   "n_transitions": 137
+  },
+  "种植种业": {
+   "state_at_day": "BOTTOM_WATCH",
+   "n_transitions": 127
+  },
+  "能源金属": {
+   "state_at_day": "EXPANSION",
+   "n_transitions": 113
+  },
+  "航空机场": {
+   "state_at_day": "BOTTOM_WATCH",
+   "n_transitions": 126
+  },
+  "航运港口": {
+   "state_at_day": "EXPANSION",
+   "n_transitions": 170
+  },
+  "证券": {
+   "state_at_day": "DOWNTREND",
+   "n_transitions": 217
+  },
+  "贵金属": {
+   "state_at_day": "BOTTOM_WATCH",
+   "n_transitions": 104
+  },
+  "造纸": {
+   "state_at_day": "DOWNTREND",
+   "n_transitions": 113
+  },
+  "钢铁": {
+   "state_at_day": "BOTTOM_WATCH",
+   "n_transitions": 74
+  },
+  "面板": {
+   "state_at_day": "DOWNTREND",
+   "n_transitions": 131
+  },
+  "饲料加工": {
+   "state_at_day": "BOTTOM_WATCH",
+   "n_transitions": 171
+  }
+ },
+ "fast_v_dist_at_day": {
+  "NO_SETUP": 168,
+  "REVERSAL_FAILED": 42,
+  "BOTTOM_SEARCH": 20,
+  "ENTRY_CONFIRMED": 1,
+  "SHOCK_DETECTED": 10,
+  "REVERSAL_CANDIDATE": 6,
+  "REBOUND_ACTIVE": 3
+ },
+ "note": "状态=前缀因果单程时序(测试锁); 候选≠预测有效"
+}

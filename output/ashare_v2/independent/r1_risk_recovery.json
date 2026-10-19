@@ -1,0 +1,66 @@
+{
+  "_title": "Ashare V2 包B R1_RISK_RECOVERY 独立证据报告",
+  "_class": "STATE_MACHINE_BEHAVIOR_VERIFICATION_ONLY",
+  "_disclaimer": "本报告仅验证R1预注册状态机在历史窗上的迁移行为(活性/防跳变/记录守恒)。禁止用于声称R1提高收益或评价双引擎策略好坏(裁定红线); R1样本内净值低于R0恰说明重入场在2020-2026下行段承担额外风险, 该读数不构成性能判断, 且2020-2026不得用于优化恢复时间/仓位参数(预注册只读历史)。",
+  "_baseline": "ashare-v2@770f362 + selfcheck盲区修复(停牌携带价), R0产物零触碰",
+  "preregistration": {
+    "version": "R1.0-PREREG",
+    "params_fixed_before_history_reading": true,
+    "LOCK_TRIGGER_dd_period": -0.20,
+    "COOLDOWN_DAYS": 20,
+    "MARKET_OBS": "breadth5>=0.45 (adj域20日动量广度5日均线, NAV无关独立观测量)",
+    "PROBE_DAYS": 40,
+    "PROBE_BUDGET_SCALE": 0.25,
+    "PROBE_FAIL_dd_probe": -0.08,
+    "no_direct_full_reentry": "LOCKOUT→COOLDOWN→PROBE→ACTIVE 强制路径, 无任何捷径转移",
+    "record_vs_decision": "high_water_global永不重置(全程记录dd_global); 再触发决策用本期锚dd_period, 仅在PROBE/ACTIVE起点re-anchor实例peak_nav"
+  },
+  "windows": {
+    "81d_smoke_2026-03-02_2026-06-30": {
+      "transitions": "03-23 LOCKOUT → 03-26 COOLDOWN(清仓完成) → 04-24 PROBE(breadth5=0.59 re-anchor) → 05-25 probe FAIL(dd_probe=-0.085)重LOCKOUT → 05-26 清仓完成回COOLDOWN",
+      "nav_hist_full.csv ledger selfcheck: all_ok TRUE (C1-C4)",
+      "key_point": "R0同窗04-01后永久平线15647.77; R1展示试探→失败→重锁→再冷却完整防反噬行为(样本内非性能宣称)"
+    },
+    "multi_year_2020-06-01_2026-10-16": {
+      "state_day_counts": {"ACTIVE": 1090, "LOCKOUT": 26, "COOLDOWN": 177, "PROBE_REENTRY": 252},
+      "n_transitions": 30,
+      "first_full_cycle": "2020-09-11 LOCKOUT → 09-15 COOLDOWN → 10-21 PROBE → 12-16 ACTIVE (R0自2020-09-14起永久锁定1453个交易日, std(NAV)=0死锁, 旧峰值上涨要求永不可达)",
+      "second_cycle": "2021-02-04 LOCKOUT → 02-10 COOLDOWN → 03-17 PROBE → 05-18 ACTIVE",
+      "third_cycle_with_probe_failure": "2022-01-25 LOCKOUT → 02-07 COOLDOWN → 03-07 PROBE → 03-15 PROBE_FAIL重锁 → 03-16 COOLDOWN → 04-15 PROBE → ACTIVE",
+      "final_state_2026-10-15": "ACTIVE (2026-06-01重锁后经完整路径恢复)",
+      "dd_global_min": -0.6059,
+      "dd_global_final": -0.5416,
+      "record_never_reset": true,
+      "terminal_flatline_days": 0,
+      "ledger_selfcheck": "all_ok TRUE (C1现金流水/C2 NAV构成[含停牌携带价修复]/C3明细对齐/C4股数守恒)",
+      "r0_comparison_behavior_only": {
+        "R0": "2020-09-14冻结至窗尾, 1453锁定日, 后续6年零敞口",
+        "R1": "同信号流同记账域, 风险编排差异: 锁定段总计26天(清仓等待), 无永久平线",
+        "nav_readings_context_free": {"R0_final": 15840.76, "R1_final": 9396.05},
+        "interpretation_boundary": "净值差异=状态机行为差异在历史路径上的投影(PATHWISE), 无企业行动入账(CORPORATE_ACTION_UNVERIFIED), 严禁用作策略优劣或收益改善证据"
+      }
+    }
+  },
+  "redline_compliance": {
+    "R0_untouched": "portfolio/allocator/16元组零改动; raw_bt产物未重写; R1全部在tools域新文件",
+    "prediction_params_frozen": true,
+    "formal_admit": "CLOSED(本报告为RESEARCH_REPLAY)",
+    "no_return_improvement_claim": true,
+    "no_param_optimization_on_2020_2026": true
+  },
+  "known_gaps": [
+    "breadth5为预注册固定市场观测量, 未做参数敏感性(预注册纪律禁止)",
+    "PROBE期budget_scale作用于执行前预算(与P0-3单调收缩兼容), 试探仓位仍受整手/流动性约束",
+    "企业行动未入账影响两窗全部净值(CORPORATE_ACTION_UNVERIFIED, 包D解决)",
+    "个股退出层级错配(裁定C-3)单独设计, 不入R1"
+  ],
+  "artifacts": [
+    "cycle_system/ashare_v2/tools/r1_state_machine.py (预注册状态机, 6项合成测试)",
+    "tests/ashare_v2/test_r1.py (6 passed; 抓到probe_start_nav丢失真bug)",
+    "cycle_system/ashare_v2/tools/r1_backtest.py (R1Runner+编排+生命周期报告)",
+    "output/ashare_v2/r1_bt/r1_2026-03-02_2026-06-30/ (9件)",
+    "output/ashare_v2/r1_bt/r1_2020-06-01_2026-10-16/ (9件含r1_state_log.csv 1545行)",
+    "cycle_system/ashare_v2/tools/ledger_selfcheck.py 停牌携带价盲区修复(R0两窗回归all_ok)"
+  ],
+  "amended": "2026-10-19T21:47+08:00"
+}
