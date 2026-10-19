@@ -1,0 +1,158 @@
+{
+ "version": "DUAL_CYCLE_V2.R0",
+ "frozen_trade_date": "2026-10-16",
+ "note": "独立复核修复批次8857398后冻结: V2双周期规则R0, 信号日>2026-10-16计FORWARD; 预测规则零改动(审查A/B/C/D工程缺陷修复), config_hash cc5cb7c990c2a499不变",
+ "frozen_at": "2026-10-19T11:34:43.469316+08:00",
+ "head_sha": "88573981dc2d70a87eadbb8d28a92f186cd3de51",
+ "branch": "ashare-v2",
+ "config_hash": "cc5cb7c990c2a499",
+ "module_hashes": {
+  "ashare_v2/__init__.py": "bee520ba12c701099308860d5305c81421df4b90847e878b1f6ed86deb40710e",
+  "ashare_v2/_path.py": "ca4f17cb496f975b2dd4d715490e323ec194a9fe444624b78b9711324ad27c0e",
+  "ashare_v2/capital_allocator.py": "a4c3e8a8f980ae89c948ecc656476f1c722c5de745348bf8751d400b6e408960",
+  "ashare_v2/config.py": "6723f7bf352fa4ac1ffb807a72a8d96a0c1d9515db47c9453fb11beb7df6b3d1",
+  "ashare_v2/data_portal.py": "a85ce8902ec3ea175f8853a5418769cc76cef898b309a54c29e84fe5c45b19f3",
+  "ashare_v2/exit_manager.py": "1b74499eaadbd42a640dfe95812e679208e129adf9735ee00b5c2e079073c0c4",
+  "ashare_v2/fast_v.py": "2f982cdc0603a42ab9859b4137feacb7cf325f946f8b353bcea5c6fa80d77ef1",
+  "ashare_v2/forward_ledger.py": "8d88d42665d0aa34489ba1c2e8b3a9aa6a5d22a542e4385a521541e2661ea4af",
+  "ashare_v2/industry_cycle.py": "b9731759ed599508e8fbc78dbd7e2b633530bc181e994eb29216253cac93cd54",
+  "ashare_v2/long_cycle.py": "eed78bcc26502358cc9be8c85c02a86f8d02325125a9ad192062d8d0a7213bfa",
+  "ashare_v2/opportunity_ranker.py": "b9262ae4dead3604400b7bbbaff8bf948dd623383eac7002ed22495ff225eb5e",
+  "ashare_v2/portfolio.py": "c7029738566c2059e19d20a6ffd506555be53a2d25476ee3837f1a268137b75c",
+  "ashare_v2/report.py": "40e699e3b06674ca600ce4274c0428e0d2d53b13136e9a8dfbec90aa76c9f42a",
+  "ashare_v2/runner.py": "26a813b4e29c8d63a10df47cd51027cc363291fe8cabf1400f62675876713746",
+  "ashare_v2/schemas.py": "1065fbbade46faee5691ada1656ac15cdaecc9106b899363df633b95d7dbc48c",
+  "ashare_v2/signal_merge.py": "5236bf5b1bcbbace177cdce60e2db0ddfaa6228d819d5d84f5539f0cee96c934",
+  "ashare_v2/strict_gate.py": "f0ae3998e174d49ca7b85b2890c4b115cb6bd6a1068dbc7c7991808e2c3c2dcd",
+  "ashare_v2/tools/__init__.py": "1767a25872d6b8a66cd20c29a5e6ca302ae0e32e8585068fc040202dd837b9ff",
+  "ashare_v2/tools/acceptance.py": "bdbe905aea0319d265f1ba359951213dac9ff51622649e5fd5088135e82d3c52",
+  "ashare_v2/tools/baseline_integrity.py": "e773d1a8a85d9b8ff5f945087129f60a3c083744f73c6de98cc6bc285e562756",
+  "ashare_v2/tools/f2_repro_check.py": "e5994eb1aba169bc42ecf306432fcd2a6c6b27c68ec157fa27fff7c01a796ee5",
+  "ashare_v2/tools/forward_shadow.py": "4a8fc2b4962affc794c891dbefd8257acb84e85bf487110e83c78715aefdfcd9",
+  "ashare_v2/tools/freeze_manifest.py": "618af5bc38f5381f7d2b967e5e77f22865e3c47f431350356ac71810f989cc14",
+  "ashare_v2/tools/make_experiment_manifest.py": "c067ebddf8df19be6ec9de8c596fe5a936439c135f1b0d790832a789beb49183",
+  "ashare_v2/tools/phaseB_report.py": "914795166a35841cfaa1251fcabae876152059728c55519979dad422bdaeec07",
+  "ashare_v2/tools/phaseC_smoke.py": "71d8233a4e219e40ce464c9882f97cfada73ad48ca6e64f4305d6a53d7c8a655",
+  "ashare_v2/tools/phaseD_smoke.py": "0f65d6ef98ffd6a1691e513dd74a7e66e4d1ce0a56165a7ffd9dd958e6335c92",
+  "ashare_v2/tools/phaseF_run.py": "5c1728b2775d836be78c5372156c42137a5531391eaf55714b9b557a34294406",
+  "ashare_v2/tools/strict_gate_report.py": "35f2da8c887ba9f706576c5eb48a23634e0ae7bbf6ba2c2f09d3005d71bad090",
+  "ashare_v2/universe.py": "fdb1f14c1e582dbd5a343f12f473e5d552c49f470614d935252c3c86e342db4d"
+ },
+ "frozen_rule_params": {
+  "ASHARE_V2_DIR": "E:\\mystockagent\\cycle_system\\ashare_v2",
+  "CALIBRATED": false,
+  "CASH_RESERVE_FRAC": 0.05,
+  "DATA_DIR": "E:\\mystockagent\\data",
+  "DEFAULT_DATA_MODE": "strict",
+  "ENGINE_SPLIT_FRAC": null,
+  "F2_LEDGER": {
+   "return": 0.4964,
+   "ann": 0.0612,
+   "max_dd": -0.3515,
+   "calmar": 0.17,
+   "sharpe": 0.38,
+   "buy": 163,
+   "sell": 154,
+   "s2gate": 1253
+  },
+  "F2_REPRO_PARAMS": {
+   "strategy": "expt",
+   "gate": true,
+   "exit_mode": "monthly",
+   "entry_mode": "daily",
+   "cap": 0,
+   "alloc_policy": "score",
+   "risk_mode": "gate",
+   "gate_realloc": "realloc"
+  },
+  "FROZEN_ARTIFACTS": [
+   "output/ashare/swing_m1_B0_full.json",
+   "output/ashare/swing_m1_B1_full.json",
+   "output/ashare/swing_m1_F2_realloc_full.json",
+   "output/ashare/manifest.json",
+   "output/ashare/f2_repro_p0.json",
+   "output/ashare/data_audit.json",
+   "output/ashare/swing_flow_audit.json",
+   "output/ashare/swing_dd_attribution_v2.json"
+  ],
+  "FV_DD_FROM_HIGH": 0.18,
+  "FV_EXPIRE_D": 40,
+  "FV_PANIC_VOL_RATIO": 1.8,
+  "FV_REBOUND_CONFIRM": 0.03,
+  "FV_SHOCK_WINDOWS_D": [
+   5,
+   10,
+   20
+  ],
+  "FV_SPEED_DROP_20D": 0.15,
+  "FV_STABILIZE_D": 3,
+  "FV_VOL_Z_ANOMALY": 1.5,
+  "INDUSTRY_CONCENTRATION_ALLOWED": 0.6,
+  "LC_BOTTOM_LOOKBACK_D": 250,
+  "LC_IMPAIR_CONFIRM_D": 20,
+  "LC_MERITMA20_ONLY_WARNING": true,
+  "LC_MOMENTUM_MONTHS": [
+   6,
+   12,
+   24
+  ],
+  "LC_RANGE_WINDOWS": [
+   120,
+   250,
+   500
+  ],
+  "LC_RESEARCH_WINDOWS_M": [
+   12,
+   24,
+   36
+  ],
+  "LC_TREND_WINDOWS": [
+   60,
+   120,
+   250
+  ],
+  "LC_WEAK_VS_INDUSTRY_D": 60,
+  "MAX_POSITIONS": null,
+  "NAME_RISK_FRAC_OF_NAV": 0.1,
+  "NAV0": 20000.0,
+  "OUTPUT_DIR": "E:\\mystockagent\\output\\ashare_v2",
+  "OUTPUT_FILES": [
+   "cycle_state_daily.json",
+   "fast_v_candidates.json",
+   "long_cycle_candidates.json",
+   "opportunity_ranking.json",
+   "capital_allocation.json",
+   "trade_plans.json",
+   "risk_report.json",
+   "daily_cycle_report.md",
+   "data_quality_report.json",
+   "experiment_manifest.json"
+  ],
+  "PIT_RESEARCH": "research",
+  "PIT_STRICT": "strict",
+  "PORT_DAILY_RISK_FRAC": 0.2,
+  "PRESSURE_SCENARIOS": {
+   "index_down_8pct_5d": 0.08,
+   "vol_x2": 2.0
+  },
+  "REPO_ROOT": "E:\\mystockagent",
+  "RISK_BUDGET_DRAWDOWN": 0.2,
+  "SCORE_WEIGHTS": {
+   "cycle_stage_quality": 0.3,
+   "long_horizon_evidence": 0.2,
+   "relative_strength": 0.15,
+   "liquidity_executability": 0.15,
+   "data_credibility": 0.2
+  },
+  "STOCKS_DIR": "E:\\mystockagent\\data\\stocks",
+  "SWAP_COST_MULT": 2.0,
+  "SWAP_DAILY_LIMIT": 2,
+  "SWAP_MIN_SCORE_EDGE": 0.5,
+  "US_FROZEN_FILES": [
+   "cycle_system/cycle_portfolio.py",
+   "scripts/run_shadow.py"
+  ]
+ },
+ "calibrated": false,
+ "policy": "预测规则变更须另立新版本(R1+)并重新冻结; 工程修复登记history且不改frozen_rule_params; frozen_trade_date之后的信号才可标FORWARD; 之前一律REPLAY(历史回放不冒充前向)"
+}
