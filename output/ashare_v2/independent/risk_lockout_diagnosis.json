@@ -1,0 +1,37 @@
+{
+ "_disclaimer": "REPLAY状态机诊断: 复现的是机制行为序列, 非性能判断(审查裁定: 停止对收益数字作性能解读)",
+ "rule_frozen": {
+  "RISK_BUDGET_DRAWDOWN": 0.2,
+  "NAME_RISK_FRAC_OF_NAV": 0.1,
+  "note": "本诊断未改任何参数; 恢复机制属独立新版本, 与R0对照(阶段3裁定)"
+ },
+ "S1_nav_below_80pct_peak": {
+  "first_day": "2020-10-30",
+  "dd_at_breach": -0.2042
+ },
+ "S2_EXCEEDED_freeze_started": {
+  "first_day": "2020-10-30",
+  "frozen_days_total": 1437,
+  "tail_locked_consecutive_days": 1436,
+  "permanent_from": "2020-11-11",
+  "note_oscillation": "2020-11-02曾单日回到NORMAL(dd瞬时>-20%), 次日再锁后永久(边界抖动不构成恢复路径)",
+  "window_last_day": "2026-10-16"
+ },
+ "S3_forced_liquidation": {
+  "last_sell_date": "2020-11-17",
+  "note": "强平卖单标记在allocation_plan_log/链记录(plan级), 账本行级为SELL流水"
+ },
+ "S4_flat_nav_after_liquidation": {
+  "flat_since": "2020-11-17",
+  "post_flat_daily_ret_std": 0.0,
+  "flat_nav": 15647.77,
+  "required_recovery_pct_to_unfreeze": 0.0225
+ },
+ "S5_opportunities_while_frozen": {
+  "candidate_rows_after_lock": 84486,
+  "distinct_days": 1427,
+  "alloc_rejected_while_frozen_total": 84493
+ },
+ "risk_lockout": true,
+ "verdict": "状态机死锁成立: 冻结新增→清仓→零敞口→NAV恒平→回撤预算永不修复→新机会永久无法入场。"
+}
