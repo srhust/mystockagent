@@ -22,6 +22,10 @@
     先verify再动作。链头独立存档 chain_head.json(整链重写可被比对发现; 非不可篡改存储宣称)。
   * 正式账本门: 默认 DIAGNOSTIC_REHEARSAL 标注(第二轮裁定: 修复验证前暂停写入正式FORWARD
     绩效账本); --formal 且准入标志文件存在时才打 FORMAL 标。
+  * 状态域统一(第三轮§6-2修复): _state_domain() 令 plan 与 execute 在 DIAGNOSTIC 下**读写同一
+    rehearsal 域**——T+1 成交必然进入下一交易日 plan 的初始状态(此前 plan 写正式 state 而
+    execute 写 rehearsal, 存在连续运行分叉); 准入前正式 state/正式账本全程零写入, 由连续三
+    交易日 plan→execute→plan→execute 实弹测试硬断言(test_rehearsal_three_day_state_continuity)。
 """
 from __future__ import annotations
 
