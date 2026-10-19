@@ -36,6 +36,11 @@ from r1_state_machine import init_state, step                                # n
 
 
 class R1Runner(RawRunner):
+    def __init__(self, *a, ca_events: dict | None = None, **kw):
+        super().__init__(*a, **kw)
+        self.ca_events = ca_events or {}        # {ex_date: [event]} —— R1_CAI 重放注入
+        self.ca_rows: list = []
+
     def run(self) -> dict:
         self.setup()
         anchor = self._anchor_adj()
@@ -112,6 +117,19 @@ class R1Runner(RawRunner):
             rawo_1 = {c: v for c, v in self._row(self.raw_open, d1).items() if v}
             rawc_1 = {c: v for c, v in self._row(self.raw_close, d1).items() if v}
             fills, rejects = self.coord.execute_day(day_s, rawo_1, rawc_d)
+            # ---- R1_CAI 企业行动入账(CAI.0-PREREG; ca_events=None 时零行为) ----
+            if getattr(self, "ca_events", None):
+                from ca_apply import apply_dividend, tax_tier_after
+                _d1s = rec["exec_day"]
+                for e_ in self.ca_events.get(_d1s, []):
+                    if e_["type"] != "DIVIDEND":
+                        continue          # BONUS重放内调整=hits 0(预注册); 一致性由事件加载旁证核
+                    _lots = [{"shares": int(v.shares), "entry_day": v.opened_day}
+                             for v in self.coord.virtuals
+                             if v.code == e_["code"] and v.shares > 0]
+                    self.coord.ledger.cash, _rows = apply_dividend(
+                        float(self.coord.ledger.cash), _lots, e_, None)
+                    self.ca_rows.extend(_rows)
             for f in fills:
                 if f.get("status") != "FILLED":
                     continue
@@ -161,7 +179,8 @@ def summarize(res: dict, outdir: str, tag: str) -> dict:
     for l in log:
         by_state[l["from_state"]] = by_state.get(l["from_state"], 0) + 1
     # R0对照: 读既有raw_bt MERGED产物(同窗同信号)
-    r0_dir = os.path.join(C.OUTPUT_DIR, "raw_bt", tag.replace("r1_", ""))
+    r0_dir = os.path.join(C.OUTPUT_DIR, "raw_bt",
+                          tag.replace("ca_r1_", "").replace("r1_", ""))
     r0_cmp = {}
     if os.path.exists(os.path.join(r0_dir, "nav_hist_full.csv")):
         n0 = pd.read_csv(os.path.join(r0_dir, "nav_hist_full.csv"), encoding="utf-8-sig")
@@ -194,17 +213,54 @@ if __name__ == "__main__":
     if "--engines" in sys.argv:
         engines = sys.argv[sys.argv.index("--engines") + 1]
     start, end = args[0], args[1]
-    tag = f"r1_{start}_{end}" + (f"_{engines}" if engines else "")
-    outdir = os.path.join(C.OUTPUT_DIR, "r1_bt", tag)
+    CA_MODE = "--ca" in sys.argv                      # R1_CAI: 企业行动入账重放(默认关=历史行为逐数不变)
+    ca_events: dict = {}
+    ca_audit: dict = {"mode": "OFF"}
+    if CA_MODE:
+        import glob as _glob
+        from ca_apply import apply_dividend           # noqa: F401  循环内消费, 此处仅声明依赖
+        pool = os.path.join(C.DATA_DIR, "ashare_history_2000", "corporate_actions",
+                            "full_replay_pool")
+        n_b = 0
+        for f in _glob.glob(os.path.join(pool, "*.events.json")):
+            j = json.load(open(f, encoding="utf-8"))
+            if j["_meta"]["status"] != "COVERED_EVENTS":
+                continue                              # CAI.6: 只消费已验证源
+            for e_ in j["events"]:
+                if start <= e_["ex_date"] <= end:
+                    ca_events.setdefault(e_["ex_date"], []).append(e_)
+                    if e_["type"] != "DIVIDEND":
+                        n_b += 1
+        ca_audit = {"mode": "R1_CAI_ON", "events_in_window": sum(len(v) for v in ca_events.values()),
+                    "days_with_events": len(ca_events), "non_dividend_events": n_b,
+                    "note": "入账=DIVIDEND应计制(ex_date当日盘后, CAI.1); BONUS重放内股数调整未启用"
+                            "(持仓命中0, CAI.4旁证核在coverage侧); 税档按lot持有期(CAI.3)"}
+    tag = ("ca_r1_" if CA_MODE else "r1_") + f"{start}_{end}" + (f"_{engines}" if engines else "")
+    outdir = os.path.join(C.OUTPUT_DIR, ("ca_bt" if CA_MODE else "r1_bt"), tag)
     import shutil
     shutil.rmtree(outdir, ignore_errors=True)          # 账本追加污染纪律: 每次全新目录
     os.makedirs(outdir, exist_ok=True)
     runner = R1Runner(RunMode.SHADOW.value, portal=DataPortal(data_mode=C.PIT_RESEARCH),
                       window=(start, end), allow_engines=engines,
                       ledger_root=os.path.join(outdir, "ledger"),
-                      ledger_name=f"r1_{tag.replace('-', '').replace(':', '')}")
+                      ledger_name=f"r1_{tag.replace('-', '').replace(':', '')}",
+                      ca_events=ca_events)
     res = runner.run()
+    if CA_MODE:
+        pd.DataFrame(runner.ca_rows).to_csv(os.path.join(outdir, "ca_events.csv"),
+                                            index=False, encoding="utf-8-sig")
+        ca_audit["dividend_amount_total"] = round(sum(float(r["amount"]) for r in runner.ca_rows
+                                                      if r["tax_chosen"] != "NO_HOLDER"), 2)
+        ca_audit["n_audit_rows"] = len(runner.ca_rows)
+        ca_audit["tier_dist"] = {}
+        for r in runner.ca_rows:
+            ca_audit["tier_dist"][r["tax_chosen"]] = ca_audit["tier_dist"].get(r["tax_chosen"], 0) + 1
+        json.dump(ca_audit, open(os.path.join(outdir, "ca_audit.json"), "w", encoding="utf-8"),
+                  ensure_ascii=False, indent=1)
     summ = summarize(res, outdir, tag)
+    if CA_MODE:
+        summ["ca_integration"] = ca_audit
+        summ["version"] = "R1_CAI.0-PREREG(R1状态机+企业行动入账, 独立版本非R1行为延续)"
     from cycle_system.ashare_v2 import report as RP                          # 账本五件套(selfcheck验收前置)
     files = RP.write_all(outdir, runner, res)
     pd.DataFrame([{k: v for k, v in h.items() if k != "positions"} for h in res["nav_hist"]]

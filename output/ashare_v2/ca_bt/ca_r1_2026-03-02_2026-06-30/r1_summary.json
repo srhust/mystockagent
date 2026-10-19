@@ -1,0 +1,89 @@
+{
+ "version": "R1_CAI.0-PREREG(R1状态机+企业行动入账, 独立版本非R1行为延续)",
+ "tag": "ca_r1_2026-03-02_2026-06-30",
+ "disclaimer": "STATE-MACHINE-BEHAVIOR-VERIFICATION ONLY: 状态迁移活性/防跳变/守恒验证; 非收益改善宣称; REPLAY+RESEARCH+企业行动未入账(CORPORATE_ACTION_UNVERIFIED)",
+ "state_day_counts": {
+  "ACTIVE": 16,
+  "LOCKOUT": 4,
+  "COOLDOWN": 43,
+  "PROBE_REENTRY": 18
+ },
+ "transition_timeline": [
+  {
+   "day": "2026-03-23",
+   "from_state": "ACTIVE",
+   "to_state": "LOCKOUT",
+   "rule": "dd_period<=-0.2",
+   "dd_period": -0.22810441400638692,
+   "dd_global": -0.22810441400638692,
+   "breadth5": 0.31920000000000004,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2026-03-26",
+   "from_state": "LOCKOUT",
+   "to_state": "COOLDOWN",
+   "rule": "liquidated -> cooldown 20d (NAV-independent)",
+   "dd_period": -0.1952985945496999,
+   "dd_global": -0.1952985945496999,
+   "breadth5": 0.2064,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2026-04-24",
+   "from_state": "COOLDOWN",
+   "to_state": "PROBE_REENTRY",
+   "rule": "cooldown done & breadth5>=0.45",
+   "dd_period": -0.1952985945496999,
+   "dd_global": -0.1952985945496999,
+   "breadth5": 0.6072,
+   "reanchor_peak_nav": 16122.08
+  },
+  {
+   "day": "2026-05-25",
+   "from_state": "PROBE_REENTRY",
+   "to_state": "LOCKOUT",
+   "rule": "probe FAIL dd_probe=-0.081",
+   "dd_period": -0.09124031644692543,
+   "dd_global": -0.2602603661817452,
+   "breadth5": 0.3104,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2026-05-26",
+   "from_state": "LOCKOUT",
+   "to_state": "COOLDOWN",
+   "rule": "liquidated -> cooldown 20d (NAV-independent)",
+   "dd_period": -0.0957845502183513,
+   "dd_global": -0.2639594187331482,
+   "breadth5": 0.3064,
+   "reanchor_peak_nav": null
+  }
+ ],
+ "n_transitions": 5,
+ "activity_check": {
+  "ever_recovered_after_first_lock": true,
+  "reached_active_again": false,
+  "days_in_terminal_flatline": 4
+ },
+ "final_nav_r1": 14746.47,
+ "r0_comparison_behavior_only": {
+  "r0_final_nav": 15814.89,
+  "r0_frozen_from": "2026-03-24",
+  "r0_days_locked": 65
+ },
+ "fills": 175,
+ "mode": "SHADOW",
+ "ca_integration": {
+  "mode": "R1_CAI_ON",
+  "events_in_window": 38,
+  "days_with_events": 26,
+  "non_dividend_events": 0,
+  "note": "入账=DIVIDEND应计制(ex_date当日盘后, CAI.1); BONUS重放内股数调整未启用(持仓命中0, CAI.4旁证核在coverage侧); 税档按lot持有期(CAI.3)",
+  "dividend_amount_total": 0,
+  "n_audit_rows": 38,
+  "tier_dist": {
+   "NO_HOLDER": 38
+  }
+ }
+}
