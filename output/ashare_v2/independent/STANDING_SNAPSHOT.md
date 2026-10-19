@@ -10,7 +10,7 @@
 | D 企业行动 | ✅端到端 | corporate_actions机制+守恒8项; **ca_ingest Baostock官方事件实弹**(600000 2000-2010税率20%→10%正确/600036送转+派现同日级联100→150); 全池摄取属M2后 | 80d8e34/1c5bb56 |
 | E-1 时间语义 | ✅ | _kind_refined三值+rc=8+test_forward 17项 | 209b34d |
 | E-2 通道纪律 | ✅ | fetch_guard 7项+**corrections_log更正追加账(6+1条入册)** | 3d2d0c3/913f6c8 |
-| F 统一验收 | ✅ | F1红线全ok / F2重放确定性 / F3四run隔离+selfcheck全TRUE / F4 FORWARD/LATE分离+明日序列 | 9a36946 |
+| F 统一验收 | ✅ | F1红线全ok / F2重放确定性 / F3四run隔离+selfcheck全TRUE / F4 FORWARD/LATE分离 | 9a36946 |
 | 2000扩展 | **M1✅** | poc2000_smoke通过: baostock独立通道(不受akshare限流)3/3券+tradestatus/isST齐+**10-19当日数据已在=明日直播独立对账源**; M2待审查者知悉 | 097b021 |
 
 - 全套测试 **124 passed**; R0 产物零触碰; FORMAL_ADMIT 关闭; 红线 R6 TRUE。
@@ -22,6 +22,7 @@
 ## 明日 15:50 / 16:10 执行序（裁定后修正版——10-19 不再是"首条真 FORWARD"）
 1. **单发探测**：`python -X utf8 _netprobe.py`（PROBE_OK 才继续；失败=仍疑似限流，记录后顺延，**严禁批量轮询**）。
 2. 通了 → 两次 fetch：`forward_shadow.py fetch 2026-10-19`（补抓）与 `fetch 2026-10-20`（**当日盘后**）。
+2b. **baostock 独立对账（新增必做）**：`python -X utf8 cycle_system/ashare_v2/tools/live_crosscheck.py 2026-10-19 --codes <当日持仓池券>` 与同日 `2026-10-20`；sina 缓存滞后已实证（000002@10-16 差 1.639%，M2 交叉核验）→ 入账价与 baostock 差>0.5% 时**登记 CORRECTIONS 不回填**，账本路径不变（红线）；baostock 通道独立于 akshare 限流，**即使 step1 探测失败也应跑 2b**（对账证据独立存在）。
 3. `plan 2026-10-19` → 预期 **run_kind=LATE_RECONSTRUCTION**（今晚生成的 10-19 信号晚于 10-19 开盘边界——裁定：这是合法演练记录，永不计前向样本；链上如实标注，formal 会被 rc=8 拒绝）。
 4. `execute 2026-10-19` → 10-16 计划的 raw-open 重建（seq3/4，rehearsal 域，同样 LATE 类——"历史成交演练"性质，正是裁定 §② 的定性）。
 5. `plan 2026-10-20` → **这才是首条真 FORWARD**（exec_day=10-21，wall_clock 10-20 15:5x < 10-21 09:25 边界；audit 匹配+rehearsal 域）。
