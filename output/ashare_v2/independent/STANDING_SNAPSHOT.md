@@ -1,5 +1,21 @@
 # STANDING SNAPSHOT — Ashare V2 第四阶段（2026-10-19 20:40 更新，裁定 c182102+后）
 
+## 第四阶段裁定工作包执行状态(2026-10-19 22:26 追加)
+
+| 包 | 状态 | 证据 | commit |
+|---|---|---|---|
+| A 修正结论 | ✅ | AUDIT_FINAL §0/§5+附录B, JSON加注×4 | c182102 |
+| B R1状态机 | ✅ | r1_state_machine+test_r1 6项+r1_bt两窗重放(30迁移/ACTIVE 1090天/重放确定性逐数吻合)+r1_risk_recovery.json | 2c5ba44/770f362/381d01b |
+| C LC审计 | ✅ | lc_audit.json: 预热(ma250中位可用2021-01-12)/机会缺席**证伪**(首候选=可用次日)/组合锁定为主因(R0锁定早于首候选); 三模式候选identical TRUE | ceaa7e4 |
+| D 企业行动 | ⚠机制✅数据⏳ | corporate_actions.py+守恒测试8项; 接口存在离线登记; 实拉待通道恢复(fetch_guard纪律), 缺数据期CORPORATE_ACTION_UNVERIFIED保持 | 80d8e34 |
+| E-1 时间语义 | ✅ | _kind_refined三值+rc=8+test_forward 17项 | 209b34d |
+| E-2 通道纪律 | ✅ | fetch_guard(上限/退避/熔断/分布)+7项测试 | 3d2d0c3 |
+| F 统一验收 | ✅ | F1红线全ok / F2重放确定性 / F3四run隔离+selfcheck全TRUE / F4 FORWARD/LATE分离+明日序列 | 9a36946 |
+| 2000扩展 | 规划✅ | HISTORY_2000_POC_PLAN.md(M0完成; POC先行严禁全量; A1-A6硬闸) | 9a36946 |
+
+- 全套测试 **121 passed**; R0 产物零触碰; FORMAL_ADMIT 关闭; 红线 R6 TRUE。
+- 待外部时钟: 明日 10-19 彩排(LATE标注)/10-20 盘后 plan=首条真 FORWARD; 通道恢复后包 D 事件实拉+POC M1 冒烟。
+
 ## 状态行（裁定）
 `ENGINEERING_AUDIT_PASS / RESEARCH_REPLAY_ONLY / FORMAL_ADMIT_BLOCKED`。主线审计通过；工作包 A 已交付（PATHWISE/降级/会计边界）；**E-1 时间语义已实装**（commit 见下）：`_kind_refined` 三值判定 FORWARD=signal>锚 且 wall_clock<exec_day 09:25；晚生成=LATE_RECONSTRUCTION 且 FORMAL 拒绝 rc=8。100 passed。
 
