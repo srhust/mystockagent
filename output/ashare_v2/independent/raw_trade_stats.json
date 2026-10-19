@@ -1,0 +1,41 @@
+{
+ "_disclaimer": "RAW交易域REPLAY平仓配对(T+1 raw open双向): 决策质量的口径修正后读数, 非性能宣称",
+ "stats": {
+  "MERGED_RAW": {
+   "closed": 26,
+   "win_rate": 0.154,
+   "avg_ret_per_trade": -0.0455,
+   "median_ret": -0.0503,
+   "avg_win": 0.0216,
+   "avg_loss": -0.0577,
+   "avg_hold_days": 12.2,
+   "total_pnl": -4159.24,
+   "best": 0.0267,
+   "worst": -0.1252
+  },
+  "LC_ONLY_RAW": {
+   "closed": 9,
+   "win_rate": 0.444,
+   "avg_ret_per_trade": 0.0087,
+   "median_ret": -0.0917,
+   "avg_win": 0.1957,
+   "avg_loss": -0.1408,
+   "avg_hold_days": 91.9,
+   "total_pnl": -4280.75,
+   "best": 0.6213,
+   "worst": -0.2385
+  },
+  "81D_RAW": {
+   "closed": 7,
+   "win_rate": 0.143,
+   "avg_ret_per_trade": -0.1625,
+   "median_ret": -0.1807,
+   "avg_win": 0.0086,
+   "avg_loss": -0.1911,
+   "avg_hold_days": 21.1,
+   "total_pnl": -4185.11,
+   "best": 0.0086,
+   "worst": -0.2755
+  }
+ }
+}
