@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import os
 from copy import deepcopy
+from datetime import datetime, timedelta, timezone
 
 from cycle_system.ashare_v2 import _path  # noqa: F401,E402  旧模块路径引导(必须先于ashare_executor)
 import ashare_executor as ex  # noqa: E402  冻结执行器: 只读复用
@@ -40,6 +41,7 @@ class PortfolioCoordinator:
         self.execution_log: list = []
         self.rejects: list = []
         self.annotations: list = []
+        self.adjust_log: list = []            # T+1预算缩减调整记录(parent_plan_hash链, P0-3审计)
         self.px_last: dict = {}             # code → 最近已知收盘价(缺价last口径)
         self.pos_meta: dict = {}            # position_id → {"opened_px":...} 归因实现盈亏需要
         self.realized_log: list = []        # 每笔卖出实现损益(引擎归因口径, 非收益宣称)
@@ -282,18 +284,34 @@ class PortfolioCoordinator:
                                         f"同股双引擎资金单承诺; 卖先于买; {cash_extra_note}"))
 
     def _rebudget_pending_buys(self, rec, signal_day):
-        """每笔卖出真实入账后, 把尚未执行的买入预算重估到剩余现金内(真实到账资金口径, 防缺口)。"""
-        created = f"{signal_day}T15:05:00+08:00"
+        """每笔卖出真实入账后, 把尚未执行的买入预算重估到剩余现金内(真实到账资金口径, 防缺口)。
+
+        第二轮复核P0-3: T日冻结计划保持不可变 — 执行日只允许**缩减**(不增股/不增预算/不换码),
+        每次缩减生成关联父plan_hash的调整记录(原plan快照留在adjust_log), 供审计"策略未在T+1偷改"。"""
+        created = f"{signal_day}T15:05:00+08:00"                       # 执行器申报窗要求(审计另记真实时刻)
         avail = self.ledger.cash
         for b in rec["buys"]:
             if b.get("_executed") or "plan" not in b:
                 continue
             if b["cash_budget"] > avail:
-                b["cash_budget"] = round(max(avail, 0.0), 2)
+                old_plan = b["plan"]
+                old_budget = b["cash_budget"]
+                new_budget = round(max(avail, 0.0), 2)
+                if new_budget >= old_budget:            # 只缩减(浮点毛刺不进调整)
+                    continue
+                b["cash_budget"] = new_budget
                 b["plan"] = ex.create_plan(b["code"], "BUY", signal_day,
-                                           self.px_last.get(b["code"], b["plan"]["signal_px"]),
-                                           cash_budget=b["cash_budget"], created_at=created)
+                                           self.px_last.get(b["code"], old_plan["signal_px"]),
+                                           cash_budget=new_budget, created_at=created)
                 self.ledger.register_plan(b["plan"])
+                adj = {"pos": "buy", "code": b["code"], "signal_day": signal_day,
+                       "parent_plan_hash": old_plan["plan_hash"], "child_plan_hash": b["plan"]["plan_hash"],
+                       "budget_before": old_budget, "budget_after": new_budget,
+                       "monotone_down": True, "code_unchanged": True,
+                       "wall_clock": datetime.now(timezone(timedelta(hours=8))).isoformat(),
+                       "reason": "cash_constrained_T+1"}
+                b["plan_adjust"] = adj
+                self.adjust_log.append(adj)
 
     # ── 执行(信息日T+1) ──
     def execute_day(self, signal_day: str, px_t1: dict, prev_close: dict, halted: set | None = None):
@@ -400,7 +418,8 @@ class PortfolioCoordinator:
                             "sells": [{k: v_ for k, v_ in s.items() if k != "record"} for s in r["sells"]],
                             "buys": [{k: b_ for k, b_ in bo.items() if k != "record"} for bo in r["buys"]]}
                         for d, r in self.plans.items()},
-              "seq": self._seq, "annotations": self.annotations, "realized_log": self.realized_log}
+              "seq": self._seq, "annotations": self.annotations, "realized_log": self.realized_log,
+              "adjust_log": self.adjust_log}
         os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
         with open(path, "w", encoding="utf-8") as f:
             json.dump(st, f, ensure_ascii=False, default=str)
@@ -419,6 +438,7 @@ class PortfolioCoordinator:
         co.px_last = st["px_last"]
         co.pos_meta = st["pos_meta"]
         co.realized_log = st["realized_log"]
+        co.adjust_log = st.get("adjust_log", [])
         co.annotations = st["annotations"]
         co._seq = st["seq"]
         co.virtuals = []

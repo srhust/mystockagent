@@ -31,8 +31,10 @@ def sha(p: str) -> str:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--date", required=True, help="冻结生效交易日(frozen_trade_date, YYYY-MM-DD)")
+    ap.add_argument("--date", default="", help="冻结生效交易日(frozen_trade_date, YYYY-MM-DD)")
     ap.add_argument("--note", default="")
+    ap.add_argument("--addendum", default="", help="追加执行工具版本(如R0.1), 不改写R0原件")
+    ap.add_argument("--diff-note", default="", help="addendum: 工程修复内容摘要")
     a = ap.parse_args()
     root = os.path.dirname(_path.__file__)
     files = {os.path.relpath(p, os.path.join(C.REPO_ROOT, "cycle_system")).replace("\\", "/"): sha(p)
@@ -42,6 +44,46 @@ def main() -> int:
     def git(*x):
         return subprocess.run(["git", "-C", C.REPO_ROOT] + list(x), capture_output=True,
                               text=True).stdout.strip()
+    os.makedirs(os.path.join(C.OUTPUT_DIR, "forward"), exist_ok=True)
+    if a.addendum:
+        fp = os.path.join(C.OUTPUT_DIR, "forward", "FREEZE.json")
+        if not os.path.exists(fp):
+            print(json.dumps({"error": "无R0基线"}, ensure_ascii=False))
+            return 1
+        base = json.load(open(fp, encoding="utf-8"))
+        def _norm(v):
+            if isinstance(v, (tuple, list)):
+                return [_norm(x) for x in v]
+            return v
+        param_diff = {k: (base["frozen_rule_params"].get(k), params[k])
+                      for k in set(base["frozen_rule_params"]) | set(params)
+                      if _norm(base["frozen_rule_params"].get(k)) != _norm(params.get(k))}
+        if param_diff:
+            print(json.dumps({"error": "规则常数已变, 必须另立新版本(R1)重新冻结, 不许addendum",
+                              "param_diff": param_diff}, ensure_ascii=False, default=str))
+            return 2
+        changed = {k: (base["module_hashes"].get(k), v) for k, v in files.items()
+                   if base["module_hashes"].get(k) != v}
+        out = {"version": f"DUAL_CYCLE_V2.{a.addendum}", "based_on": base["version"],
+               "addendum_at": datetime.now(TZ).isoformat(), "head_sha": git("rev-parse", "HEAD"),
+               "branch": git("branch", "--show-current"), "config_hash": C.config_hash(),
+               "frozen_rule_params_identical": True, "param_diff": {},
+               "module_changes": {k: {"before": b, "after": n} for k, (b, n) in changed.items()},
+               "module_hashes": files,
+               "diff_note": a.diff_note,
+               "policy": "addendum仅登记工程修复(规则常数零变化); 与R0联合构成FORWARD模块审计基线; "
+                         "预测规则任何变化须另立版本重新冻结并重走前向准入"}
+        p = os.path.join(C.OUTPUT_DIR, "forward", f"FREEZE_ADDENDUM_{a.addendum}.json")
+        if os.path.exists(p):
+            print(json.dumps({"error": f"addendum {a.addendum} 已存在"}, ensure_ascii=False))
+            return 1
+        json.dump(out, open(p, "w", encoding="utf-8"), ensure_ascii=False, indent=1, default=str)
+        print(json.dumps({"addendum": out["version"], "based_on": base["version"],
+                          "head": out["head_sha"], "modules_changed": len(changed)}, ensure_ascii=False))
+        return 0
+    if not a.date:
+        print(json.dumps({"error": "需--date(冻结)或--addendum(追加审计)"}, ensure_ascii=False))
+        return 1
     out = {"version": "DUAL_CYCLE_V2.R0", "frozen_trade_date": a.date, "note": a.note,
            "frozen_at": datetime.now(TZ).isoformat(), "head_sha": git("rev-parse", "HEAD"),
            "branch": git("branch", "--show-current"), "config_hash": C.config_hash(),

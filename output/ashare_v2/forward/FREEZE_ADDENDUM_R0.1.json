@@ -1,0 +1,72 @@
+{
+ "version": "DUAL_CYCLE_V2.R0.1",
+ "based_on": "DUAL_CYCLE_V2.R0",
+ "addendum_at": "2026-10-19T12:22:57.454831+08:00",
+ "head_sha": "cc452bd8db4bf7057ea8b22d0a9b98b3fd609c65",
+ "branch": "ashare-v2",
+ "config_hash": "cc5cb7c990c2a499",
+ "frozen_rule_params_identical": true,
+ "param_diff": {},
+ "module_changes": {
+  "ashare_v2/forward_ingest.py": {
+   "before": null,
+   "after": "9f91643911545366e6be31efc7e9c48cb7dbcb857fc428028708885012057138"
+  },
+  "ashare_v2/portfolio.py": {
+   "before": "c7029738566c2059e19d20a6ffd506555be53a2d25476ee3837f1a268137b75c",
+   "after": "3abd2c24615a9ea08d487aec4222defdb6fabb5bddf852ce0ac12bf7490d829f"
+  },
+  "ashare_v2/tools/acceptance.py": {
+   "before": "bdbe905aea0319d265f1ba359951213dac9ff51622649e5fd5088135e82d3c52",
+   "after": "896fc04ad8dabcb25130445767c63102e370aa6b0f45eec5276509fc44530153"
+  },
+  "ashare_v2/tools/engine_eval.py": {
+   "before": null,
+   "after": "c62b1696362c16255e44f4a6e0ca036d258f8f794e2aa27adaf947c330c38948"
+  },
+  "ashare_v2/tools/forward_shadow.py": {
+   "before": "4a8fc2b4962affc794c891dbefd8257acb84e85bf487110e83c78715aefdfcd9",
+   "after": "9b95a5b011fa5be6096be1a2219efdded0eca02b7f24689b10808d7454546acc"
+  },
+  "ashare_v2/tools/freeze_manifest.py": {
+   "before": "618af5bc38f5381f7d2b967e5e77f22865e3c47f431350356ac71810f989cc14",
+   "after": "cc4f48fdf77a6eadc6b955e5849edbcfe8a7a4824a1b24a06c8a56154e3554aa"
+  }
+ },
+ "module_hashes": {
+  "ashare_v2/__init__.py": "bee520ba12c701099308860d5305c81421df4b90847e878b1f6ed86deb40710e",
+  "ashare_v2/_path.py": "ca4f17cb496f975b2dd4d715490e323ec194a9fe444624b78b9711324ad27c0e",
+  "ashare_v2/capital_allocator.py": "a4c3e8a8f980ae89c948ecc656476f1c722c5de745348bf8751d400b6e408960",
+  "ashare_v2/config.py": "6723f7bf352fa4ac1ffb807a72a8d96a0c1d9515db47c9453fb11beb7df6b3d1",
+  "ashare_v2/data_portal.py": "a85ce8902ec3ea175f8853a5418769cc76cef898b309a54c29e84fe5c45b19f3",
+  "ashare_v2/exit_manager.py": "1b74499eaadbd42a640dfe95812e679208e129adf9735ee00b5c2e079073c0c4",
+  "ashare_v2/fast_v.py": "2f982cdc0603a42ab9859b4137feacb7cf325f946f8b353bcea5c6fa80d77ef1",
+  "ashare_v2/forward_ingest.py": "9f91643911545366e6be31efc7e9c48cb7dbcb857fc428028708885012057138",
+  "ashare_v2/forward_ledger.py": "8d88d42665d0aa34489ba1c2e8b3a9aa6a5d22a542e4385a521541e2661ea4af",
+  "ashare_v2/industry_cycle.py": "b9731759ed599508e8fbc78dbd7e2b633530bc181e994eb29216253cac93cd54",
+  "ashare_v2/long_cycle.py": "eed78bcc26502358cc9be8c85c02a86f8d02325125a9ad192062d8d0a7213bfa",
+  "ashare_v2/opportunity_ranker.py": "b9262ae4dead3604400b7bbbaff8bf948dd623383eac7002ed22495ff225eb5e",
+  "ashare_v2/portfolio.py": "3abd2c24615a9ea08d487aec4222defdb6fabb5bddf852ce0ac12bf7490d829f",
+  "ashare_v2/report.py": "40e699e3b06674ca600ce4274c0428e0d2d53b13136e9a8dfbec90aa76c9f42a",
+  "ashare_v2/runner.py": "26a813b4e29c8d63a10df47cd51027cc363291fe8cabf1400f62675876713746",
+  "ashare_v2/schemas.py": "1065fbbade46faee5691ada1656ac15cdaecc9106b899363df633b95d7dbc48c",
+  "ashare_v2/signal_merge.py": "5236bf5b1bcbbace177cdce60e2db0ddfaa6228d819d5d84f5539f0cee96c934",
+  "ashare_v2/strict_gate.py": "f0ae3998e174d49ca7b85b2890c4b115cb6bd6a1068dbc7c7991808e2c3c2dcd",
+  "ashare_v2/tools/__init__.py": "1767a25872d6b8a66cd20c29a5e6ca302ae0e32e8585068fc040202dd837b9ff",
+  "ashare_v2/tools/acceptance.py": "896fc04ad8dabcb25130445767c63102e370aa6b0f45eec5276509fc44530153",
+  "ashare_v2/tools/baseline_integrity.py": "e773d1a8a85d9b8ff5f945087129f60a3c083744f73c6de98cc6bc285e562756",
+  "ashare_v2/tools/engine_eval.py": "c62b1696362c16255e44f4a6e0ca036d258f8f794e2aa27adaf947c330c38948",
+  "ashare_v2/tools/f2_repro_check.py": "e5994eb1aba169bc42ecf306432fcd2a6c6b27c68ec157fa27fff7c01a796ee5",
+  "ashare_v2/tools/forward_shadow.py": "9b95a5b011fa5be6096be1a2219efdded0eca02b7f24689b10808d7454546acc",
+  "ashare_v2/tools/freeze_manifest.py": "cc4f48fdf77a6eadc6b955e5849edbcfe8a7a4824a1b24a06c8a56154e3554aa",
+  "ashare_v2/tools/make_experiment_manifest.py": "c067ebddf8df19be6ec9de8c596fe5a936439c135f1b0d790832a789beb49183",
+  "ashare_v2/tools/phaseB_report.py": "914795166a35841cfaa1251fcabae876152059728c55519979dad422bdaeec07",
+  "ashare_v2/tools/phaseC_smoke.py": "71d8233a4e219e40ce464c9882f97cfada73ad48ca6e64f4305d6a53d7c8a655",
+  "ashare_v2/tools/phaseD_smoke.py": "0f65d6ef98ffd6a1691e513dd74a7e66e4d1ce0a56165a7ffd9dd958e6335c92",
+  "ashare_v2/tools/phaseF_run.py": "5c1728b2775d836be78c5372156c42137a5531391eaf55714b9b557a34294406",
+  "ashare_v2/tools/strict_gate_report.py": "35f2da8c887ba9f706576c5eb48a23634e0ae7bbf6ba2c2f09d3005d71bad090",
+  "ashare_v2/universe.py": "fdb1f14c1e582dbd5a343f12f473e5d552c49f470614d935252c3c86e342db4d"
+ },
+ "diff_note": "第二轮复核P0修复: P0-1执行入口改增量raw open延迟重建(非T+1 close_adj)/P0-2冻结层与增量层分离(旧manifest零改写,校验零关闭)/P0-3计划不可变+parent_plan_hash缩减记录/时间证明+幂等+链头独立存档/forward_ingest增量抓取器; 均为执行与审计链路, 预测规则常数零变化",
+ "policy": "addendum仅登记工程修复(规则常数零变化); 与R0联合构成FORWARD模块审计基线; 预测规则任何变化须另立版本重新冻结并重走前向准入"
+}
