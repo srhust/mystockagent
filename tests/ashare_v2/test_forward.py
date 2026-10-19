@@ -202,6 +202,69 @@ def test_p01_execute_rejects_intraday(tmp_path, monkeypatch):
     assert FS.cmd_execute("2026-10-16") == 5, "盘中(10:00)重建拒绝"
 
 
+def test_ingest_fetch_pipeline_synthetic(tmp_path, monkeypatch):
+    """P0-2正路径全链: fetch_day落盘→meta/sha审计→load_day验证→require_plan_ready→merge。
+    akshare接口用monkeypatch假数据(真连通已实测: fetch_one双口径至2026-10-16)。"""
+    import ashare_stock_pipeline as real_pipe
+    monkeypatch.setattr(FI, "ING_DIR", str(tmp_path / "inc"))
+    day = "2026-10-19"
+    fake_raw = pd.DataFrame([{"date": day, "open": 10.0, "high": 10.5, "low": 9.9,
+                              "close": 10.2, "volume": 1e7, "amount": 2e8}])
+    fake_hfq = pd.DataFrame([{"date": day, "close": 20.4}])          # factor=2.0
+
+    def fake_fetch_one(code, start="20200101", adjust=""):
+        return fake_raw if adjust == "" else fake_hfq
+    monkeypatch.setattr(real_pipe, "fetch_one", fake_fetch_one)
+    monkeypatch.setattr(real_pipe, "configured_stocks", lambda: ["600010", "600011"])
+    monkeypatch.setattr(FI, "datetime_now_iso", lambda: f"{day}T15:30:00+08:00")
+    meta = FI.fetch_day(day, per_call_sleep=0.0)
+    assert meta["rows"] == 2 and meta["close_trading_after_fetch"] is True
+    assert meta["codes_missing"] == [] and len(meta["csv_sha256"]) == 64
+    df = FI.load_day(day)                                           # sha256逐字节复验
+    assert float(df["adj_factor"].iloc[0]) == 2.0 and float(df["close_adj"].iloc[0]) == 20.4
+    assert FI.require_plan_ready(day)["fetched_at"].endswith("+08:00")
+    # 篡改审计: csv被改写→load_day必须raise
+    open(os.path.join(FI.ING_DIR, f"{day}.csv"), "a", encoding="utf-8").write("junk\n")
+    with pytest.raises(ValueError, match="哈希失配"):
+        FI.load_day(day)
+    # 幂等重抓: 复用既有meta不重写(先还原csv使哈希自洽)
+    pd.DataFrame([{"date": day, "code": "600010", "sector": "", "open": 10.0, "high": 10.5,
+                   "low": 9.9, "close": 10.2, "volume": 1e7, "amount": 2e8,
+                   "adj_factor": 2.0, "close_adj": 20.4},
+                  {"date": day, "code": "600011", "sector": "", "open": 10.0, "high": 10.5,
+                   "low": 9.9, "close": 10.2, "volume": 1e7, "amount": 2e8,
+                   "adj_factor": 2.0, "close_adj": 20.4}]).to_csv(
+        os.path.join(FI.ING_DIR, f"{day}.csv"), index=False, encoding="utf-8")
+    meta["csv_sha256"] = FI._sha256(os.path.join(FI.ING_DIR, f"{day}.csv"))
+    json.dump(meta, open(os.path.join(FI.ING_DIR, f"{day}.meta.json"), "w", encoding="utf-8"))
+    calls = []
+    monkeypatch.setattr(real_pipe, "fetch_one", lambda *a, **k: (calls.append(1), fake_raw)[1])
+    meta2 = FI.fetch_day(day, per_call_sleep=0.0)
+    assert meta2["csv_sha256"] == meta["csv_sha256"] and not calls, "幂等: 已抓取日不重抓"
+    # merge: 增量日不得覆盖冻结日期
+    frozen = _synth_panel(["600010"], end="2026-10-16")
+    merged = FI.merge_with_frozen(frozen, [day])
+    assert len(merged[merged["date"] == pd.Timestamp(day)]) == 2
+    with pytest.raises(ValueError, match="冲突"):
+        d16 = df.copy()
+        d16["date"] = pd.Timestamp("2026-10-16")
+        d16.to_csv(os.path.join(FI.ING_DIR, "2026-10-16.csv"), index=False, encoding="utf-8")
+        m16 = dict(meta); m16["day"] = "2026-10-16"
+        m16["csv_sha256"] = FI._sha256(os.path.join(FI.ING_DIR, "2026-10-16.csv"))
+        json.dump(m16, open(os.path.join(FI.ING_DIR, "2026-10-16.meta.json"), "w", encoding="utf-8"))
+        FI.merge_with_frozen(frozen, ["2026-10-16"])
+    with pytest.raises(FileNotFoundError, match="先 fetch"):
+        FI.merge_with_frozen(frozen, ["2026-10-20"])       # 未抓取日 fail-closed
+    # 内容日期与文件名不符: 审计拒绝(本测试由此洞被负例逼出后补的fail-closed)
+    d15 = df.copy()
+    d15["date"] = pd.Timestamp("2026-10-15")
+    d15.to_csv(os.path.join(FI.ING_DIR, "2026-10-21.csv"), index=False, encoding="utf-8")
+    m21 = dict(meta); m21["csv_sha256"] = FI._sha256(os.path.join(FI.ING_DIR, "2026-10-21.csv"))
+    json.dump(m21, open(os.path.join(FI.ING_DIR, "2026-10-21.meta.json"), "w", encoding="utf-8"))
+    with pytest.raises(ValueError, match="内容日期与文件名不符"):
+        FI.load_day("2026-10-21")
+
+
 def test_missing_increment_graceful_rc6(tmp_path, monkeypatch):
     """P0-2负例: 增量层缺日 → plan/execute均给出结构化拒绝(rc=6), 不裸抛。"""
     codes = ["600040"]

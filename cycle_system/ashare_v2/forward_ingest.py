@@ -112,7 +112,11 @@ def load_day(day: str) -> pd.DataFrame:
     meta = json.load(open(meta_p, encoding="utf-8"))
     if _sha256(csv_p) != meta["csv_sha256"]:
         raise ValueError(f"增量{day}.csv与meta哈希失配(数据可能被改写): {meta['csv_sha256']}")
-    return pd.read_csv(csv_p, parse_dates=["date"])
+    df = pd.read_csv(csv_p, parse_dates=["date"])
+    bad = df[df["date"] != pd.Timestamp(day)]
+    if len(bad):
+        raise ValueError(f"增量{day}.csv内容日期与文件名不符(审计失配, 拒绝): {bad['date'].unique()[:3]}")
+    return df
 
 
 def require_plan_ready(day: str) -> dict:
