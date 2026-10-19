@@ -23,7 +23,7 @@ git diff --stat 8857398..HEAD -- fast_v.py long_cycle.py exit_manager.py opportu
 |---|---|---|---|
 | P0-1 执行价 | cmd_execute 用 T+1 `close_adj` 充当 09:40 成交价(未来信息+口径错) | `execution_mode=DELAYED_REBUILD_RAW_OPEN`: 收盘后用增量层当日 **raw open**(09:25 集合竞价后即固定, 无时间穿越)延迟重建; 涨跌停/费用/金额全 raw 域; 当日 15:00 前运行直接拒绝 rc=5; **不声称实时执行**, 记录=重建审计 | 成交价逐笔=当日open≠close; 盘中拒绝 |
 | P0-2 数据分层 | 新交易日追加进冻结 R31 CSV → 哈希失配 → 前向任务被数据完整性检查杀死 | 新 `forward_ingest`: 冻结层永不改写(前向期禁跑 pipeline 全量); 增量层 `forward/incremental/<day>.csv` + `meta{fetched_at,source,sha256,codes_missing,close_trading_after_fetch}`; plan 要求收盘后抓取证明; merge 时增量覆盖冻结日期直接 raise; 校验零静默关闭(冻结层仍 verify_hashes=True) | 缺日 rc=6 结构化拒绝; meta哈希失配 raise; 覆盖冻结日 raise; 盘中抓取禁 plan |
-| P0-3 计划不可变 | T+1 `_rebudget_pending_buys` 用新 plan 哈希+伪造 created_at 替换 T 日冻结计划 | 只许**缩减**(budget回升结构不可能, 二次调用测试锁); 每笔生成 `{parent_plan_hash, child_plan_hash, budget_before/after, monotone_down, code_unchanged, wall_clock, reason}` 入 adjust_log 并持久化; T 日原 plan 快照哈希留档链上; 换码/增股不可能(仅缩cash_budget) | 单调缩减+父链断言; 无二次调整 |
+| P0-3 计划不可变 | T+1 `_rebudget_pending_buys` 用新 plan 哈希+伪造 created_at 替换 T 日冻结计划 | 只许**缩减或撤销**(验收14补全CANCEL: 现金不足最小申报单位→event=CANCEL+父哈希+budget_after=0, 不建零预算假计划, 执行留cancelled_T+1_min_lot拒单; REDUCE/CANCEL均带event标签); 每笔生成 `{parent_plan_hash, child_plan_hash, budget_before/after, monotone_down, code_unchanged, wall_clock, reason}` 入 adjust_log 并持久化; T 日原 plan 快照哈希留档链上; 换码/增股不可能(仅缩cash_budget) | 单调缩减+父链断言; 无二次调整 |
 
 ## 3. 两条纪律
 
