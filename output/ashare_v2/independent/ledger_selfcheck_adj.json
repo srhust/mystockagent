@@ -1,0 +1,31 @@
+{
+ "_note": "C1现金流水/C2 NAV构成/C3明细对齐/C4股数守恒; 估值域=adj",
+ "results": [
+  {
+   "run": "long_backtest",
+   "price_basis": "adj",
+   "checks": {
+    "C1_cash_replay_vs_nav_curve": {
+     "ok": true,
+     "mismatch_days": [],
+     "n": 0
+    },
+    "C2_nav_composition_cash_plus_mv": {
+     "ok": true,
+     "mismatch_days": [],
+     "n": 0
+    },
+    "C3_trades_vs_ledger_rowwise": {
+     "ok": true,
+     "diff": []
+    },
+    "C4_share_conservation": {
+     "ok": true,
+     "mismatch_days": [],
+     "n": 0
+    }
+   },
+   "all_ok": true
+  }
+ ]
+}
