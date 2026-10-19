@@ -105,6 +105,7 @@ def eval_window(run_dir: str) -> dict:
 
 def main() -> int:
     res = {"shadow_run_realdata": eval_window("shadow_run"),
+           "long_backtest": eval_window("long_backtest"),
            "synthetic_run": eval_window("synthetic_run"),
            "disclaimer": "行为指标评估, 非收益宣称; 账本数值为模拟实现读数(含费), "
                          "不作预期收益/胜率外推(CALIBRATED=False); "

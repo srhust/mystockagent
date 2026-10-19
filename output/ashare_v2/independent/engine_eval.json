@@ -111,6 +111,113 @@
    }
   }
  },
+ "long_backtest": {
+  "FAST_V": {
+   "coverage": {
+    "signal_days": 1146,
+    "window_days": 1545,
+    "signal_day_rate": 0.742,
+    "unique_codes": 236,
+    "records": 9365,
+    "n_scored_total": 84930
+   },
+   "churn_stability": {
+    "trades": 34,
+    "buys": 14,
+    "median_survival_d1": 0.9,
+    "lc_transitions_total": null,
+    "fv_state_dist": {
+     "NO_SETUP": 180,
+     "REVERSAL_FAILED": 7,
+     "SHOCK_DETECTED": 26,
+     "BOTTOM_SEARCH": 36,
+     "REBOUND_ACTIVE": 1
+    }
+   },
+   "concentration": {
+    "funding_by_engine": {
+     "FAST_V": 132754.0
+    },
+    "max_single_buy_notional": 9554.0
+   },
+   "risk_discipline": {
+    "exceeded_days": 1437,
+    "alloc_rejects": 84900,
+    "exec_fills": 40,
+    "exec_rejects": 10,
+    "exec_reject_rate": 0.2,
+    "max_dd_seen": -0.2242
+   }
+  },
+  "LONG_CYCLE": {
+   "coverage": {
+    "signal_days": 1392,
+    "window_days": 1545,
+    "signal_day_rate": 0.901,
+    "unique_codes": 243,
+    "records": 77791,
+    "n_scored_total": 84930
+   },
+   "churn_stability": {
+    "trades": 0,
+    "buys": 0,
+    "median_survival_d1": 0.818,
+    "lc_transitions_total": 4309,
+    "fv_state_dist": null
+   },
+   "concentration": {
+    "funding_by_engine": {
+     "LONG_CYCLE": 0.0
+    },
+    "max_single_buy_notional": 0.0
+   },
+   "risk_discipline": {
+    "exceeded_days": 1437,
+    "alloc_rejects": 84900,
+    "exec_fills": 40,
+    "exec_rejects": 10,
+    "exec_reject_rate": 0.2,
+    "max_dd_seen": -0.2242
+   }
+  },
+  "MERGED": {
+   "coverage": {
+    "signal_days": 1488,
+    "window_days": 1545,
+    "signal_day_rate": 0.963,
+    "unique_codes": 249,
+    "records": 84930,
+    "n_scored_total": 84930
+   },
+   "churn_stability": {
+    "trades": 50,
+    "buys": 20,
+    "median_survival_d1": 0.825,
+    "lc_transitions_total": 4309,
+    "fv_state_dist": {
+     "NO_SETUP": 180,
+     "REVERSAL_FAILED": 7,
+     "SHOCK_DETECTED": 26,
+     "BOTTOM_SEARCH": 36,
+     "REBOUND_ACTIVE": 1
+    }
+   },
+   "concentration": {
+    "funding_by_engine": {
+     "FAST_V": 132754.0
+    },
+    "max_single_buy_notional": 11264.0
+   },
+   "risk_discipline": {
+    "exceeded_days": 1437,
+    "alloc_rejects": 84900,
+    "exec_fills": 40,
+    "exec_rejects": 10,
+    "exec_reject_rate": 0.2,
+    "max_dd_seen": -0.2242
+   }
+  }
+ },
  "synthetic_run": {
   "FAST_V": {
    "coverage": {
