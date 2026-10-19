@@ -1,15 +1,16 @@
-# STANDING SNAPSHOT — Ashare V2 审计（2026-10-19 晚 19:45 封账态）
+# STANDING SNAPSHOT — Ashare V2 第四阶段（2026-10-19 20:40 更新，裁定 c182102+后）
 
-## 一句话状态
-审计主线**全部交付并机器验证**（三阶段+验收三关+红线 R6=TRUE+总呈报告+commit 索引，23 commits，HEAD==origin e46d8bf）；唯一开放项 = live FORWARD 记录，因**数据源侧 IP 限流**（本机被 eastmoney 封，直连/代理两路径均 RemoteDisconnected）今晚客观不可行，顺延明日。
+## 状态行（裁定）
+`ENGINEERING_AUDIT_PASS / RESEARCH_REPLAY_ONLY / FORMAL_ADMIT_BLOCKED`。主线审计通过；工作包 A 已交付（PATHWISE/降级/会计边界）；**E-1 时间语义已实装**（commit 见下）：`_kind_refined` 三值判定 FORWARD=signal>锚 且 wall_clock<exec_day 09:25；晚生成=LATE_RECONSTRUCTION 且 FORMAL 拒绝 rc=8。100 passed。
 
-## 明日 15:50 / 16:10 提醒到达时的执行序（勿凭记忆，按此做）
-1. **单发探测**：`python -X utf8 _netprobe.py`（输出 PROBE_OK 才继续；失败=仍未解封，报告后等晚间/后日，**严禁 530 连发轮询**——今日 4000+ 次调用是限流主因）。
-2. 探测通 → `python -X utf8 cycle_system/ashare_v2/tools/forward_shadow.py fetch 2026-10-19`（全量 530×2 调用仅此一次，收盘后历史日线确定性可得；meta 落 `output/ashare_v2/forward/incremental/2026-10-19.meta.json`）。
-3. `forward_shadow.py plan 2026-10-19` → 期望 rc=0，链 seq2，字段核对：`run_kind=FORWARD`、`formal_gate=DIAGNOSTIC_REHEARSAL`、`ledger_target=REHEARSAL:*`、`data_fetched_at` 真实时刻、module_audit 预测 16 项 match=true。
-4. 16:10 批次：`forward_shadow.py execute 2026-10-19`（10-16 计划 raw-open 重建，seq3，成交只进 rehearsal 域）→ 若 10-20 增量也已可得，plan 2026-10-20 走 rehearsal state（连续性由修复保证）。
-5. **收口三件套**：`tools/rehearsal_check.py`（H1-H5 全 ok）、`tools/redline_audit.py`（R6 仍 TRUE）、`forward_shadow.py verify seq` + head seal 汇报；若 execute 产生了 ledger 行，抽 2-3 笔 fills 与 10-19 raw open 逐笔对照（数据在 rehearsal ledger）。
-6. 向总呈报告 §5 追加 live 完成记录 → commit + push（清理 `_barwatch.ps1`/`_netwatch.ps1` 临时 watcher；`_netprobe.py` 保留在库——它就是本执行序第 1 步的探测工具）。
+## 明日 15:50 / 16:10 执行序（裁定后修正版——10-19 不再是"首条真 FORWARD"）
+1. **单发探测**：`python -X utf8 _netprobe.py`（PROBE_OK 才继续；失败=仍疑似限流，记录后顺延，**严禁批量轮询**）。
+2. 通了 → 两次 fetch：`forward_shadow.py fetch 2026-10-19`（补抓）与 `fetch 2026-10-20`（**当日盘后**）。
+3. `plan 2026-10-19` → 预期 **run_kind=LATE_RECONSTRUCTION**（今晚生成的 10-19 信号晚于 10-19 开盘边界——裁定：这是合法演练记录，永不计前向样本；链上如实标注，formal 会被 rc=8 拒绝）。
+4. `execute 2026-10-19` → 10-16 计划的 raw-open 重建（seq3/4，rehearsal 域，同样 LATE 类——"历史成交演练"性质，正是裁定 §② 的定性）。
+5. `plan 2026-10-20` → **这才是首条真 FORWARD**（exec_day=10-21，wall_clock 10-20 15:5x < 10-21 09:25 边界；audit 匹配+rehearsal 域）。
+6. 收口：`tools/rehearsal_check.py`（H1-H5）+ `tools/redline_audit.py`（R6 须 TRUE）+ verify/head seal；报告 §5 追加实况；清理 `_barwatch.ps1`/`_netwatch.ps1`（`_netprobe.py` 留库）。
+7. **10-21 起每日**：`execute 当日`（重建前一日 FORWARD 计划=真前向执行样本）+ `plan 当日` → 自然三日以上 FORWARD 积累开始。
 
 ## 若明日仍被封
 - 记录事实即可；live 顺延不破坏任何账本语义（exec_day 由 10-16 计划固定，历史日线补抓确定性）。
@@ -31,4 +32,4 @@
 预测 16 模块哈希不变（RAW=tools 子类已证）；FORMAL_ADMIT.json 不得创建；正式 state/正式账本准入前零写入；收益数字只作来源分解不作性能判断；链记录不可删改（rc3/4/6/7 如实报告）。
 
 ## 测试基线
-99 passed（tests/ashare_v2 全量，含三日连续实弹 `test_rehearsal_three_day_state_continuity`）。live 收口无需重跑全量（tools 无改动时）。
+**100 passed**（tests/ashare_v2 全量，20:35 复核，含三日实弹 + `test_e1_forward_time_boundary`）。redline_audit R6=TRUE 同步复核（prediction_mismatch=0，FL/16 元组零触碰——E-1 全部在 tools 域）。

@@ -147,6 +147,34 @@ def _run_kind(day: str) -> str:
     return "FORWARD"
 
 
+def _kind_refined(day: str, exec_day: str | None, wall_iso: str) -> str:
+    """第四阶段裁定E-1/E-3: 前向样本须证明计划在拟执行时刻信息边界之前生成。
+
+    signal_day > 冻结锚(必要) **且** wall_clock < exec_day 09:25(集合竞价定价时刻, 充分) ⇒ FORWARD;
+    晚于该边界生成的历史信号计划 ⇒ LATE_RECONSTRUCTION(开盘信息已过, 不入前向样本计数,
+    永不接受FORMAL准入——裁定: 不得手工回填历史日期提升FORWARD计数)。"""
+    base = _run_kind(day)
+    if base != "FORWARD" or not exec_day:
+        return base
+    import pandas as pd
+    try:
+        cut = pd.Timestamp(exec_day).normalize() + pd.Timedelta(hours=9, minutes=25)
+        w = pd.Timestamp(wall_iso)
+        if w.tzinfo is not None:                       # +08:00 wall与naive边界同域比较(均为中国法定钟)
+            w = w.tz_localize(None)
+    except Exception:                                     # noqa: BLE001  边界算不出→保守按FORWARD候选
+        return base
+    return "LATE_RECONSTRUCTION" if w >= cut else "FORWARD"
+
+
+def _chain_plan_kind(signal_day: str) -> str | None:
+    """链上该信号日PLAN记录的kind(EXECUTE跟随, 保证同信号日分类一致; 旧记录无显式值则None)。"""
+    for r in FL.read_all(CHAIN_P):
+        if r.get("event") == "PLAN" and r.get("signal_day") == signal_day and r.get("run_kind"):
+            return r["run_kind"]
+    return None
+
+
 def _merged_portal(through: str):
     """冻结层(原verify_hashes) + 增量层合并; 增量=冻结快照末日之后已审计的日数据。"""
     portal = DataPortal(data_mode=C.PIT_RESEARCH)     # 校验不关闭
@@ -260,10 +288,17 @@ def cmd_plan(day: str, formal: bool = False, recover: bool = False) -> int:
     net = r.coord.plan_day(day, [s for s in scored if s["code"] in px_valid], px_valid,
                            ctx_vol, r.sec_of,
                            exit_ctx_fn=lambda c, d: r._exit_ctx(c, pd.Timestamp(day)))
-    run_kind = _run_kind(day)
-    audit = _module_audit() if run_kind == "FORWARD" else {"prediction_verified": [], "tool_changes": [],
-                                                           "modules_hashed": 0, "note": "REPLAY不强制模块审计"}
+    run_kind = _kind_refined(day, r.coord.plans[day]["exec_day"], datetime.now(TZ).isoformat())
+    if gate == "FORMAL" and run_kind == "LATE_RECONSTRUCTION":
+        print(json.dumps({"error": "LATE_RECONSTRUCTION(晚于拟执行日开盘边界生成的历史信号计划)永不接受"
+                                   "FORMAL账本——裁定E-3: 不得回填历史日期提升FORWARD计数",
+                          "code": "LATE_NO_FORMAL"}, ensure_ascii=False))
+        return 8
+    audit = _module_audit() if run_kind != "REPLAY" else {"prediction_verified": [], "tool_changes": [],
+                                                          "modules_hashed": 0, "note": "REPLAY不强制模块审计"}
     rec = {"event": "PLAN_RECOVERY" if recover else "PLAN", "signal_day": day, **_prov(),
+           "run_kind": run_kind,
+           "kind_basis": "E-1时间语义: signal>锚 且 wall_clock<exec_day 09:25=FORWARD; 晚于边界=LATE_RECONSTRUCTION",
            "recovers_plan_of": day if recover else None,
            "run_kind_expected": run_kind,
            "data_frozen_through": frozen_max, "data_incremental_days": inc_days,
@@ -329,8 +364,8 @@ def cmd_execute(day: str, formal: bool = False) -> int:
     if signal_day is None:
         print(json.dumps({"error": f"无信号日的计划以{day}为执行日"}, ensure_ascii=False))
         return 2
-    if _run_kind(signal_day) == "FORWARD":
-        _module_audit()                                # 执行记账同样验预测模块哈希
+    if _run_kind(signal_day) != "REPLAY":
+        _module_audit()                                # FORWARD/LATE执行记账均验预测模块哈希
     try:
         inc = FI.load_day(day)                             # raw OHLC(增量层, 哈希已验)
     except (FileNotFoundError, ValueError) as e:
@@ -357,8 +392,9 @@ def cmd_execute(day: str, formal: bool = False) -> int:
         print(json.dumps({"error": f"{day} 增量层无raw open"}, ensure_ascii=False))
         return 2
     fills, rejects = coord.execute_day(signal_day, px1, pxc)
-    run_kind = _run_kind(signal_day)
+    run_kind = _chain_plan_kind(signal_day) or _kind_refined(signal_day, day, datetime.now(TZ).isoformat())
     rec = {"event": "EXECUTE", "signal_day": signal_day, "exec_day": day, **_prov(),
+           "run_kind": run_kind,
            "execution_mode": "DELAYED_REBUILD_RAW_OPEN",
            "price_basis": "raw open(执行/涨跌停/费用域), 非close_adj — P0-1修复",
            "formal_gate": gate,

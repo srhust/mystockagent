@@ -170,7 +170,7 @@ def test_p03_rebudget_only_shrinks_with_parent_link(tmp_path):
 
 
 def test_p01_forward_plan_execute_uses_raw_open_and_seals(tmp_path, monkeypatch):
-    """P0-1/P0-2+纪律: plan→FORWARD标注+DIAGNOSTIC门; execute用增量raw open延迟重建; 幂等拒绝重复。"""
+    """P0-1/P0-2+纪律: plan→kind标注(E-1时间语义)+DIAGNOSTIC门; execute用增量raw open延迟重建; 幂等拒绝重复。"""
     codes = ["600010", "600011", "600012"]
     panel = _synth_panel(codes)
     _fwd_env(tmp_path, monkeypatch, panel)
@@ -178,7 +178,8 @@ def test_p01_forward_plan_execute_uses_raw_open_and_seals(tmp_path, monkeypatch)
     assert rc == 0
     recs = FL.read_all(FS.CHAIN_P)
     plan_rec = recs[-1]
-    assert plan_rec["run_kind"] == "FORWARD", "信号日>锚=FORWARD"
+    assert plan_rec["run_kind"] == "LATE_RECONSTRUCTION", \
+        "E-1: 真实钟晚于exec_day 09:25边界的历史信号计划=LATE重建, 非前向样本"
     assert plan_rec["formal_gate"] == "DIAGNOSTIC_REHEARSAL", "默认非正式账本门"
     assert plan_rec["data_fetched_at"].endswith("+08:00") and plan_rec["data_csv_sha256"]
     assert FS.cmd_plan("2026-10-15") == 3, "幂等: 同日重复plan拒绝"
@@ -220,12 +221,13 @@ def _fwd_real_env(tmp_path, monkeypatch):
 
 
 def test_p01_real_panel_execute_fills_raw_open(tmp_path, monkeypatch):
-    """实弹核心: 真面板plan(2026-10-16)→FORWARD+DIAGNOSTIC+buys≥4;
+    """实弹核心: 真面板plan(2026-10-16)现钟生成=LATE重建标注+DIAGNOSTIC+buys≥4;
     execute(10-19)用增量raw open成交——fills非空且逐笔价格=open(结构性≠close_adj)。"""
     _fwd_real_env(tmp_path, monkeypatch)
     assert FS.cmd_plan("2026-10-16") == 0
     plan_rec = FL.read_all(FS.CHAIN_P)[-1]
-    assert plan_rec["run_kind"] == "FORWARD" and plan_rec["formal_gate"] == "DIAGNOSTIC_REHEARSAL"
+    assert plan_rec["run_kind"] == "LATE_RECONSTRUCTION" and plan_rec["formal_gate"] == "DIAGNOSTIC_REHEARSAL", \
+        "E-1: 实弹场景plan(10-16)现钟生成已晚于10-19开盘边界→LATE(裁定: 明日补录同样LATE, 不冒充FORWARD)"
     assert len(plan_rec["buys"]) >= 4, f"真面板须产生买入, got {len(plan_rec['buys'])}"
     assert plan_rec["data_source"].startswith("R31 frozen")
     assert FS.cmd_plan("2026-10-16") == 3, "幂等"
@@ -518,3 +520,32 @@ def test_chain_head_detects_full_rewrite(tmp_path, monkeypatch):
     open(FS.CHAIN_P, "w", encoding="utf-8").write("")
     FL.append_record(FS.CHAIN_P, rec)             # 重算哈希→链自洽但≠封存头
     assert FS.cmd_verify() == 1, "链头存档不符必须非零退出"
+
+
+def test_e1_forward_time_boundary(tmp_path, monkeypatch):
+    """裁定E-1/E-3: FORWARD须证明计划在exec_day 09:25信息边界前生成;
+    晚生成的历史信号=LATE_RECONSTRUCTION, 永不入正式账本(禁回填提升FORWARD计数)。"""
+    codes = ["600010", "600011", "600012"]
+    panel = _synth_panel(codes)
+    _fwd_env(tmp_path, monkeypatch, panel)
+    # 1) 三值边界纯函数: 锚10-14, 信号10-15→exec 10-16
+    assert FS._kind_refined("2026-10-15", "2026-10-16", "2026-10-15T18:00:00+08:00") == "FORWARD"
+    assert FS._kind_refined("2026-10-15", "2026-10-16", "2026-10-16T09:24:59+08:00") == "FORWARD"
+    assert FS._kind_refined("2026-10-15", "2026-10-16", "2026-10-16T09:25:00+08:00") == "LATE_RECONSTRUCTION"
+    assert FS._kind_refined("2026-10-13", "2026-10-14", "2026-10-13T18:00:00+08:00") == "REPLAY"
+    # 2) FORWARD集成: fake钟=信号日18:00, 早于执行日开盘边界 → 链记录FORWARD+kind_basis
+    class _PreOpenDT(datetime):
+        @staticmethod
+        def now(tz=None):
+            return datetime(2026, 10, 15, 18, 0, tzinfo=FS.TZ)
+    monkeypatch.setattr(FS, "datetime", _PreOpenDT)
+    assert FS.cmd_plan("2026-10-15") == 0
+    rec = FL.read_all(FS.CHAIN_P)[-1]
+    assert rec["run_kind"] == "FORWARD" and rec["kind_basis"].startswith("E-1")
+    # 3) LATE+FORMAL拒绝: 新环境+真实钟(现>10-16 09:25边界)+ADMIT存在+formal → rc=8零副作用
+    monkeypatch.setattr(FS, "datetime", datetime)
+    _fwd_env(tmp_path / "e2", monkeypatch, panel)
+    json.dump({"note": "admitted"}, open(FS.ADMIT_P, "w", encoding="utf-8"))
+    assert FS.cmd_plan("2026-10-15", formal=True) == 8, "LATE重建永不接受FORMAL账本"
+    assert not os.path.exists(FS.CHAIN_P), "拒绝须零副作用(无半写记录)"
+
