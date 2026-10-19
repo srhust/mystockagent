@@ -1,0 +1,67 @@
+{
+ "_class": "LC_INDEPENDENT_AUDIT / RESEARCH_REPLAY / 只读数不改信号(MA250/500不动, 裁定C-4)",
+ "pool": {
+  "n_files": 250,
+  "start_min": "2020-01-02",
+  "start_max": "2022-12-30",
+  "depth_median": 1643.0,
+  "depth_min": 916,
+  "depth_max": 1643
+ },
+ "warmup_availability": {
+  "first_valid_ma250_median": "2021-01-12",
+  "first_valid_ma250_p90": "2021-01-13",
+  "cross_section_ma250_coverage": {
+   "2020-06-01": 0.0,
+   "2020-09-14": 0.0,
+   "2021-01-13": 0.904,
+   "2021-06-01": 0.96,
+   "2022-01-01": 0.976,
+   "2022-06-01": 0.98
+  },
+  "note": "个股ma250可用日=该股第250行; 覆盖率为池内(剔窗口后新上市者分母含之, 保守)"
+ },
+ "candidate_flow": {
+  "first_lc_candidate_day": "2021-01-13",
+  "n_candidate_rows_lc_only": 77791,
+  "n_candidate_days": 1392,
+  "candidates_before_R0_lock": 0,
+  "R0_locked_from": "2020-09-14",
+  "monthly_head": {
+   "2021-01-13": 42,
+   "2021-01-14": 50,
+   "2021-01-15": 49,
+   "2021-01-18": 43,
+   "2021-01-19": 51,
+   "2021-01-20": 45,
+   "2021-01-21": 45,
+   "2021-01-22": 42
+  }
+ },
+ "credibility_flags": {
+  "data_credibility_dist": {
+   "DATA_LIMITED": 41864,
+   "PROXY_ONLY": 35927
+  },
+  "membership_trust_dist": {
+   "SW_PARTIAL": 61675,
+   "CURRENT_SNAPSHOT_ONLY": 16116
+  }
+ },
+ "three_mode_consistency": {
+  "lc_only_pairs": 77791,
+  "merged_lc_pairs": 77791,
+  "identical": true,
+  "only_in_lc_only": 0,
+  "only_in_merged": 0,
+  "note": "同信息边界(同日同券)候选集应全等; 不等=合并层改写了候选生成, 须逐条追因"
+ },
+ "zero_funding_decomposition": {
+  "(a)_warmup_block": "窗口首2020-06-01至池ma250中位可用日2021-01-12期间结构不可评",
+  "(b)_opportunity": "特征可用后候选日1392天/记录77791条——真实机会并非缺席",
+  "(c)_portfolio_lock": "R0自2020-09-14永久EXCEEDED冻结新增, LC首候选2021-01-13在其后",
+  "conclusion": "LC零成交主因=组合级R0永久锁定(c)+早期预热(a), '真实机会缺席'(b)被证伪: 特征可用后存在多年候选流"
+ },
+ "exit_layer_mismatch_C3": "登记: 个股级MA250/500退出 vs 行业级入场语境存在层级错配, 单独设计不入R1(裁定C-3), 本审计未修改",
+ "amended": "2026-10-19T21:55+08:00"
+}
