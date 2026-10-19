@@ -6,6 +6,8 @@
 
 > **口径纪律(全篇)**: 以下均为 REPLAY/RESEARCH 历史回放读数——非前向样本、非收益宣称; 样本含幸存者偏差标注(SURVIVORSHIP_BIAS_PARTIAL); STRICT/FORMAL 口径独立且仍被四数据闸门阻断, 本文件不得用于证明正式模式有效性。
 
+> **口径状态(2026-10-19 晚补充)**: 本报告基于 `runner.py` 原实现的 **close_adj 成交/估值口径**——即审查第三轮指令 P0-1 所指的旧口径, 其成交数值不可作"可交易性"解读。**统一 RAW 交易口径(T+1 raw open 成交/raw close 估值/决策审计字段)的重跑已交付**, 多年三模式全指标与 81 日逐笔归因见 `raw_attribution_report.md` 与 `AUDIT_FINAL_backtest_credibility.md`; 本报告保留作旧口径对照基线。
+
 ## 1. 组合层总览(回答"值不值得推进"的基础)
 
 | 指标 | 读数 |
