@@ -1,0 +1,20 @@
+{
+ "frame": "包D集成影响边界测量(只读, 非绩效, R0/R1零触碰)",
+ "events_used": {
+  "DIVIDEND_hits": 21,
+  "BONUS_hits": 0,
+  "events_total": 591
+ },
+ "dividend_cash_omitted": {
+  "lower_tax": 562.44,
+  "upper_taxfree": 622.96,
+  "as_pct_of_final_nav": [
+   5.99,
+   6.63
+  ]
+ },
+ "bonus_phantom_loss_upper": 0.0,
+ "bonus_phantom_as_pct_nav": 0.0,
+ "caveat": "边界用除权前日持仓×全额, 未扣同期卖出/费用; BONUS虚损未与adj_factor旁证逐事件核",
+ "decision_input": "若phantom+dividend合计占NAV>5%, ca_bt全事件overlay集成列为下一工作包必做; 验收=ledger_selfcheck C1-C4全过+守恒含企业行动项"
+}
