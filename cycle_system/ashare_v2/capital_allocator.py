@@ -134,6 +134,10 @@ def _try_swap(reject_r, s, holdings, held_by_code, swaps, p, v, nav):
     swaps.append({"out": weakest["code"], "in": s["code"], "edge": round(edge, 3),
                   "est_cost": round(est_cost, 2), "in_score": s["score_points"],
                   "out_score": weakest["score_points"],
+                  "in_engines": s.get("engines", [s.get("engine")]),
+                  "in_industry": s.get("industry", ""),
+                  "in_vol": v, "in_px": p, "out_value": round(weakest["value"], 2),
+                  "out_vol": weakest.get("vol20"),
                   "note": "换仓成本判据为工程保守上限, 非预期收益宣称"})
     return True
 
