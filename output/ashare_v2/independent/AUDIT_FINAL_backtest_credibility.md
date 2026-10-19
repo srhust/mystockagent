@@ -127,3 +127,29 @@ S1 2020-10-30 NAV 破峰值 80%（-20.42%）→ S2 EXCEEDED 边界振荡（11-02
 审查者最终判断（记录原文要点）："真正决定下一阶段方向的发现……是统一风险状态机能够让 Fast-V 先触发不可恢复的组合锁死，导致 Long-Cycle 在多年回放中实际上从未获得正常参与机会……还不能根据 MERGED 的历史收益评价双引擎策略好坏，也不应该急着优化 Fast-V 的胜率或 LC 的入场阈值。"
 
 后续按工作包 A（修正结论，本次入库）/ B（R1）/ C（LC 独立审计）/ D（企业行动）/ E（前向时间+数据通道）/ F（统一验收）推进；并行准备 2000 年至今历史数据扩展工程（Baostock POC 先行，独立数据层，不触碰 R31 冻结）。
+
+---
+
+## 附录 C — 第四阶段执行日志（2026-10-19 20:40→23:20，全部推送 origin/ashare-v2）
+
+| commit | 内容 |
+|---|---|
+| 209b34d | E-1 时间语义（_kind_refined 三值+rc=8+17 项 forward 测试，100 passed） |
+| 2c5ba44 | B 首批：R1 预注册状态机+合成测试 6 项（抓到 probe_start_nav 丢失真 bug） |
+| 770f362 | B 主体：r1_backtest R1Runner（re-anchor/编排/清仓注入修复） |
+| 381d01b | B 完成：多年窗 30 迁移全周期+selfcheck 停牌携带价盲区修复（R0 回归非破坏）+r1_risk_recovery.json |
+| ceaa7e4 | C 完成：lc_audit（预热/缺席证伪/锁定主因三层分离；三模式 identical TRUE） |
+| 80d8e34 | D 机制：corporate_actions+守恒测试 8 项（114 passed） |
+| 3d2d0c3 | E-2：fetch_guard（上限/退避/熔断/分布+7 测试） |
+| 9a36946 | F：四份验收证据 F1-F4；2000 POC 规划 M0 |
+| 9389cf1/913f6c8 | 快照执行表；corrections_log 更正追加账（6 条入册，124 passed） |
+| 097b021 | **2000 扩展 M1 通过**：baostock 独立通道 3/3 券+10-19 当日数据在=明日对账旁路；更正 #7 |
+| 1c5bb56 | **D 端到端实证**：ca_ingest 官方事件实弹（税率 20%→10% 档/送转级联 100→150） |
+| a9d499d/51fd193 | **M2 全 POC 干净完成**（136 请求 0 错误；A1=0.53% 且 100% 归因 sina 缓存滞后；A4 行业 PIT UNKNOWN 100% 已知化）+fetch_guard pacing 强化 |
+| 2855166 | B×C 交叉验证：**LC 供给日 R0=0 vs R1=221/1545**（行为级操作化证实）；全项目 30 JSON parse 审计 ALL_OK+更正 #8（手写 JSON 缺陷自报） |
+| 327da65 | live_crosscheck 对账工具入役（首跑复现 SINA_STALE 1.639%）；明日序列 2b；更正 #9 |
+| 7d1f0c9 | DESIGN_EXIT_LAYER_MISMATCH 设计稿（裁定 C-3 单独成篇不入 R1）；注：该 commit 信息声称含附录 C 但实际未入库（edit 竞态失败），由本 commit 补齐并登记更正 #10 |
+
+关键量化状态：全套测试 **124 passed**；红线审计 R 项全 ok（16 元组 mismatch 空）；FORMAL_ADMIT 关闭；
+R0 产物零触碰；R1 重放确定性逐数吻合；待外部时钟：明日 15:50/16:10 直播
+（10-20 盘后 plan=首条真 FORWARD，序列 2b baostock 对账必做）+ M3 扩量评审（材料=QC/poc_report.json）。
