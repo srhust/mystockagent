@@ -1,0 +1,377 @@
+{
+ "_disclaimer": "REPLAY旧口径(close_adj成交)归因: 用于审查点名交易的行为分析, 非性能结论; RAW域重跑后将出新版对照。",
+ "runs": {
+  "shadow_run": {
+   "closed_pairs": 17,
+   "total_realized_loss": -3057.38,
+   "worst_and_targeted": [
+    {
+     "code": "601069",
+     "buy_signal_day": "2026-03-02",
+     "buy_exec_day": "2026-03-03",
+     "buy_px": 41.29000785,
+     "sell_exec_day": "2026-06-08",
+     "sell_signal_day": "2026-06-05",
+     "sell_px": 24.939996600000004,
+     "shares": 100,
+     "pnl": -1646.31,
+     "ret": -0.3982,
+     "cost": 4134.04,
+     "sector": "贵金属",
+     "buy_evidence": {
+      "engines": "LONG_CYCLE",
+      "cycle_stage": "EXPANSION",
+      "entry_kinds": "TREND_CONTINUATION",
+      "score_points": 7.191,
+      "cred": "DATA_LIMITED",
+      "trust": "SW_PARTIAL"
+     },
+     "holding_mae_mfe": {
+      "mae_adj": -0.396,
+      "mfe_adj": 0.0,
+      "mae_raw": -0.3993,
+      "mfe_raw": 0.0,
+      "days_held": 66
+     },
+     "share_of_total_loss": 0.5385
+    },
+    {
+     "code": "002207",
+     "buy_signal_day": "2026-03-12",
+     "buy_exec_day": "2026-03-13",
+     "buy_px": 22.81999724,
+     "sell_exec_day": "2026-04-20",
+     "sell_signal_day": "2026-04-17",
+     "sell_px": 15.03999952,
+     "shares": 100,
+     "pnl": -788.79,
+     "ret": -0.3449,
+     "cost": 2287.02,
+     "sector": "油气开采",
+     "buy_evidence": {
+      "engines": "LONG_CYCLE",
+      "cycle_stage": "EXPANSION",
+      "entry_kinds": "TREND_CONTINUATION",
+      "score_points": 7.217,
+      "cred": "DATA_LIMITED",
+      "trust": "SW_PARTIAL"
+     },
+     "holding_mae_mfe": {
+      "mae_adj": -0.3532,
+      "mfe_adj": 0.0167,
+      "mae_raw": -0.3608,
+      "mfe_raw": 0.017,
+      "days_held": 26
+     },
+     "share_of_total_loss": 0.258
+    },
+    {
+     "code": "600115",
+     "buy_signal_day": "2026-03-03",
+     "buy_exec_day": "2026-03-04",
+     "buy_px": 5.48999899,
+     "sell_exec_day": "2026-06-02",
+     "sell_signal_day": "2026-06-01",
+     "sell_px": 4.429999499999999,
+     "shares": 100,
+     "pnl": -116.24,
+     "ret": -0.2098,
+     "cost": 554.01,
+     "sector": "航空机场",
+     "buy_evidence": {
+      "engines": "LONG_CYCLE",
+      "cycle_stage": "EARLY_RECOVERY",
+      "entry_kinds": "EARLY_REVERSAL",
+      "score_points": 6.507,
+      "cred": "PROXY_ONLY",
+      "trust": "SW_PARTIAL"
+     },
+     "holding_mae_mfe": {
+      "mae_adj": -0.2186,
+      "mfe_adj": 0.0,
+      "mae_raw": -0.2294,
+      "mfe_raw": 0.0,
+      "days_held": 61
+     },
+     "share_of_total_loss": 0.038
+    },
+    {
+     "code": "601857",
+     "buy_signal_day": "2026-04-20",
+     "buy_exec_day": "2026-04-21",
+     "buy_px": 16.249996330000002,
+     "sell_exec_day": "2026-06-05",
+     "sell_signal_day": "2026-06-04",
+     "sell_px": 15.389995979999998,
+     "shares": 100,
+     "pnl": -96.8,
+     "ret": -0.0594,
+     "cost": 1630.02,
+     "sector": "油气开采",
+     "buy_evidence": {
+      "engines": "LONG_CYCLE",
+      "cycle_stage": "EXPANSION",
+      "entry_kinds": "TREND_CONTINUATION",
+      "score_points": 7.137,
+      "cred": "DATA_LIMITED",
+      "trust": "SW_PARTIAL"
+     },
+     "holding_mae_mfe": {
+      "mae_adj": -0.0529,
+      "mfe_adj": 0.048,
+      "mae_raw": -0.075,
+      "mfe_raw": 0.068,
+      "days_held": 31
+     },
+     "share_of_total_loss": 0.0317
+    },
+    {
+     "code": "600688",
+     "buy_signal_day": "2026-03-12",
+     "buy_exec_day": "2026-03-13",
+     "buy_px": 8.23999882,
+     "sell_exec_day": "2026-04-22",
+     "sell_signal_day": "2026-04-21",
+     "sell_px": 7.54000011,
+     "shares": 100,
+     "pnl": -80.39,
+     "ret": -0.097,
+     "cost": 829.01,
+     "sector": "石油加工",
+     "buy_evidence": {
+      "engines": "LONG_CYCLE",
+      "cycle_stage": "EXPANSION",
+      "entry_kinds": "TREND_CONTINUATION",
+      "score_points": 6.262,
+      "cred": "DATA_LIMITED",
+      "trust": "SW_PARTIAL"
+     },
+     "holding_mae_mfe": {
+      "mae_adj": -0.085,
+      "mfe_adj": 0.0036,
+      "mae_raw": -0.1442,
+      "mfe_raw": 0.0061,
+      "days_held": 28
+     },
+     "share_of_total_loss": 0.0263
+    },
+    {
+     "code": "601022",
+     "buy_signal_day": "2026-03-05",
+     "buy_exec_day": "2026-03-06",
+     "buy_px": 10.39000076,
+     "sell_exec_day": "2026-03-13",
+     "sell_signal_day": "2026-03-12",
+     "sell_px": 9.8900041,
+     "shares": 100,
+     "pnl": -60.51,
+     "ret": -0.058,
+     "cost": 1044.01,
+     "sector": "航运港口",
+     "buy_evidence": {
+      "engines": "LONG_CYCLE",
+      "cycle_stage": "EXPANSION",
+      "entry_kinds": "TREND_CONTINUATION",
+      "score_points": 6.492,
+      "cred": "DATA_LIMITED",
+      "trust": "SW_PARTIAL"
+     },
+     "holding_mae_mfe": {
+      "mae_adj": -0.0481,
+      "mfe_adj": 0.0,
+      "mae_raw": -0.0505,
+      "mfe_raw": 0.0,
+      "days_held": 6
+     },
+     "share_of_total_loss": 0.0198
+    }
+   ]
+  },
+  "long_backtest": {
+   "closed_pairs": 20,
+   "total_realized_loss": -4877.62,
+   "worst_and_targeted": [
+    {
+     "code": "300164",
+     "buy_signal_day": "2020-10-23",
+     "buy_exec_day": "2020-10-26",
+     "buy_px": 30.319998880000004,
+     "sell_exec_day": "2020-10-30",
+     "sell_signal_day": "2020-10-29",
+     "sell_px": 27.27000175,
+     "shares": 300,
+     "pnl": -929.26,
+     "ret": -0.1021,
+     "cost": 9101.09,
+     "sector": "油气开采",
+     "buy_evidence": {
+      "engines": "FAST_V",
+      "cycle_stage": "REVERSAL_CANDIDATE",
+      "entry_kinds": "PANIC_REBOUND",
+      "score_points": 5.994,
+      "cred": "CONFIRMED",
+      "trust": "UNKNOWN"
+     },
+     "holding_mae_mfe": {
+      "mae_adj": -0.1006,
+      "mfe_adj": 0.0096,
+      "mae_raw": -0.1109,
+      "mfe_raw": 0.0105,
+      "days_held": 5
+     },
+     "share_of_total_loss": 0.1905
+    },
+    {
+     "code": "601127",
+     "buy_signal_day": "2020-07-13",
+     "buy_exec_day": "2020-07-14",
+     "buy_px": 10.23999938,
+     "sell_exec_day": "2020-07-17",
+     "sell_signal_day": "2020-07-16",
+     "sell_px": 9.420004,
+     "shares": 1100,
+     "pnl": -917.39,
+     "ret": -0.0814,
+     "cost": 11269.11,
+     "sector": "汽车整车",
+     "buy_evidence": {
+      "engines": "FAST_V",
+      "cycle_stage": "REVERSAL_CANDIDATE",
+      "entry_kinds": "PANIC_REBOUND",
+      "score_points": 6.058,
+      "cred": "CONFIRMED",
+      "trust": "UNKNOWN"
+     },
+     "holding_mae_mfe": {
+      "mae_adj": -0.0801,
+      "mfe_adj": 0.0,
+      "mae_raw": -0.0852,
+      "mfe_raw": 0.0,
+      "days_held": 4
+     },
+     "share_of_total_loss": 0.1881
+    },
+    {
+     "code": "002463",
+     "buy_signal_day": "2020-09-02",
+     "buy_exec_day": "2020-09-03",
+     "buy_px": 52.3400004,
+     "sell_exec_day": "2020-09-30",
+     "sell_signal_day": "2020-09-29",
+     "sell_px": 47.27999928,
+     "shares": 100,
+     "pnl": -518.46,
+     "ret": -0.099,
+     "cost": 5239.05,
+     "sector": "元件",
+     "buy_evidence": {
+      "engines": "FAST_V",
+      "cycle_stage": "REVERSAL_CANDIDATE",
+      "entry_kinds": "PANIC_REBOUND",
+      "score_points": 7.261,
+      "cred": "CONFIRMED",
+      "trust": "UNKNOWN"
+     },
+     "holding_mae_mfe": {
+      "mae_adj": -0.1263,
+      "mfe_adj": 0.0032,
+      "mae_raw": -0.1307,
+      "mfe_raw": 0.0034,
+      "days_held": 20
+     },
+     "share_of_total_loss": 0.1063
+    },
+    {
+     "code": "600075",
+     "buy_signal_day": "2020-08-20",
+     "buy_exec_day": "2020-08-21",
+     "buy_px": 75.96000209,
+     "sell_exec_day": "2020-08-26",
+     "sell_signal_day": "2020-08-25",
+     "sell_px": 71.31999896,
+     "shares": 100,
+     "pnl": -477.72,
+     "ret": -0.0628,
+     "cost": 7601.08,
+     "sector": "化学原料",
+     "buy_evidence": {
+      "engines": "FAST_V",
+      "cycle_stage": "ENTRY_CONFIRMED",
+      "entry_kinds": "PANIC_REBOUND",
+      "score_points": 6.945,
+      "cred": "CONFIRMED",
+      "trust": "UNKNOWN"
+     },
+     "holding_mae_mfe": {
+      "mae_adj": -0.0611,
+      "mfe_adj": 0.0,
+      "mae_raw": -0.0571,
+      "mfe_raw": 0.0,
+      "days_held": 4
+     },
+     "share_of_total_loss": 0.0979
+    },
+    {
+     "code": "601788",
+     "buy_signal_day": "2020-08-17",
+     "buy_exec_day": "2020-08-18",
+     "buy_px": 26.20000056,
+     "sell_exec_day": "2020-08-26",
+     "sell_signal_day": "2020-08-25",
+     "sell_px": 25.06999495,
+     "shares": 400,
+     "pnl": -467.21,
+     "ret": -0.0446,
+     "cost": 10485.1,
+     "sector": "证券",
+     "buy_evidence": {
+      "engines": "FAST_V",
+      "cycle_stage": "REVERSAL_CANDIDATE",
+      "entry_kinds": "PANIC_REBOUND",
+      "score_points": 6.75,
+      "cred": "CONFIRMED",
+      "trust": "UNKNOWN"
+     },
+     "holding_mae_mfe": {
+      "mae_adj": -0.0592,
+      "mfe_adj": 0.0,
+      "mae_raw": -0.0672,
+      "mfe_raw": 0.0,
+      "days_held": 7
+     },
+     "share_of_total_loss": 0.0958
+    },
+    {
+     "code": "600546",
+     "buy_signal_day": "2020-09-16",
+     "buy_exec_day": "2020-09-17",
+     "buy_px": 59.54000298,
+     "sell_exec_day": "2020-09-25",
+     "sell_signal_day": "2020-09-24",
+     "sell_px": 56.00000396,
+     "shares": 100,
+     "pnl": -366.92,
+     "ret": -0.0616,
+     "cost": 5959.06,
+     "sector": "煤炭",
+     "buy_evidence": {
+      "engines": "FAST_V",
+      "cycle_stage": "ENTRY_CONFIRMED",
+      "entry_kinds": "PANIC_REBOUND",
+      "score_points": 7.965,
+      "cred": "CONFIRMED",
+      "trust": "UNKNOWN"
+     },
+     "holding_mae_mfe": {
+      "mae_adj": -0.0595,
+      "mfe_adj": 0.0238,
+      "mae_raw": -0.0637,
+      "mfe_raw": 0.0255,
+      "days_held": 7
+     },
+     "share_of_total_loss": 0.0752
+    }
+   ]
+  }
+ }
+}
