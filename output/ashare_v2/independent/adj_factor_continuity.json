@@ -1,0 +1,24 @@
+{
+ "A_factor_identity(close_adj/close==adj_factor)": {
+  "max_rel_err": 0.0,
+  "ok": true
+ },
+ "B_ex_day_universe": {
+  "codes": 250,
+  "factor_drift_rows": 386800,
+  "drift_share_pct": 0.9561,
+  "true_ex_event_rows(|df|>0.5%)": 48477,
+  "median_daily_drift": 0.0,
+  "largest_single_jump": 3.0355,
+  "smallest_single_jump": 0.7768,
+  "finding": "hfq因子为滚动基准量: 逐日微漂(95.6%行)非除权事件; 真除权(|df|>0.5%)仅48477行。逐日按factor换算股数会把漂移放大成持仓失真"
+ },
+ "C_return_continuity": {
+  "resid_on_ex_days_median": 0.0,
+  "resid_on_ex_days_p99": 0.0,
+  "resid_normal_days_median": 0.0,
+  "ok_alignment": true,
+  "note": "resid=close_adj收益 - raw收益×factor比率; 若≈0则factor完全解释除权断裂; 若个别>1e-4提示现金分红未复入(RAW估值需股数换算而非价格换算)"
+ },
+ "D_implication_for_raw_valuation": "RAW账本定稿: 成交/股数/费用/NAV全raw且**股数不因因子换算**(漂移会失真); 除权现金分红在raw域无现金入账→raw NAV结构性低约(年分红率), 故双轨呈报: raw NAV(主账本)+adj NAV(对照) + 两者差额按真除权日(|df|>0.5%)列表分解"
+}
