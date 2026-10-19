@@ -180,10 +180,67 @@ def test_p01_forward_plan_execute_uses_raw_open_and_seals(tmp_path, monkeypatch)
     ex_rec = FL.read_all(FS.CHAIN_P)[-1]
     assert ex_rec["execution_mode"] == "DELAYED_REBUILD_RAW_OPEN"
     assert ex_rec["formal_gate"] == "DIAGNOSTIC_REHEARSAL"
-    inc_open = inc.set_index("code")["open"]
-    for f in ex_rec["fills"]:
-        assert abs(f["price"] - float(inc_open[f["code"]])) < 1e-9, "成交价=raw open非close"
+    assert isinstance(ex_rec["fills"], list) and isinstance(ex_rec["rejects"], list)
+    # 合成缓涨面板无引擎候选(fills空, 结构路径); 真实成交断言由real_panel测试实弹覆盖
     assert FS.cmd_execute("2026-10-16") == 3, "幂等: 重复execute拒绝"
+
+
+def _fwd_real_env(tmp_path, monkeypatch):
+    """真实R31冻结面板环境: 锚2026-10-15 → 真面板10-16信号日=FORWARD(36候选/5买入实弹)。"""
+    monkeypatch.setattr(FS, "FWD_DIR", str(tmp_path / "fwd"))
+    os.makedirs(tmp_path / "fwd", exist_ok=True)
+    monkeypatch.setattr(FS, "CHAIN_P", str(tmp_path / "fwd" / "chain.jsonl"))
+    monkeypatch.setattr(FS, "HEAD_P", str(tmp_path / "fwd" / "head.json"))
+    monkeypatch.setattr(FS, "STATE_P", str(tmp_path / "fwd" / "state.json"))
+    monkeypatch.setattr(FS, "FREEZE_P", str(tmp_path / "fwd" / "FREEZE.json"))
+    monkeypatch.setattr(FS, "ADMIT_P", str(tmp_path / "fwd" / "ADMIT.json"))
+    monkeypatch.setattr(FI, "ING_DIR", str(tmp_path / "fwd" / "incremental"))
+    os.makedirs(FI.ING_DIR, exist_ok=True)
+    json.dump({"frozen_trade_date": "2026-10-15", "module_hashes": {}, "version": "T.R0"},
+              open(tmp_path / "fwd" / "FREEZE.json", "w", encoding="utf-8"))
+
+
+def test_p01_real_panel_execute_fills_raw_open(tmp_path, monkeypatch):
+    """实弹核心: 真面板plan(2026-10-16)→FORWARD+DIAGNOSTIC+buys≥4;
+    execute(10-19)用增量raw open成交——fills非空且逐笔价格=open(结构性≠close_adj)。"""
+    _fwd_real_env(tmp_path, monkeypatch)
+    assert FS.cmd_plan("2026-10-16") == 0
+    plan_rec = FL.read_all(FS.CHAIN_P)[-1]
+    assert plan_rec["run_kind"] == "FORWARD" and plan_rec["formal_gate"] == "DIAGNOSTIC_REHEARSAL"
+    assert len(plan_rec["buys"]) >= 4, f"真面板须产生买入, got {len(plan_rec['buys'])}"
+    assert plan_rec["data_source"].startswith("R31 frozen")
+    assert FS.cmd_plan("2026-10-16") == 3, "幂等"
+    from cycle_system.ashare_v2.data_portal import DataPortal
+    frozen = DataPortal(data_mode=C.PIT_RESEARCH).price_panel()
+    sig = frozen[frozen["date"] == pd.Timestamp("2026-10-16")].set_index("code")
+    codes = [b["code"] for b in plan_rec["buys"]]
+    inc = pd.DataFrame({"date": pd.Timestamp("2026-10-19"), "code": codes,
+                        "open": [float(sig["close"][c]) * 1.005 for c in codes],
+                        "high": [float(sig["close"][c]) * 1.03 for c in codes],
+                        "low": [float(sig["close"][c]) for c in codes],
+                        "close": [float(sig["close"][c]) * 1.03 for c in codes],
+                        "volume": 1e7, "amount": 2e8, "adj_factor": 1.0,
+                        "close_adj": [float(sig["close"][c]) * 1.03 for c in codes]})
+    monkeypatch.setattr(FI, "load_day", lambda d: inc)
+    json.dump({"fetched_at": "2026-10-19T15:30:00+08:00"},
+              open(os.path.join(FI.ING_DIR, "2026-10-19.meta.json"), "w", encoding="utf-8"))
+
+    class _AfterCloseDT(datetime):
+        @staticmethod
+        def now(tz=None):
+            return datetime(2026, 10, 20, 9, 0, tzinfo=FS.TZ)   # exec日已收盘次日
+
+    monkeypatch.setattr(FS, "datetime", _AfterCloseDT)
+    assert FS.cmd_execute("2026-10-19") == 0
+    ex = FL.read_all(FS.CHAIN_P)[-1]
+    assert ex["execution_mode"] == "DELAYED_REBUILD_RAW_OPEN"
+    assert len(ex["fills"]) >= 3, f"实弹成交须非空: {len(ex['fills'])}"
+    open_map = inc.set_index("code")["open"].to_dict()
+    for f in ex["fills"]:
+        assert f["action"] == "BUY" and abs(f["price"] - open_map[f["code"]]) < 1e-9, \
+            "成交价必须=当日raw open, 绝不可能是close"
+    head = json.load(open(FS.HEAD_P, encoding="utf-8"))
+    assert head["ok"] and head["seq"] == 2 and FS.cmd_verify() == 0
 
 
 def test_p01_execute_rejects_intraday(tmp_path, monkeypatch):
@@ -200,6 +257,72 @@ def test_p01_execute_rejects_intraday(tmp_path, monkeypatch):
 
     monkeypatch.setattr(FS, "datetime", _FakeDT)
     assert FS.cmd_execute("2026-10-16") == 5, "盘中(10:00)重建拒绝"
+
+
+def test_recovery_plan_crash_state_missing(tmp_path, monkeypatch):
+    """指令5失败恢复: PLAN已上链但state崩溃未落 → 禁重复plan(rc7), --recover重建state且
+    链记PLAN_RECOVERY(不重复PLAN), 重建的plan哈希与原PLAN逐笔一致。"""
+    codes = ["600010", "600011"]
+    panel = _synth_panel(codes)
+    _fwd_env(tmp_path, monkeypatch, panel)
+    assert FS.cmd_plan("2026-10-15") == 0
+    st = json.load(open(FS.STATE_P, encoding="utf-8"))
+    orig_buys = [(b["code"], b["plan"]["plan_hash"]) for b in st["plans"]["2026-10-15"]["buys"]]
+    del st["plans"]["2026-10-15"]                     # 模拟append后save_state前崩溃
+    json.dump(st, open(FS.STATE_P, "w", encoding="utf-8"))
+    assert FS.cmd_plan("2026-10-15") == 7, "崩溃窗口须rc7并给recover指引"
+    assert FS.cmd_plan("2026-10-15", recover=True) == 0
+    chain = FL.read_all(FS.CHAIN_P)
+    assert chain[-1]["event"] == "PLAN_RECOVERY" and chain[-1]["signal_day"] == "2026-10-15"
+    assert sum(1 for r in chain if r["event"] == "PLAN") == 1, "不重复PLAN"
+    st2 = json.load(open(FS.STATE_P, encoding="utf-8"))
+    rebuilt = [(b["code"], b["plan"]["plan_hash"]) for b in st2["plans"]["2026-10-15"]["buys"]]
+    assert rebuilt == orig_buys, "恢复重建的冻结计划哈希逐笔一致"
+
+
+def test_recovery_execute_blocked_when_ledger_advanced(tmp_path, monkeypatch):
+    """失败恢复核心防线(真实R31面板实弹): 真fills已入账本但链无EXECUTE → rc7拒绝双记账。"""
+    _fwd_real_env(tmp_path, monkeypatch)
+    assert FS.cmd_plan("2026-10-16") == 0
+    plan_rec = FL.read_all(FS.CHAIN_P)[-1]
+    assert plan_rec["buys"], "实弹前提: 真面板产生买入计划"
+    from cycle_system.ashare_v2.data_portal import DataPortal
+    frozen = DataPortal(data_mode=C.PIT_RESEARCH).price_panel()
+    sig = frozen[frozen["date"] == pd.Timestamp("2026-10-16")].set_index("code")
+    co = PortfolioCoordinator.load_state(FS.STATE_P, nav0=C.NAV0,
+                                         ledger_root=os.path.join(FS.FWD_DIR, "ledger"),
+                                         ledger_name="dual_cycle_v2_forward")
+    fills, _ = co.execute_day("2026-10-16",
+                              px_t1={c: float(v) * 1.005 for c, v in sig["close"].items()},
+                              prev_close={c: float(v) for c, v in sig["close"].items()})
+    co.save_state(FS.STATE_P)
+    assert len(fills) >= 3, f"实弹前提: 真实fills入账(账本jsonl已落盘), got {len(fills)}"
+    json.dump({"fetched_at": "2026-10-19T15:30:00+08:00"},
+              open(os.path.join(FI.ING_DIR, "2026-10-19.meta.json"), "w", encoding="utf-8"))
+    monkeypatch.setattr(FI, "load_day", lambda d: pd.DataFrame({"code": [], "open": []}))
+    assert FS.cmd_execute("2026-10-19") == 7, "账本已推进且链无记录: 必须拒绝自动重放(人工对账)"
+
+
+def test_recovery_plan_crash_state_missing_real_panel(tmp_path, monkeypatch):
+    """失败恢复(实弹): 真面板5买入的PLAN上链后state崩溃 → rc7指引 → --recover重建,
+    全部冻结plan哈希逐笔一致, 链不重复PLAN。"""
+    _fwd_real_env(tmp_path, monkeypatch)
+    assert FS.cmd_plan("2026-10-16") == 0
+    st = json.load(open(FS.STATE_P, encoding="utf-8"))
+    orig_buys = [(b["code"], b["plan"]["plan_hash"], b["plan"]["cash_budget"])
+                 for b in st["plans"]["2026-10-16"]["buys"]]
+    assert len(orig_buys) >= 4, "实弹前提: 真面板有买入计划"
+    del st["plans"]["2026-10-16"]
+    json.dump(st, open(FS.STATE_P, "w", encoding="utf-8"))
+    assert FS.cmd_plan("2026-10-16") == 7
+    assert FS.cmd_plan("2026-10-16", recover=True) == 0
+    chain = FL.read_all(FS.CHAIN_P)
+    assert chain[-1]["event"] == "PLAN_RECOVERY"
+    assert sum(1 for r in chain if r["event"] == "PLAN") == 1
+    st2 = json.load(open(FS.STATE_P, encoding="utf-8"))
+    rebuilt = [(b["code"], b["plan"]["plan_hash"], b["plan"]["cash_budget"])
+               for b in st2["plans"]["2026-10-16"]["buys"]]
+    assert rebuilt == orig_buys, "恢复重建的冻结计划(含预算)逐笔哈希一致"
 
 
 def test_ingest_fetch_pipeline_synthetic(tmp_path, monkeypatch):

@@ -163,10 +163,42 @@ class MergedPortal:
         return self._df
 
 
-def cmd_plan(day: str, formal: bool = False) -> int:
+def _ledger_last_date() -> str | None:
+    p = os.path.join(FWD_DIR, "ledger", "ledger_dual_cycle_v2_forward.jsonl")
+    if not os.path.exists(p):
+        return None
+    last = None
+    with open(p, encoding="utf-8") as f:
+        for line in f:
+            try:
+                r = json.loads(line)
+            except ValueError:
+                continue
+            d = r.get("execution_date") or r.get("date") or r.get("day")
+            if d:
+                last = max(str(last), str(d)[:10]) if last else str(d)[:10]
+    return last
+
+
+def cmd_plan(day: str, formal: bool = False, recover: bool = False) -> int:
     import pandas as pd
-    if _chain_has("PLAN", "signal_day", day):
+    if _chain_has("PLAN", "signal_day", day) and not recover:
+        st = {}
+        if os.path.exists(STATE_P):
+            try:
+                st = json.load(open(STATE_P, encoding="utf-8"))
+            except ValueError:
+                st = {}
+        if st and day not in st.get("plans", {}):
+            print(json.dumps({"error": f"链上已有{day}的PLAN但state未落(崩溃窗口): 禁止重复plan, "
+                                       "用 plan <day> --recover 重建state(链记PLAN_RECOVERY, 不重复PLAN)",
+                              "code": "PLAN_CRASH_STATE_MISSING"}, ensure_ascii=False))
+            return 7
         print(json.dumps({"error": f"{day} 已有PLAN记录(幂等拒绝; 重跑须先裁定)", "code": "IDEMPOTENT_PLAN"},
+                         ensure_ascii=False))
+        return 3
+    if recover and not _chain_has("PLAN", "signal_day", day):
+        print(json.dumps({"error": f"--recover要求链上存在{day}的PLAN", "code": "NO_PLAN_TO_RECOVER"},
                          ensure_ascii=False))
         return 3
     if os.path.exists(CHAIN_P):
@@ -206,7 +238,8 @@ def cmd_plan(day: str, formal: bool = False) -> int:
     run_kind = _run_kind(day)
     audit = _module_audit() if run_kind == "FORWARD" else {"prediction_verified": [], "tool_changes": [],
                                                            "modules_hashed": 0, "note": "REPLAY不强制模块审计"}
-    rec = {"event": "PLAN", "signal_day": day, **_prov(),
+    rec = {"event": "PLAN_RECOVERY" if recover else "PLAN", "signal_day": day, **_prov(),
+           "recovers_plan_of": day if recover else None,
            "run_kind_expected": run_kind,
            "data_frozen_through": frozen_max, "data_incremental_days": inc_days,
            "data_fetched_at": meta["fetched_at"], "data_source": meta["source"],
@@ -246,6 +279,12 @@ def cmd_execute(day: str, formal: bool = False) -> int:
         print(json.dumps({"error": f"{day} 已有EXECUTE记录(幂等拒绝)", "code": "IDEMPOTENT_EXECUTE"},
                          ensure_ascii=False))
         return 3
+    led_last = _ledger_last_date()
+    if led_last and led_last >= day:
+        print(json.dumps({"error": f"账本已推进至{led_last}≥{day}但链上无该日EXECUTE记录"
+                                   "(半执行崩溃窗口): 禁止自动重放(会双记账), 须人工对账后裁定",
+                          "code": "LEDGER_ADVANCED_NO_RECORD"}, ensure_ascii=False))
+        return 7
     now = datetime.now(TZ)
     if str(now.date()) == day and now.strftime("%H:%M") < "15:00":
         print(json.dumps({"error": f"重建须在{day}收盘后(现{now.isoformat()[:16]}): 盘中拒绝",
@@ -342,8 +381,9 @@ def cmd_seal() -> int:
 
 
 def main() -> int:
-    args = [a for a in sys.argv[1:] if a != "--formal"]
+    args = [a for a in sys.argv[1:] if a not in ("--formal", "--recover")]
     formal = "--formal" in sys.argv
+    recover = "--recover" in sys.argv
     if len(args) < 2 and args[0:1] != ["seal"]:
         print(__doc__)
         return 2
@@ -357,7 +397,7 @@ def main() -> int:
                           "sha256": m["csv_sha256"][:16]}, ensure_ascii=False))
         return 0
     if cmd == "plan":
-        return cmd_plan(day, formal=formal)
+        return cmd_plan(day, formal=formal, recover=recover)
     if cmd == "execute":
         return cmd_execute(day, formal=formal)
     if cmd == "verify":

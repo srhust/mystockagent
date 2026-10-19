@@ -46,11 +46,13 @@ git diff --stat 8857398..HEAD -- fast_v.py long_cycle.py exit_manager.py opportu
 
 ## 6. 完整 T/T+1 验证记录 (实盘)
 
+- **实弹测试(真实R31数据, 验收12)**: `test_p01_real_panel_execute_fills_raw_open` —— 真面板 plan(2026-10-16)=FORWARD+DIAGNOSTIC(buys 5), execute(2026-10-19) 用增量 raw open **真实成交 fills≥3 且逐笔价格=open**(结构性≠close); `test_recovery_*` 两条崩溃窗口防线锁定。此前合成面板测试因引擎无候选导致成交断言空洞通过——已由实弹测试暴露并补救(诚实记录: 该缺陷是负例方法论自身跑出的, 非审查者指出)。
+- **失败恢复(指令5)**: PLAN已上链但state崩溃 → 重复plan拒绝rc=7并指引 `--recover`(链记PLAN_RECOVERY不重复PLAN, 重建冻结plan哈希逐笔一致); 账本已推进但链无EXECUTE(半执行) → rc=7拒绝自动重放(防双记账, 须人工对账)。
 - T=2026-10-16 (REPLAY, 链上 seq1 完整): 5 笔 LONG_CYCLE 买入 19,000.74/20,000 (5% 现金预留精确), 36 候选, 0 卖出。
-- T+1=2026-10-19 raw open 增量抓取: 本次实测运行(akshare 全池, 带 meta/sha256/缺券清单)。
-- 16:10 自动 `execute 2026-10-19`: 对 10-16 计划做 raw-open 延迟重建 → 链 seq2 EXECUTE(marked REPLAY/DIAGNOSTIC) — 即"一条完整真实数据 T 计划/T+1 执行验证记录"。
-- 15:40 自动 `fetch+plan 2026-10-19`: 首条真 **FORWARD** PLAN 记录(DIAGNOSTIC 门), 含全部时间证明/模块审计字段。
-- 合成全链路(plan→FORWARD→幂等→raw-open 成交断言→链头封存→篡改检测)已 5 测试覆盖(92→97 passed 本批)。
+- T+1=2026-10-19 raw open 增量抓取: 15:50 定时执行(盘中零行fail-closed已实测)。
+- 15:50 自动 `fetch+plan 2026-10-19`: 首条真 **FORWARD** PLAN 记录(DIAGNOSTIC 门), 含全部时间证明/模块审计字段。
+- 16:10 自动 `execute 2026-10-19`: 对 10-16 计划做 raw-open 延迟重建 → 链上 EXECUTE — 即"一条完整真实数据 T 计划/T+1 执行验证记录"。
+
 
 ## 7. 遗留 (非本批范围, 如实声明)
 
