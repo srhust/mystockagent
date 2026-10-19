@@ -60,9 +60,10 @@ S1 2020-10-30 NAV 破峰值 80%（-20.42%）→ S2 EXCEEDED 边界振荡（11-02
 ## 5. B 线（今晚 live FORWARD 记录）状态
 
 - 10-16 REPLAY PLAN 链 seq1 完好（head 2430092e…，verify ok）。
-- 2026-10-19 当日 bar：akshare 落库异常迟缓，14:56→17:30 共 **15 次探测零行**，全部 fail-closed 零副作用（未用盘中 bar、未跑 pipeline 全量、冻结 CSV 未触碰）。
+- **根因更正（18:52，诚实披露）**：14:56→18:41 共 21 轮 fetch 报"零成交行"，经定点排查真因是**系统代理故障**（`ProxyError: Unable to connect to proxy`，push2his.eastmoney.com 直连测试 3/3 全挂）——`fetch_day` 顶层文案把 530 笔网络层失败折叠成"零成交行"，**早先"akshare 落库延迟"的归因不完整**。旁证：18:45 另一接口路径成功取回 600000 的 **10-19 真实日线（开 9.72/收 9.78）= bar 早已落库**，通道挂除当晚即不可重试成功。watcher 已停（每轮 530×2 次无效调用）。
+- 改进项（登记，明日 Addendum 窗口）：`forward_ingest.fetch_day` 零成交 raise 文案应附 missing 原因分布摘要（网络故障 vs 真无 bar 的区分），属错误可观测性修正不改规则，但该模块在 16 元组内——必须随 R0.4 登记，今晚不动。
 - 15:50/16:10 提醒批次处理如实记录：fetch 未就绪→execute 拒绝执行（rc=6 路径，非 rc7，无半执行），链零写入。
-- 扩展 watcher（至 ~21:00，10 分钟/轮）：bar 落地自动 `plan 2026-10-19`（首条真 FORWARD，DIAGNOSTIC→rehearsal 域，ledger_target=REHEARSAL），随后人工触发 `execute 2026-10-19`（10-16 计划 raw-open 重建，seq3）——阶段 1-6/7 的**实测载体**，其正确性已由三日实弹测试先行钉住，live 为补强证据。
+- live 计划不变：网络恢复后 `fetch 2026-10-19` → `plan`（首条真 FORWARD，rehearsal 域）→ `execute`（raw-open 重建，seq3）→ 重跑 redline_audit/selfcheck 收口。若今晚始终不可恢复：顺延明日 cron，账本语义不受影响（exec_day=10-19 固定重建合法）。
 
 ## 6. 交还审查者的决策点
 
