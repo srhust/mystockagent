@@ -56,11 +56,14 @@ class FetchGuard:
     def __init__(self, cap_calls: int = 600, window_s: float = 3600.0,
                  base_backoff_s: float = 2.0, mult: float = 2.0, jitter: float = 0.3,
                  max_retries: int = 3, breaker_threshold: int = 5,
-                 breaker_reset_s: float = 900.0, sleeper=time.sleep,
+                 breaker_reset_s: float = 900.0, pacing_s: float = 0.0,
+                 sleeper=time.sleep,
                  clock=time.monotonic, rng=random.Random(7)):
         self.cap, self.window = cap_calls, window_s
         self.base, self.mult, self.jitter, self.max_retries = base_backoff_s, mult, jitter, max_retries
         self.brk_thr, self.brk_reset = breaker_threshold, breaker_reset_s
+        self.pacing = pacing_s
+        self.last_call = 0.0
         self.sleep, self.clock, self.rng = sleeper, clock, rng
         self.calls = []                       # 时间戳(滚动窗)
         self.consec_fail = 0
@@ -72,6 +75,9 @@ class FetchGuard:
 
     # ---- 上限与熔断闸门 -----------------------------------------------------
     def _gate(self):
+        now = self.clock()
+        if self.pacing > 0 and self.last_call and now - self.last_call < self.pacing:
+            self.sleep(self.pacing - (now - self.last_call))     # pacing: 请求最小间隔(防burst自激)
         now = self.clock()
         self.calls = [t for t in self.calls if now - t < self.window]
         if len(self.calls) >= self.cap:
@@ -89,6 +95,7 @@ class FetchGuard:
         last = None
         for attempt in range(self.max_retries + 1):
             self._gate()
+            self.last_call = self.clock()
             self.calls.append(self.clock())
             try:
                 r = fn(*a, **kw)
