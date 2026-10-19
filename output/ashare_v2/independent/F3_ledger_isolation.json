@@ -1,0 +1,19 @@
+{
+ "_class": "EVIDENCE_F3_LEDGER_ISOLATION",
+ "isolation_discipline": "每次运行rmtree+新目录+唯一ledger_name; 旧污染jsonl已归档证据分离(包A)",
+ "selfcheck_all_ok": {
+  "raw_bt/2020-06-01_2026-10-16": true,
+  "raw_bt/2026-03-02_2026-06-30": true,
+  "r1_bt/r1_2020-06-01_2026-10-16": true,
+  "r1_bt/r1_2026-03-02_2026-06-30": true
+ },
+ "c2_halt_price_blindspot_fix": "校验侧停牌携带价(与账本px_last同源), R0两窗回归TRUE非回归",
+ "formal_ledger_zero_write": true,
+ "runs_listed": [
+  "raw_bt/2020-06-01_2026-10-16",
+  "raw_bt/2020-06-01_2026-10-16_FAST_V",
+  "raw_bt/2020-06-01_2026-10-16_LONG_CYCLE",
+  "raw_bt/2026-03-02_2026-06-30"
+ ],
+ "amended": "2026-10-19T22:25+08:00"
+}

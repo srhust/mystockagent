@@ -1,0 +1,19 @@
+{
+ "_class": "EVIDENCE_F1_R0_UNCHANGED / redline re-verify",
+ "prediction_16_tuple_mismatch": [],
+ "hard_fail": false,
+ "tools_domain_changes_warn_only": true,
+ "formal_admit_absent": true,
+ "formal_gate_records": 0,
+ "raw_bt_2020_run_untouched_proof": {
+  "nav_final_csv": "unchanged (no write after 18033fc)",
+  "r0_runs_present": [
+   "2020-06-01_2026-10-16",
+   "2020-06-01_2026-10-16_FAST_V",
+   "2020-06-01_2026-10-16_LONG_CYCLE",
+   "2026-03-02_2026-06-30"
+  ]
+ },
+ "verdict": "ENGINEERING_AUDIT_PASS / RESEARCH_REPLAY_ONLY / FORMAL_ADMIT_BLOCKED",
+ "amended": "2026-10-19T22:25+08:00"
+}

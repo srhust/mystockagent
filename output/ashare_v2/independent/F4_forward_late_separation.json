@@ -1,0 +1,9 @@
+{
+ "_class": "EVIDENCE_F4_FORWARD_LATE_SEPARATION",
+ "E1_semantics": "FORWARD=计划生成于拟执行时刻(T+1 09:25集合竞价)之前的墙钟证明; 晚生成=LATE_RECONSTRUCTION; <=冻结锚=REPLAY; FORMAL遇LATE rc=8零副作用",
+ "tests": "test_forward 17 passed (边界09:24:59/09:25:00/LATE_FORMAL零写入)",
+ "chain": "chain显式run_kind字段+EXECUTE跟随PLAN kind; FL.append_record尊重payload(16元组未动)",
+ "tomorrow_sequence": "10-19补录=REPLAY/LATE(不批准真实FORWARD标注-裁定原文); 10-20盘后plan=首条真FORWARD; 10-21起execute(前日FORWARD)+plan日积",
+ "formal_ledger_exists": false,
+ "amended": "2026-10-19T22:25+08:00"
+}

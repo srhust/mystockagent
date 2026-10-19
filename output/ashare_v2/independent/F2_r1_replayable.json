@@ -1,0 +1,32 @@
+{
+ "_class": "EVIDENCE_F2_R1_REPLAYABLE",
+ "determinism": {
+  "rerun_at_22:20": {
+   "final_nav": 9396.05,
+   "n_transitions": 30,
+   "rows": 1545,
+   "nav_sum": 18850750.5,
+   "first_run": {
+    "final_nav": 9396.05,
+    "n_transitions": 30
+   },
+   "exact_match": true
+  }
+ },
+ "prereg_version": "R1.0-PREREG",
+ "lifecycle_summary": {
+  "ever_recovered_after_first_lock": true,
+  "reached_active_again": true,
+  "days_in_terminal_flatline": 26
+ },
+ "state_days": {
+  "ACTIVE": 1090,
+  "LOCKOUT": 26,
+  "COOLDOWN": 177,
+  "PROBE_REENTRY": 252
+ },
+ "selfcheck_multi": "all_ok TRUE C1-C4",
+ "synthetic_tests": "6 passed (probe_start_nav bug caught by tests)",
+ "frame": "STATE_MACHINE_BEHAVIOR_VERIFICATION_ONLY",
+ "amended": "2026-10-19T22:25+08:00"
+}
