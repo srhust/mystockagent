@@ -1,6 +1,6 @@
 {
- "generated_at": "2026-10-19T13:17:07.077820+08:00",
- "code_version": "b304e4672bfc8c32aea50bf72ca26365a17e25bf",
+ "generated_at": "2026-10-19T13:54:13.224430+08:00",
+ "code_version": "99401efe01c85097b7ddcd90fec6b70097726ebe",
  "branch": "ashare-v2",
  "config_hash": "cc5cb7c990c2a499",
  "tests_v2": {
@@ -8,14 +8,14 @@
   "rc": 0,
   "passed": 98,
   "failed": 0,
-  "tail": "98 passed, 11 warnings in 119.10s (0:01:59)"
+  "tail": "98 passed, 11 warnings in 108.44s (0:01:48)"
  },
  "tests_all": {
   "target": "tests",
   "rc": 0,
   "passed": 146,
   "failed": 0,
-  "tail": "146 passed, 12 warnings in 140.17s (0:02:20)"
+  "tail": "146 passed, 12 warnings in 121.40s (0:02:01)"
  },
  "baseline_verdict": 0,
  "baseline_checks": {

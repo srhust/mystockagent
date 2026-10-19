@@ -1,6 +1,6 @@
 # Ashare Dual-Cycle V2 阶段G统一验收
 
-- 版本: b304e4672bfc8c32aea50bf72ca26365a17e25bf (ashare-v2)  配置哈希: cc5cb7c990c2a499
+- 版本: 99401efe01c85097b7ddcd90fec6b70097726ebe (ashare-v2)  配置哈希: cc5cb7c990c2a499
 
 | 验收项 | 结果 |
 |---|---|

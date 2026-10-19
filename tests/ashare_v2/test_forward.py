@@ -125,7 +125,7 @@ def _fwd_env(tmp_path, monkeypatch, panel):
 
 
 def test_p03_rebudget_only_shrinks_with_parent_link(tmp_path):
-    """P0-3: T+1现金约束只许缩减, 调整记录带父plan哈希且单调/换码不可能。"""
+    """P0-3: T+1现金约束只许缩减(REDUCE)或撤销(CANCEL), 记录带父plan哈希且单调/换码不可能。"""
     root = str(tmp_path / "led")
     co = PortfolioCoordinator(nav0=C.NAV0, ledger_root=root, ledger_name="rb")
     co.plan_day("2026-06-29", [{"code": "600010", "score_points": 9.0,
@@ -133,21 +133,40 @@ def test_p03_rebudget_only_shrinks_with_parent_link(tmp_path):
                 px={"600010": 10.0}, vol20={"600010": 0.02}, ind_of={"600010": "I"})
     rec = co.plans["2026-06-29"]
     assert rec["buys"], "计划应有买入"
-    orig_hash = rec["buys"][0]["plan"]["plan_hash"]
-    orig_budget = rec["buys"][0]["cash_budget"]
-    co.ledger.cash = 500.0                        # 极端缺现金(卖款未到账模拟)
-    co._rebudget_pending_buys(rec, "2026-06-29")
     b = rec["buys"][0]
-    assert b["cash_budget"] <= 500.0 < orig_budget, "只许缩减"
+    orig_hash = b["plan"]["plan_hash"]
+    orig_budget = b["cash_budget"]
+    assert orig_budget >= 2000.0, f"构造前提: 预算需够演示缩减, got {orig_budget}"
+    # ── REDUCE: 现金够最小手但不足原预算 ──
+    cut = round(orig_budget * 0.6, 2)
+    co.ledger.cash = cut
+    co._rebudget_pending_buys(rec, "2026-06-29")
     adj = co.adjust_log[-1]
-    assert adj["parent_plan_hash"] == orig_hash and adj["budget_before"] == orig_budget
-    assert adj["budget_after"] == b["cash_budget"] and adj["monotone_down"] is True
-    assert adj["code_unchanged"] is True and adj["code"] == "600010"
+    assert adj["event"] == "REDUCE" and adj["parent_plan_hash"] == orig_hash
+    assert adj["budget_before"] == orig_budget and adj["budget_after"] == cut
+    assert adj["monotone_down"] is True and adj["code_unchanged"] is True and adj["code"] == "600010"
+    assert b["cash_budget"] == cut and b["plan"]["plan_hash"] == adj["child_plan_hash"]
     # 只减不增: 再喂更多现金也不得回涨
     co.ledger.cash = 99999.0
     co._rebudget_pending_buys(rec, "2026-06-29")
-    assert b["cash_budget"] <= 500.0, "预算不得回升"
+    assert b["cash_budget"] == cut, "预算不得回升"
     assert len([a for a in co.adjust_log if a["code"] == "600010"]) == 1, "无二次调整"
+    # ── CANCEL: 现金不足最小申报单位 → 撤销, 不产生零预算假计划 ──
+    co.plan_day("2026-06-30", [{"code": "600011", "score_points": 9.0,
+                                "engines": ["LONG_CYCLE"], "industry": "J", "record_ids": ["s"]}],
+                px={"600011": 20.0}, vol20={"600011": 0.02}, ind_of={"600011": "J"})
+    rec2 = co.plans["2026-06-30"]
+    b2 = rec2["buys"][0]
+    orig2 = b2["cash_budget"]
+    co.ledger.cash = 400.0                          # < 20元×100股×1.002
+    co._rebudget_pending_buys(rec2, "2026-06-30")
+    adj2 = co.adjust_log[-1]
+    assert adj2["event"] == "CANCEL" and adj2["budget_after"] == 0.0
+    assert adj2["parent_plan_hash"] == b2["plan"]["plan_hash"] and adj2["budget_before"] == orig2
+    assert adj2["child_plan_hash"] is None and b2["_cancelled"] is True and b2["cash_budget"] == 0.0
+    fills, rejects = co.execute_day("2026-06-30", px_t1={"600011": 20.2}, prev_close={"600011": 20.0})
+    assert not [f for f in fills if f["code"] == "600011"], "撤销单不得成交"
+    assert any(r.get("reason") == "cancelled_T+1_min_lot" for r in rejects), "撤销须留拒单记录"
 
 
 def test_p01_forward_plan_execute_uses_raw_open_and_seals(tmp_path, monkeypatch):

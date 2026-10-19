@@ -286,12 +286,13 @@ class PortfolioCoordinator:
     def _rebudget_pending_buys(self, rec, signal_day):
         """每笔卖出真实入账后, 把尚未执行的买入预算重估到剩余现金内(真实到账资金口径, 防缺口)。
 
-        第二轮复核P0-3: T日冻结计划保持不可变 — 执行日只允许**缩减**(不增股/不增预算/不换码),
-        每次缩减生成关联父plan_hash的调整记录(原plan快照留在adjust_log), 供审计"策略未在T+1偷改"。"""
+        第二轮复核P0-3: T日冻结计划保持不可变 — 执行日只允许**缩减或撤销**(不增股/不增预算/不换码),
+        每次调整生成关联父plan_hash的记录(原plan快照留在adjust_log), 供审计"策略未在T+1偷改"。
+        现金不足一个最小申报单位时=撤销(CANCEL), 不产生零预算假计划。"""
         created = f"{signal_day}T15:05:00+08:00"                       # 执行器申报窗要求(审计另记真实时刻)
         avail = self.ledger.cash
         for b in rec["buys"]:
-            if b.get("_executed") or "plan" not in b:
+            if b.get("_executed") or b.get("_cancelled") or "plan" not in b:
                 continue
             if b["cash_budget"] > avail:
                 old_plan = b["plan"]
@@ -299,17 +300,29 @@ class PortfolioCoordinator:
                 new_budget = round(max(avail, 0.0), 2)
                 if new_budget >= old_budget:            # 只缩减(浮点毛刺不进调整)
                     continue
+                base, _step = ex.lot_step(b["code"])
+                px_ref = self.px_last.get(b["code"], old_plan["signal_px"])
+                now_iso = datetime.now(timezone(timedelta(hours=8))).isoformat()
+                if new_budget < px_ref * base * 1.002:  # 不足最小申报单位 → 撤销(不建零预算plan)
+                    b["_cancelled"] = True
+                    b["cash_budget"] = 0.0
+                    adj = {"pos": "buy", "event": "CANCEL", "code": b["code"], "signal_day": signal_day,
+                           "parent_plan_hash": old_plan["plan_hash"], "child_plan_hash": None,
+                           "budget_before": old_budget, "budget_after": 0.0,
+                           "monotone_down": True, "code_unchanged": True,
+                           "wall_clock": now_iso, "reason": "cash_below_min_lot_T+1"}
+                    b["plan_adjust"] = adj
+                    self.adjust_log.append(adj)
+                    continue
                 b["cash_budget"] = new_budget
                 b["plan"] = ex.create_plan(b["code"], "BUY", signal_day,
-                                           self.px_last.get(b["code"], old_plan["signal_px"]),
-                                           cash_budget=new_budget, created_at=created)
+                                           px_ref, cash_budget=new_budget, created_at=created)
                 self.ledger.register_plan(b["plan"])
-                adj = {"pos": "buy", "code": b["code"], "signal_day": signal_day,
+                adj = {"pos": "buy", "event": "REDUCE", "code": b["code"], "signal_day": signal_day,
                        "parent_plan_hash": old_plan["plan_hash"], "child_plan_hash": b["plan"]["plan_hash"],
                        "budget_before": old_budget, "budget_after": new_budget,
                        "monotone_down": True, "code_unchanged": True,
-                       "wall_clock": datetime.now(timezone(timedelta(hours=8))).isoformat(),
-                       "reason": "cash_constrained_T+1"}
+                       "wall_clock": now_iso, "reason": "cash_constrained_T+1"}
                 b["plan_adjust"] = adj
                 self.adjust_log.append(adj)
 
@@ -352,6 +365,10 @@ class PortfolioCoordinator:
         # 消除跳空/费差导致的 Ledger 现金透支崩溃(违规路径必须显式拒单而非AssertionError)
         self._rebudget_pending_buys(rec, signal_day)
         for b in rec["buys"]:
+            if b.get("_cancelled"):
+                rejects.append({"stage": "buy", "code": b["code"], "reason": "cancelled_T+1_min_lot",
+                                "parent_plan_hash": (b.get("plan_adjust") or {}).get("parent_plan_hash")})
+                continue
             if "plan" not in b:
                 continue
             code = b["code"]
