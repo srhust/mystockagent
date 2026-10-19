@@ -38,6 +38,18 @@ def check(run_dir: str, price_basis: str = "adj", tol: float = 0.51) -> dict:
     panel = DataPortal(data_mode=C.PIT_RESEARCH).price_panel()
     px = panel.pivot(index="date", columns="code", values=panel_col)
 
+    # CAI.5 守恒扩展: ca_events.csv 存在则纳入(缺文件=Σ0, 既有run逐数不变)
+    div_by_day: dict = {}
+    bonus_by_day_code: dict = {}
+    ca_p = os.path.join(run_dir, "ca_events.csv")
+    if os.path.exists(ca_p):
+        for _, r in pd.read_csv(ca_p, dtype=str).iterrows():
+            if r["type"] == "DIVIDEND" and r["tax_chosen"] != "NO_HOLDER":
+                div_by_day[str(r["day"])] = div_by_day.get(str(r["day"]), 0.0) + float(r["amount"])
+            elif r["type"] in ("BONUS", "SPLIT"):
+                key = (str(r["day"]), str(r["code"]))
+                bonus_by_day_code[key] = bonus_by_day_code.get(key, 0.0) + float(r["amount"])
+
     # C1 现金流水逐日重放
     cash = C.NAV0
     delta_by_day: dict = {}
@@ -46,7 +58,7 @@ def check(run_dir: str, price_basis: str = "adj", tol: float = 0.51) -> dict:
     bad_c1 = []
     for _, row in nav.iterrows():
         d = str(row["day"])
-        cash += delta_by_day.get(d, 0.0)
+        cash += delta_by_day.get(d, 0.0) + div_by_day.get(d, 0.0)      # CAI.5: +Σ当日派息审计
         if abs(cash - float(row["cash"])) > tol:
             bad_c1.append({"day": d, "recomputed_cash": round(cash, 2), "recorded": float(row["cash"])})
     # C4 股数守恒(逐日重放持仓)
@@ -58,6 +70,9 @@ def check(run_dir: str, price_basis: str = "adj", tol: float = 0.51) -> dict:
             if str(r["execution_date"]) == d:
                 sgn = 1 if r["action"] == "BUY" else -1
                 held[str(r["code"])] = held.get(str(r["code"]), 0) + sgn * int(r["shares"])
+        for (bd, bcode), dq in bonus_by_day_code.items():               # CAI.5: BONUS股差入held
+            if bd == d:
+                held[str(bcode)] = held.get(str(bcode), 0) + int(dq)
         try:
             pos = json.loads(row["positions_json"]) if isinstance(row["positions_json"], str) else {}
         except (TypeError, json.JSONDecodeError):
@@ -71,7 +86,7 @@ def check(run_dir: str, price_basis: str = "adj", tol: float = 0.51) -> dict:
     cash2 = C.NAV0
     for _, row in nav.iterrows():
         d = str(row["day"])
-        cash2 += delta_by_day.get(d, 0.0)
+        cash2 += delta_by_day.get(d, 0.0) + div_by_day.get(d, 0.0)       # CAI.5 同步C2
         try:
             pos = json.loads(row["positions_json"]) if isinstance(row["positions_json"], str) else {}
         except (TypeError, json.JSONDecodeError):

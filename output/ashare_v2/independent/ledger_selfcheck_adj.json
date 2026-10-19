@@ -2,7 +2,7 @@
  "_note": "C1现金流水/C2 NAV构成/C3明细对齐/C4股数守恒; 估值域=adj",
  "results": [
   {
-   "run": "long_backtest",
+   "run": "2020-06-01_2026-10-16",
    "price_basis": "adj",
    "checks": {
     "C1_cash_replay_vs_nav_curve": {
@@ -11,9 +11,35 @@
      "n": 0
     },
     "C2_nav_composition_cash_plus_mv": {
-     "ok": true,
-     "mismatch_days": [],
-     "n": 0
+     "ok": false,
+     "mismatch_days": [
+      {
+       "day": "2020-07-14",
+       "nav": 20330.89,
+       "recomputed": 21074.89
+      },
+      {
+       "day": "2020-07-15",
+       "nav": 19850.89,
+       "recomputed": 20594.89
+      },
+      {
+       "day": "2020-07-16",
+       "nav": 19406.89,
+       "recomputed": 20150.88
+      },
+      {
+       "day": "2020-08-14",
+       "nav": 19004.34,
+       "recomputed": 101353.34
+      },
+      {
+       "day": "2020-08-17",
+       "nav": 18947.34,
+       "recomputed": 100714.34
+      }
+     ],
+     "n": 51
     },
     "C3_trades_vs_ledger_rowwise": {
      "ok": true,
@@ -25,7 +51,163 @@
      "n": 0
     }
    },
-   "all_ok": true
+   "all_ok": false
+  },
+  {
+   "run": "2026-03-02_2026-06-30",
+   "price_basis": "adj",
+   "checks": {
+    "C1_cash_replay_vs_nav_curve": {
+     "ok": true,
+     "mismatch_days": [],
+     "n": 0
+    },
+    "C2_nav_composition_cash_plus_mv": {
+     "ok": false,
+     "mismatch_days": [
+      {
+       "day": "2026-03-03",
+       "nav": 20034.86,
+       "recomputed": 114771.86
+      },
+      {
+       "day": "2026-03-04",
+       "nav": 19751.82,
+       "recomputed": 275817.82
+      },
+      {
+       "day": "2026-03-05",
+       "nav": 19523.82,
+       "recomputed": 272492.82
+      },
+      {
+       "day": "2026-03-06",
+       "nav": 19165.82,
+       "recomputed": 267309.82
+      },
+      {
+       "day": "2026-03-09",
+       "nav": 19068.82,
+       "recomputed": 264153.82
+      }
+     ],
+     "n": 21
+    },
+    "C3_trades_vs_ledger_rowwise": {
+     "ok": true,
+     "diff": []
+    },
+    "C4_share_conservation": {
+     "ok": true,
+     "mismatch_days": [],
+     "n": 0
+    }
+   },
+   "all_ok": false
+  },
+  {
+   "run": "r1_2020-06-01_2026-10-16",
+   "price_basis": "adj",
+   "checks": {
+    "C1_cash_replay_vs_nav_curve": {
+     "ok": true,
+     "mismatch_days": [],
+     "n": 0
+    },
+    "C2_nav_composition_cash_plus_mv": {
+     "ok": false,
+     "mismatch_days": [
+      {
+       "day": "2020-07-14",
+       "nav": 20330.89,
+       "recomputed": 21074.89
+      },
+      {
+       "day": "2020-07-15",
+       "nav": 19850.89,
+       "recomputed": 20594.89
+      },
+      {
+       "day": "2020-07-16",
+       "nav": 19406.89,
+       "recomputed": 20150.88
+      },
+      {
+       "day": "2020-08-14",
+       "nav": 19004.34,
+       "recomputed": 101353.34
+      },
+      {
+       "day": "2020-08-17",
+       "nav": 18947.34,
+       "recomputed": 100714.34
+      }
+     ],
+     "n": 1312
+    },
+    "C3_trades_vs_ledger_rowwise": {
+     "ok": true,
+     "diff": []
+    },
+    "C4_share_conservation": {
+     "ok": true,
+     "mismatch_days": [],
+     "n": 0
+    }
+   },
+   "all_ok": false
+  },
+  {
+   "run": "r1_2026-03-02_2026-06-30",
+   "price_basis": "adj",
+   "checks": {
+    "C1_cash_replay_vs_nav_curve": {
+     "ok": true,
+     "mismatch_days": [],
+     "n": 0
+    },
+    "C2_nav_composition_cash_plus_mv": {
+     "ok": false,
+     "mismatch_days": [
+      {
+       "day": "2026-03-03",
+       "nav": 20034.86,
+       "recomputed": 114771.86
+      },
+      {
+       "day": "2026-03-04",
+       "nav": 19751.82,
+       "recomputed": 275817.82
+      },
+      {
+       "day": "2026-03-05",
+       "nav": 19523.82,
+       "recomputed": 272492.82
+      },
+      {
+       "day": "2026-03-06",
+       "nav": 19165.82,
+       "recomputed": 267309.82
+      },
+      {
+       "day": "2026-03-09",
+       "nav": 19068.82,
+       "recomputed": 264153.82
+      }
+     ],
+     "n": 35
+    },
+    "C3_trades_vs_ledger_rowwise": {
+     "ok": true,
+     "diff": []
+    },
+    "C4_share_conservation": {
+     "ok": true,
+     "mismatch_days": [],
+     "n": 0
+    }
+   },
+   "all_ok": false
   }
  ]
 }
