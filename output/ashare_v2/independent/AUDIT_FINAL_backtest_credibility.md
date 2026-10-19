@@ -73,3 +73,25 @@ S1 2020-10-30 NAV 破峰值 80%（-20.42%）→ S2 EXCEEDED 边界振荡（11-02
 4. 隔夜跳空成本（A 段）在 2026 样本显著、多年窗反号——live FORWARD 记录攒够后建议按执行时刻重估该成本分布。
 
 *本报告由 pwsh 全链可复算：`raw_shadow_runner.py` / `ledger_selfcheck.py` / `raw_old_pairing.py` / `risk_lockout_diag.py` / `big_loss_attrib.py` / `adj_factor_check.py`（均 tools 域，审计 warn-only）。*
+
+## 附录 A — 审计留痕 commit 索引（`578418e..HEAD`，19 个，按时间序）
+
+| commit | 主题 |
+|---|---|
+| 4ee8786 | A线全历史 REPLAY 读数（-21.76%/锁死5.5年/LC零成交，审查裁定后当日交付） |
+| 5a5f1dc / 9d5ed16 | engine_eval 多年接入 + LC"双重时间错位"归因精化 |
+| df1a05b | 表述边界纪律（raw-open 重建≠实时可成交性）入 disposition §6 |
+| 459aa6c | **§6-2 rehearsal 状态分叉修复 + 连续三交易日实弹测试**（99 passed） |
+| 7f1275d | **阶段3 risk_lockout=true** 五段时序复现 |
+| 3ce2e66 | 阶段2 601069/002207 独立归因（双域 MAE 一致性分解决策vs口径） |
+| a704e89 | **验收第一关 ledger_selfcheck** + shadow_run 账本污染取证 |
+| cc9cff2 | **阶段1-3 adj 因子连续性**（hfq 滚动基准量发现→股数不换算定稿） |
+| d4dfb00 | **阶段1核心：raw_shadow_runner**（RAW 交易域重跑引擎，16 模块零改动） |
+| 1df35e1 / e80e21f | 阶段1/2 主交付：多年三模式 + 归因报告（含锁死日期修正） |
+| 115a4cb | **阶段1-4：81日逐笔配对 + NAV差 A/B 两段分解** |
+| c528f96 | LC 挤出机制修正为时序错配实锤 |
+| 36d3160 | 本总呈报告 |
+| 2784146 | **红线机器验证 redline_audit（R6=TRUE）** |
+| dd31a8d / 95dc00d | 旧报告取代声明 + docstring 补状态域说明 |
+| a7cf33f | 决策层 RAW 读数（FV 结构负期望 / LC 未充分测量） |
+| 04822d3 | **B线根因更正**：代理故障≠落库延迟（误归因完整留痕） |
