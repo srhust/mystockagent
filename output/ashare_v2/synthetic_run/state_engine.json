@@ -1,12 +1,12 @@
 {
  "_provenance": {
-  "code_version": "44e57df06e1792d1d1a8cc84bd593c9d638fb9f1",
+  "code_version": "f1a322f64fd55b8a87bc516a9f085c4db7ea2531",
   "branch": "ashare-v2",
   "config_hash": "cc5cb7c990c2a499",
   "manifest_sha256": "90dd925b61c4ba96b625715e010ade8127d0ff9e72ef8b3a7240097fb1d80abf",
   "mode": "SYNTHETIC",
   "asof": "2026-06-30",
-  "generated_at": "2026-10-19T11:27:32.598177+08:00",
+  "generated_at": "2026-10-19T11:41:31.962964+08:00",
   "four_state": {
    "compile": "PASS(pytest)",
    "sync_data_anchor": "PASS(250/250 C1)",

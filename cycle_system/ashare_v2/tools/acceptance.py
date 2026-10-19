@@ -96,7 +96,8 @@ def main() -> int:
         "603603 sector为空→行业特征缺失即不参选(非静默)",
         "C7代码锚=PASS_ANNOTATED: B0/B1产物生成后执行器/管线有已授权修复提交, 哈希漂移显式标注而非伪PASS",
         "ST历史标记不可得; 停牌=缺行近似(执行器按halted参数)",
-        "swap记录仅诊断输出, 未接入执行通道(E层不自动换仓, §5.4保守)",
+        "swap已执行化(验收4): allocator冻结判据批准后E层卖先于买执行, 单名/组合/行业三上限同源复验(含当日buys), 撤销/跳过一律落rejects(验收6)",
+        "前向影子R0: FREEZE锚=2026-10-16(HEAD 8857398), 信号日>锚=FORWARD; STRICT四闸门未解除⇒仅行为验证准入, 非正式信号",
         "评分权重/阈值全部为未校准预设(CALIBRATED=False), 2020-2026非样本外→不声明预测有效",
     ]
     out["blockers_annotated"] = blockers

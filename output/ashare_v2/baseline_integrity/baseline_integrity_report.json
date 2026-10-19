@@ -87,7 +87,7 @@
    "id": "C4_worktree_frozen",
    "status": "PASS",
    "dirty_lines_on_frozen_paths": [],
-   "all_porcelain": "M cycle_system/ashare_v2/capital_allocator.py\n M cycle_system/ashare_v2/exit_manager.py\n M cycle_system/ashare_v2/fast_v.py\n M cycle_system/ashare_v2/industry_cycle.py\n M cycle_system/ashare_v2/long_cycle.py\n M cycle_system/ashare_v2/opportunity_ranker.py\n M cycle_system/ashare_v2/portfolio.py\n M cycle_system/ashare_v2/report.py\n M cycle_system/ashare_v2/runner.py\n M cycle_system/ashare_v2/schemas.py\n M cycle_system/ashare_v2/strict_gate.py\n M cycle_system/ashare_v2/tools/phaseF_run.py\n M cycle_system/ashare_v2/tools/strict_gate_report.py\n M output/ashare_v2/diagnostic_run/data_quality_report.json\n M output/ashare_v2/diagnostic_run/findings.md\n M output/ashare_v2/diagnostic_run/industry_stage_snapshot.json\n M output/ashare_v2/diagnostic_run/opportunities.csv\n M output/ashare_v2/diagnostic_run/state_engine.json\n M output/ashare_v2/diagnostic_run/universe_buckets_sample.json\n M output/ashare_v2/independent/strict_gate.json\n M output/ashare_v2/shadow_run/allocation_plan_log.csv\n M output/ashare_v2/shadow_run/attribution.csv\n M output/ashare_v2/shadow_run/data_quality_report.json\n M output/ashare_v2/shadow_run/findings.md\n M output/ashare_v2/shadow_run/industry_stage_snapshot.json\n M output/ashare_v2/shadow_run/ledger/ledger_dual_cycle_v2_shadow.jsonl\n M output/ashare_v2/shadow_run/nav_curve.csv\n M output/ashare_v2/shadow_run/opportunities.csv\n M output/ashare_v2/shadow_run/state_engine.json\n M output/ashare_v2/shadow_run/trades.csv\n M output/ashare_v2/shadow_run/universe_buckets_sample.json\n M output/ashare_v2/synthetic_run/allocation_plan_log.csv\n M output/ashare_v2/synthetic_run/data_quality_report.json\n M output/ashare_v2/synthetic_run/findings.md\n M output/ashare_v2/synthetic_run/industry_stage_snapshot.json\n M output/ashare_v2/synthetic_run/ledger/ledger_dual_cycle_v2_synth.jsonl\n M output/ashare_v2/synthetic_run/opportunities.csv\n M output/ashare_v2/synthetic_run/state_engine.json\n M output/ashare_v2/synthetic_run/trades.csv\n M output/ashare_v2/synthetic_run/universe_buckets_sample.json\n M tests/ashare_v2/test_phaseC.py\n M tests/ashare_v2/test_phaseD.py\n?? .acl-recovery/\n?? cycle_system/ashare_v2/forward_ledger.py\n?? cycle_system/ashare_v2/tools/forward_shadow.py\n?? cycle_system/ashare_v2/tools/freeze_manifest.py\n?? cycle_system/today_view.py\n?? output/ashare/_panel_cache.parquet\n?? output/ashare/swing_m1_m1_True_daily_3f_monthly_cap0.json\n?? output/ashare/today_view.json\n?? tests/ashare_v2/test_forward.py\n?? tests/ashare_v2/test_independent_fixes.py"
+   "all_porcelain": "M cycle_system/ashare_v2/tools/acceptance.py\n M output/ashare_v2/diagnostic_run/data_quality_report.json\n M output/ashare_v2/diagnostic_run/findings.md\n M output/ashare_v2/diagnostic_run/industry_stage_snapshot.json\n M output/ashare_v2/diagnostic_run/state_engine.json\n M output/ashare_v2/diagnostic_run/universe_buckets_sample.json\n M output/ashare_v2/shadow_run/data_quality_report.json\n M output/ashare_v2/shadow_run/findings.md\n M output/ashare_v2/shadow_run/industry_stage_snapshot.json\n M output/ashare_v2/shadow_run/ledger/ledger_dual_cycle_v2_shadow.jsonl\n M output/ashare_v2/shadow_run/state_engine.json\n M output/ashare_v2/shadow_run/universe_buckets_sample.json\n M output/ashare_v2/synthetic_run/data_quality_report.json\n M output/ashare_v2/synthetic_run/findings.md\n M output/ashare_v2/synthetic_run/industry_stage_snapshot.json\n M output/ashare_v2/synthetic_run/ledger/ledger_dual_cycle_v2_synth.jsonl\n M output/ashare_v2/synthetic_run/state_engine.json\n M output/ashare_v2/synthetic_run/universe_buckets_sample.json\n?? .acl-recovery/\n?? cycle_system/ashare_v2/tools/engine_eval.py\n?? cycle_system/today_view.py\n?? output/ashare/_panel_cache.parquet\n?? output/ashare/swing_m1_m1_True_daily_3f_monthly_cap0.json\n?? output/ashare/today_view.json\n?? output/ashare_v2/independent/engine_eval.json\n?? output/ashare_v2/independent/engine_eval.md\n?? output/ashare_v2/independent/independent_review.md"
   },
   {
    "id": "C5_swing_m1_untouched",
@@ -128,7 +128,7 @@
   "C7_frozen_code_hashes"
  ],
  "_provenance": {
-  "code_version": "44e57df06e1792d1d1a8cc84bd593c9d638fb9f1",
+  "code_version": "f1a322f64fd55b8a87bc516a9f085c4db7ea2531",
   "branch": "ashare-v2",
   "worktree_dirty": true,
   "config_hash": "cc5cb7c990c2a499",
@@ -136,7 +136,7 @@
    "manifest_sha256": "90dd925b61c4ba96b625715e010ade8127d0ff9e72ef8b3a7240097fb1d80abf"
   },
   "asof": "2026-10-19",
-  "generated_at": "2026-10-19T11:30:27.062162+08:00",
+  "generated_at": "2026-10-19T11:46:49.123136+08:00",
   "mode": "SYNTHETIC",
   "pit_notes": [
    "本工具为工程验证, 非绩效声明"
