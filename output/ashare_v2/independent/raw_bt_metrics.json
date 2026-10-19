@@ -1,5 +1,5 @@
 {
- "_disclaimer": "RAW交易域REPLAY(T+1 raw open成交/raw close估值), 非前向非OOS, 250票幸存者池, PIT冻结快照研究模式; 按审查裁定不作性能判断, 仅用于归因分解",
+ "_disclaimer": "RAW口径REPLAY三模式读数, RESEARCH+SURVIVORSHIP_BIAS_PARTIAL+PIT缺陷标注。会计边界(裁定修正): NAV为raw价格域账本, 送转股数调整与现金分红入账未完成=CORPORATE_ACTION_UNVERIFIED, 不得称完整经济总收益; 收益数字仅用于实现问题与决策问题的占比证据, 停止性能判断。",
  "runs": {
   "MERGED": {
    "days": 1545,
@@ -67,5 +67,6 @@
    "avg_utilization": 0.0289,
    "max_consecutive_empty_days": 1446
   }
- }
+ },
+ "_amended": "2026-10-19 reviewer ruling (18033fc+): see AUDIT_FINAL appendix B"
 }

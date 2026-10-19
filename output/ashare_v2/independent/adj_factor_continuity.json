@@ -20,5 +20,7 @@
   "ok_alignment": true,
   "note": "resid=close_adj收益 - raw收益×factor比率; 若≈0则factor完全解释除权断裂; 若个别>1e-4提示现金分红未复入(RAW估值需股数换算而非价格换算)"
  },
- "D_implication_for_raw_valuation": "RAW账本定稿: 成交/股数/费用/NAV全raw且**股数不因因子换算**(漂移会失真); 除权现金分红在raw域无现金入账→raw NAV结构性低约(年分红率), 故双轨呈报: raw NAV(主账本)+adj NAV(对照) + 两者差额按真除权日(|df|>0.5%)列表分解"
+ "D_implication_for_raw_valuation": "RAW账本定稿: 成交/股数/费用/NAV全raw且**股数不因因子换算**(漂移会失真); 除权现金分红在raw域无现金入账→raw NAV结构性低约(年分红率), 故双轨呈报: raw NAV(主账本)+adj NAV(对照) + 两者差额按真除权日(|df|>0.5%)列表分解",
+ "_ruling_note": "裁定补充: 恒等式A/C仅证明close_adj=close*factor两列内部一致, 不证明历史分红/拆股/送转处理完整; 因子微漂不应成为取消企业行动处理的理由(D包处理真实事件), RAW NAV标CORPORATE_ACTION_UNVERIFIED直至事件级验证。",
+ "_amended": "2026-10-19 reviewer ruling (18033fc+): see AUDIT_FINAL appendix B"
 }

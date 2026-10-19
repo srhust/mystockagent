@@ -696,5 +696,7 @@
    "nav_gap_0401": 4026.42,
    "contrib_pp": 0.2013
   }
- }
+ },
+ "_decomposition_note": "PATHWISE_ACCOUNTING_DECOMPOSITION: A/B两段为不同交易路径截至04-01的净值恒等分解, 包含价格口径+成交决策变化+风险状态反馈三重差异, 不是复权虚高/隔夜成本的独立因果贡献份额; 两run决策集仅1笔重叠即证明路径已分叉。",
+ "_amended": "2026-10-19 reviewer ruling (18033fc+): see AUDIT_FINAL appendix B"
 }
