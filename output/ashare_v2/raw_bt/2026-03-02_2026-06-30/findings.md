@@ -1,0 +1,30 @@
+# Ashare Dual-Cycle V2 findings — mode=SHADOW
+
+- 窗口: ('2026-03-02', '2026-06-30')  模拟天数: 81
+- 代码版本: cc9cff28194f1da09793ac7151e14ff177f91fc2  配置哈希: cc5cb7c990c2a499
+- 数据锚: manifest 90dd925b61c4…(250/250)
+
+## 四态分离
+- 编译/静态: PASS
+- 工程测试: PASS(pytest tests/ashare_v2, 见 experiment_manifest)
+- 数据同步: PASS(R31锚一致, baseline_integrity C1-C7)
+- **预测有效: NOT_CLAIMED —— 全流程未经独立样本外验证, 不声明任何预测有效**
+
+## 显式标注
+- SURVIVORSHIP_BIAS_PARTIAL(池=当前配置)
+- 行业信任=SW_PARTIAL/CURRENT_SNAPSHOT_ONLY(PROXY), Strict无正式信号
+- 评分未校准(CALIBRATED=False): 禁止预期收益率/胜率解读
+- ST历史不可得; 停牌=缺行近似
+- 2020-2026研究窗非样本外
+- 模式边界: SHADOW
+
+## 运行读数(工程口径, 非绩效宣称)
+- 候选(合并后)记录数: 5384
+- 成交笔数: 14  执行拒绝: 1  拒绝分布: {'insufficient_cash_after_fees': 1}
+- 守恒: nav=cash+Σ持仓 OK; 虚拟=真实对账 OK
+- NAV(模拟账本, 基20000): 20034.86 → 15814.89(仅系统守恒性读数, 不含滑点建模全量, 禁止绩效解读)
+- 风险预算事件: 65
+- 协调器显式标注: ['SWAP_IN_LOT_INFEASIBLE: 002157->001309(budget=310显式)', 'SWAP_IN_LOT_INFEASIBLE: 002157->300223(budget=310显式)', 'SWAP_IN_LOT_INFEASIBLE: 002157->600988(budget=314显式)', 'SWAP_IN_LOT_INFEASIBLE: 002157->600489(budget=314显式)', 'SWAP_IN_LOT_INFEASIBLE: 002157->600988(budget=311显式)', 'SWAP_IN_LOT_INFEASIBLE: 002157->600489(budget=311显式)', 'SWAP_IN_LOT_INFEASIBLE: 600688->600988(budget=348显式)', 'SWAP_IN_LOT_INFEASIBLE: 600688->600489(budget=348显式)', 'SWAP_IN_LOT_INFEASIBLE: 600688->600745(budget=349显式)', 'SWAP_IN_LOT_INFEASIBLE: 600688->000060(budget=349显式)', 'SWAP_IN_LOT_INFEASIBLE: 600688->600745(budget=330显式)', 'SWAP_IN_LOT_INFEASIBLE: 600688->002532(budget=330显式)', 'SWAP_IN_LOT_INFEASIBLE: 600688->600745(budget=327显式)', 'SWAP_IN_LOT_INFEASIBLE: 600688->002155(budget=327显式)', 'SWAP_IN_LOT_INFEASIBLE: 600688->600745(budget=329显式)', 'SWAP_IN_LOT_INFEASIBLE: 600688->300475(budget=329显式)', 'SWAP_IN_LOT_INFEASIBLE: 600688->600745(budget=321显式)', 'SWAP_IN_LOT_INFEASIBLE: 600688->300475(budget=321显式)', 'SWAP_IN_LOT_INFEASIBLE: 600688->600745(budget=323显式)', 'SWAP_IN_LOT_INFEASIBLE: 600688->688981(budget=323显式)', 'SWAP_IN_LOT_INFEASIBLE: 600688->688981(budget=313显式)', 'SWAP_IN_LOT_INFEASIBLE: 600688->000807(budget=313显式)', 'SWAP_IN_LOT_INFEASIBLE: 600688->688981(budget=306显式)', 'SWAP_IN_LOT_INFEASIBLE: 600688->000933(budget=306显式)', 'SWAP_IN_LOT_INFEASIBLE: 600688->688981(budget=307显式)', 'SWAP_IN_LOT_INFEASIBLE: 600688->601319(budget=307显式)', 'SWAP_IN_LOT_INFEASIBLE: 600688->000933(budget=291显式)', 'SWAP_IN_LOT_INFEASIBLE: 600688->000807(budget=291显式)']
+
+## 失败项清单
+- (逐日拒绝原因见 allocation_plan_log.csv / trades.csv REJECT_* 行)

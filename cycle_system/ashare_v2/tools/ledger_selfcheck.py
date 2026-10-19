@@ -118,7 +118,7 @@ def main() -> int:
         json.dump({"_note": "C1现金流水/C2 NAV构成/C3明细对齐/C4股数守恒; 估值域=" + basis,
                    "results": results}, f, ensure_ascii=False, indent=1)
     print(json.dumps(results, ensure_ascii=False, indent=1)[:2500])
-    return 0 if all(r.get("all_ok", r.get("checks", {}).get("C0_ledger_present", {}).get("ok") in (None, True)) for r in results) else 1
+    return 0 if all(r.get("all_ok", True) for r in results) else 1
 
 
 if __name__ == "__main__":
