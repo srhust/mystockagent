@@ -1,0 +1,110 @@
+{
+ "_provenance": {
+  "code_version": "d4dfb0016eb136919a7114e7b9e15832d7900709",
+  "branch": "ashare-v2",
+  "config_hash": "cc5cb7c990c2a499",
+  "manifest_sha256": "90dd925b61c4ba96b625715e010ade8127d0ff9e72ef8b3a7240097fb1d80abf",
+  "mode": "SHADOW",
+  "asof": "2026-10-16",
+  "generated_at": "2026-10-19T17:05:46.335334+08:00",
+  "four_state": {
+   "compile": "PASS(pytest)",
+   "sync_data_anchor": "PASS(250/250 C1)",
+   "test": "见tests/ashare_v2",
+   "prediction_valid_claimed": "NOT_CLAIMED"
+  },
+  "window": [
+   "2020-06-01",
+   "2026-10-16"
+  ],
+  "days_simulated": 1545
+ },
+ "mode": "research",
+ "snapshots": {
+  "manifest_sha256": "90dd925b61c4ba96b625715e010ade8127d0ff9e72ef8b3a7240097fb1d80abf",
+  "manifest_git_sha": "d46c50f258244650634c36f37e7af23d4edb689c",
+  "n_csv": 250,
+  "calendar_csv_sha256": "f591aa94e91a3d592cca5dc94829de5dbffb7ca400302d0f6d82788e4f175101",
+  "stocks_dir_sha256_of_concat": "c41569089e33ffa207938ea9654ec75139f72d2ab1b9a609e535a199dcc2bb51"
+ },
+ "datasets": {
+  "price_panel_csv": {
+   "status": "CONFIRMED",
+   "note": "250 CSV sha256↔R31 manifest逐文件验证"
+  },
+  "market_calendar": {
+   "status": "CONFIRMED",
+   "range": "2012-06-08..2026-10-13(并集); 官方日程至2026-12-31",
+   "fail_closed": "超出→RuntimeError"
+  },
+  "tradeable_pool": {
+   "status": "RECONSTRUCTABLE",
+   "source": "ashare_tradeable_pool.pool_at(九桶)",
+   "gaps": [
+    "SUSPENDED_CONFIRMED永不产出(无权威停复牌)",
+    "ST历史UNAVAILABLE"
+   ]
+  },
+  "universe_marketwide": {
+   "status": "DATA_BLOCKED",
+   "reason": "Baostock 9011全名录未落盘(R48 DATA_NOT_CACHED)",
+   "fallback": "227退市清单+81月存续曲线可用"
+  },
+  "industry_sw_historical": {
+   "status": "PIT_UNVERIFIED",
+   "reason": "申万历史成员verified=0(R44-48), in_date部分覆盖(5222码)但out缺失"
+  },
+  "industry_snapshot": {
+   "status": "PROXY_ONLY",
+   "source": "CYCLE_SECTORS当前快照(30板块249码)"
+  },
+  "fundamental_indicators": {
+   "pig.price": "DATA_BLOCKED",
+   "pig.sow_stock": "DATA_BLOCKED",
+   "pig.cost": "DATA_BLOCKED",
+   "pig.margin": "DATA_BLOCKED",
+   "cu.supply_demand": "DATA_BLOCKED",
+   "cu.inventory": "DATA_BLOCKED",
+   "cu.capacity": "DATA_BLOCKED",
+   "cu.tc_rc": "DATA_BLOCKED",
+   "cu.price": "DATA_BLOCKED",
+   "au.real_rate": "DATA_BLOCKED",
+   "au.price": "DATA_BLOCKED",
+   "au.output": "DATA_BLOCKED",
+   "au.cost": "DATA_BLOCKED",
+   "coal.price": "DATA_BLOCKED",
+   "coal.inventory": "DATA_BLOCKED",
+   "coal.output": "DATA_BLOCKED",
+   "coal.demand": "DATA_BLOCKED",
+   "coal.profit_capex": "DATA_BLOCKED",
+   "cm.sales": "DATA_BLOCKED",
+   "cm.operating_rate": "DATA_BLOCKED",
+   "cm.renewal": "DATA_BLOCKED",
+   "cm.inventory": "DATA_BLOCKED",
+   "cm.profit": "DATA_BLOCKED",
+   "semi.inventory": "DATA_BLOCKED",
+   "semi.orders": "DATA_BLOCKED",
+   "semi.price": "DATA_BLOCKED",
+   "semi.capex": "DATA_BLOCKED",
+   "semi.profit": "DATA_BLOCKED",
+   "bank.nim": "DATA_BLOCKED",
+   "bank.credit": "DATA_BLOCKED",
+   "bank.asset_quality": "DATA_BLOCKED",
+   "brk.turnover": "DATA_BLOCKED",
+   "brk.margin": "DATA_BLOCKED",
+   "brk.ib": "DATA_BLOCKED",
+   "brk.profit": "DATA_BLOCKED",
+   "ins.rate": "DATA_BLOCKED",
+   "ins.equity": "DATA_BLOCKED",
+   "ins.income": "DATA_BLOCKED",
+   "growth.demand": "DATA_BLOCKED",
+   "growth.orders": "DATA_BLOCKED",
+   "growth.rev_momentum": "DATA_BLOCKED"
+  }
+ },
+ "explicit_annotations": [
+  "SURVIVORSHIP_BIAS_PARTIAL: 250池=当前配置池, 未消除幸存者偏差",
+  "ST_FLAG_UNVERIFIED; suspension=缺行近似",
+  "2020-2026为研究窗口, 非样本外"
+ ]
+}

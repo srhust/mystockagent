@@ -1,0 +1,52 @@
+{
+ "_provenance": {
+  "code_version": "d4dfb0016eb136919a7114e7b9e15832d7900709",
+  "branch": "ashare-v2",
+  "config_hash": "cc5cb7c990c2a499",
+  "manifest_sha256": "90dd925b61c4ba96b625715e010ade8127d0ff9e72ef8b3a7240097fb1d80abf",
+  "mode": "SHADOW",
+  "asof": "2026-10-16",
+  "generated_at": "2026-10-19T17:11:01.830878+08:00",
+  "four_state": {
+   "compile": "PASS(pytest)",
+   "sync_data_anchor": "PASS(250/250 C1)",
+   "test": "见tests/ashare_v2",
+   "prediction_valid_claimed": "NOT_CLAIMED"
+  },
+  "window": [
+   "2020-06-01",
+   "2026-10-16"
+  ],
+  "days_simulated": 1545
+ },
+ "day": "2026-10-16",
+ "pool_counts": {
+  "TRADEABLE": 248,
+  "SUSPENDED_CONFIRMED": 0,
+  "DATA_MISSING": 0,
+  "NOT_YET_LISTED": 0,
+  "HISTORY_UNAVAILABLE": 0,
+  "INACTIVE_UNVERIFIED": 0,
+  "INSUFFICIENT_HISTORY": 0,
+  "DELISTED_CONFIRMED": 1,
+  "DATA_UNVERIFIED": 0
+ },
+ "data_layer_sizes": {
+  "HAS_QUOTES_T": 248,
+  "NO_QUOTES_YET(近似NOT_YET_LISTED, 仅数据内可知)": 0,
+  "AFTER_LAST_QUOTE": 2
+ },
+ "market_wide": {
+  "status": "DATA_BLOCKED",
+  "reason": "9011全名录未落盘(R48 DATA_NOT_CACHED); 逐股历史资格不可离线精确反推",
+  "aggregate_only": {
+   "month": "2026-10",
+   "n_alive": null,
+   "note": "月末存续计数≠可交易计数(停牌/ST/流动性未验证)"
+  },
+  "delisted_to_asof_n": 225
+ },
+ "caveats": {
+  "survivorship": "SURVIVORSHIP_BIAS_PARTIAL: 250文件=当前配置池(249唯一码+603603), 全市场历史池仅聚合曲线可用(名录DATA_BLOCKED), 未消除幸存者偏差"
+ }
+}

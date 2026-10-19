@@ -1,0 +1,71 @@
+{
+ "_disclaimer": "RAW交易域REPLAY(T+1 raw open成交/raw close估值), 非前向非OOS, 250票幸存者池, PIT冻结快照研究模式; 按审查裁定不作性能判断, 仅用于归因分解",
+ "runs": {
+  "MERGED": {
+   "days": 1545,
+   "nav_end": 15840.76,
+   "cum_ret": -0.208,
+   "cagr": -0.0359,
+   "maxDD": -0.2209,
+   "sharpe_ann": -0.78,
+   "calmar": -0.16,
+   "yearly": {
+    "2020": -0.208,
+    "2021": 0.0,
+    "2022": 0.0,
+    "2023": 0.0,
+    "2024": 0.0,
+    "2025": 0.0,
+    "2026": 0.0
+   },
+   "n_fills": 52,
+   "turnover_ann": 1.82,
+   "avg_utilization": 0.0289,
+   "max_consecutive_empty_days": 1446
+  },
+  "LC_ONLY": {
+   "days": 1545,
+   "nav_end": 15719.25,
+   "cum_ret": -0.214,
+   "cagr": -0.0371,
+   "maxDD": -0.2162,
+   "sharpe_ann": -0.42,
+   "calmar": -0.17,
+   "yearly": {
+    "2020": 0.0,
+    "2021": -0.214,
+    "2022": 0.0,
+    "2023": 0.0,
+    "2024": 0.0,
+    "2025": 0.0,
+    "2026": 0.0
+   },
+   "n_fills": 18,
+   "turnover_ann": 0.51,
+   "avg_utilization": 0.069,
+   "max_consecutive_empty_days": 1286
+  },
+  "FV_ONLY": {
+   "days": 1545,
+   "nav_end": 15840.76,
+   "cum_ret": -0.208,
+   "cagr": -0.0359,
+   "maxDD": -0.2209,
+   "sharpe_ann": -0.78,
+   "calmar": -0.16,
+   "yearly": {
+    "2020": -0.208,
+    "2021": 0.0,
+    "2022": 0.0,
+    "2023": 0.0,
+    "2024": 0.0,
+    "2025": 0.0,
+    "2026": 0.0
+   },
+   "n_fills": 52,
+   "turnover_ann": 1.82,
+   "avg_utilization": 0.0289,
+   "max_consecutive_empty_days": 1446
+  }
+ }
+}
