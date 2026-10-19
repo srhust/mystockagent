@@ -1,0 +1,41 @@
+{
+ "day": "2026-10-19",
+ "R1_FORMAL_ADMIT_absent": {
+  "path_exists": false,
+  "ok": true
+ },
+ "R2_formal_state_and_ledger": {
+  "ledger_exists": false,
+  "state_exists": true,
+  "state_is_replay_leftover_only": true,
+  "state_plans": [
+   "2026-10-16"
+  ],
+  "state_trading_day": null,
+  "ok": true
+ },
+ "R3_prediction_modules_match_R03_baseline": {
+  "prediction_checked": 19,
+  "prediction_mismatch": [],
+  "tools_domain_changes_warn_only": [
+   "ashare_v2/tools/engine_eval.py",
+   "ashare_v2/tools/forward_shadow.py"
+  ],
+  "ok": true
+ },
+ "R4_frozen_panel_intact": {
+  "strict_manifest_verified": true,
+  "rows": 404813,
+  "max_date": "2026-10-16",
+  "ok": true
+ },
+ "R5_chain": {
+  "n": 1,
+  "verify": true,
+  "formal_gate_records": 0,
+  "ok": true
+ },
+ "R6_overall": {
+  "ok": true
+ }
+}
