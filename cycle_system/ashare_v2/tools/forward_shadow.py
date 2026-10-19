@@ -187,16 +187,30 @@ def _ledger_last_date(ledger_name: str) -> str | None:
     return last
 
 
+def _state_domain(formal: bool):
+    """状态/账本单一域(审查§6-2分叉修复): plan与execute必须读写同一域——
+    FORMAL准入前两者都进rehearsal state+rehearsal ledger, 正式state/账本保持只读冻结;
+    否则出现"execute成交进rehearsal而次日plan读正式state(无成交)"的计划-持仓分叉。"""
+    gate = "FORMAL" if (formal and os.path.exists(ADMIT_P)) else "DIAGNOSTIC_REHEARSAL"
+    rep = _state_rehearsal_p()
+    if gate == "FORMAL":
+        return gate, STATE_P, STATE_P, LEDGER_NAME
+    src = rep if os.path.exists(rep) else STATE_P          # 首跑从正式state快照初始化(只读)
+    return gate, src, rep, LEDGER_NAME_REHEARSAL
+
+
 def cmd_plan(day: str, formal: bool = False, recover: bool = False) -> int:
     import pandas as pd
+    gate, state_src, state_dst, lname = _state_domain(formal)
     if _chain_has("PLAN", "signal_day", day) and not recover:
         st = {}
-        if os.path.exists(STATE_P):
+        if os.path.exists(state_src):
             try:
-                st = json.load(open(STATE_P, encoding="utf-8"))
+                st = json.load(open(state_src, encoding="utf-8"))
             except ValueError:
                 st = {}
-        if st and day not in st.get("plans", {}):
+        if not st or day not in st.get("plans", {}):
+            # 保守崩溃检测: state缺失或plan未落, 都按"链有PLAN但state未落"处理(防幂等漏检)
             print(json.dumps({"error": f"链上已有{day}的PLAN但state未落(崩溃窗口): 禁止重复plan, "
                                        "用 plan <day> --recover 重建state(链记PLAN_RECOVERY, 不重复PLAN)",
                               "code": "PLAN_CRASH_STATE_MISSING"}, ensure_ascii=False))
@@ -229,12 +243,12 @@ def cmd_plan(day: str, formal: bool = False, recover: bool = False) -> int:
         print(json.dumps({"error": f"{day} 无增量数据: 先 fetch {day}"}, ensure_ascii=False))
         return 2
     r = Runner(RunMode.SHADOW.value, portal=MergedPortal(panel),
-               ledger_root=os.path.join(FWD_DIR, "ledger"), ledger_name="dual_cycle_v2_forward")
+               ledger_root=os.path.join(FWD_DIR, "ledger"), ledger_name=lname)
     r.setup()
-    if os.path.exists(STATE_P):
-        r.coord = PortfolioCoordinator.load_state(STATE_P, nav0=C.NAV0,
+    if os.path.exists(state_src):
+        r.coord = PortfolioCoordinator.load_state(state_src, nav0=C.NAV0,
                                                   ledger_root=os.path.join(FWD_DIR, "ledger"),
-                                                  ledger_name="dual_cycle_v2_forward")
+                                                  ledger_name=lname)
     scored = r._scored_for(pd.Timestamp(day))
     pxm, volm, _ = r._day_maps(pd.Timestamp(day))
     px_valid = {c: v for c, v in pxm.items() if v}
@@ -252,7 +266,9 @@ def cmd_plan(day: str, formal: bool = False, recover: bool = False) -> int:
            "data_fetched_at": meta["fetched_at"], "data_source": meta["source"],
            "data_csv_sha256": meta["csv_sha256"], "data_missing_codes": meta["codes_missing"],
            "module_audit": audit,
-           "formal_gate": "FORMAL" if (formal and os.path.exists(ADMIT_P)) else "DIAGNOSTIC_REHEARSAL",
+           "formal_gate": gate,
+           "ledger_target": (f"FORMAL:{lname}" if gate == "FORMAL"
+                             else f"REHEARSAL:{lname}(正式账本与正式state零写入)"),
            "industry_states": {ind: r.lc.industry_state(ind, day) for ind in r.lc._states},
            "candidates": [{"code": m["merged"]["code"], "engines": m["merged"]["engines"],
                            "stage": m["score"]["cycle_stage"], "pts": m["score"]["score_points"],
@@ -267,7 +283,7 @@ def cmd_plan(day: str, formal: bool = False, recover: bool = False) -> int:
            "budget_state": r.coord.plans[day]["budget_state"], "dd": r.coord.plans[day]["dd"],
            "nav_est": r.coord.nav(px_valid)}
     FL.append_record(CHAIN_P, rec, freeze=_freeze())
-    r.coord.save_state(STATE_P)
+    r.coord.save_state(state_dst)
     head = _seal_head()
     print(json.dumps({"plan": day, "sells": len(net.sells), "buys": len(net.buys),
                       "run_kind": rec.get("run_kind") or run_kind,
@@ -283,15 +299,7 @@ def cmd_execute(day: str, formal: bool = False) -> int:
     --formal)之前**零写入**——默认全部成交进 rehearsal 账本与rehearsal state(从正式state
     快照初始化), 正式状态/账本保持"从未自动成交"的原始性; 链记录(execution audit)始终写。"""
     import pandas as pd
-    gate = "FORMAL" if (formal and os.path.exists(ADMIT_P)) else "DIAGNOSTIC_REHEARSAL"
-    STATE_REHEARSAL_P = _state_rehearsal_p()
-    if gate == "FORMAL":
-        state_src = state_dst = STATE_P
-        ledger_name = LEDGER_NAME
-    else:
-        state_src = STATE_REHEARSAL_P if os.path.exists(STATE_REHEARSAL_P) else STATE_P
-        state_dst = STATE_REHEARSAL_P
-        ledger_name = LEDGER_NAME_REHEARSAL
+    gate, state_src, state_dst, ledger_name = _state_domain(formal)
     if not os.path.exists(state_src):
         print(json.dumps({"error": "先执行 plan(信号日)才能 execute"}, ensure_ascii=False))
         return 2

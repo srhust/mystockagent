@@ -288,18 +288,85 @@ def test_recovery_plan_crash_state_missing(tmp_path, monkeypatch):
     panel = _synth_panel(codes)
     _fwd_env(tmp_path, monkeypatch, panel)
     assert FS.cmd_plan("2026-10-15") == 0
-    st = json.load(open(FS.STATE_P, encoding="utf-8"))
+    rep = FS._state_rehearsal_p()                      # rehearsal域统一: plan/execute同读写此文件
+    st = json.load(open(rep, encoding="utf-8"))
     orig_buys = [(b["code"], b["plan"]["plan_hash"]) for b in st["plans"]["2026-10-15"]["buys"]]
     del st["plans"]["2026-10-15"]                     # 模拟append后save_state前崩溃
-    json.dump(st, open(FS.STATE_P, "w", encoding="utf-8"))
+    json.dump(st, open(rep, "w", encoding="utf-8"))
     assert FS.cmd_plan("2026-10-15") == 7, "崩溃窗口须rc7并给recover指引"
     assert FS.cmd_plan("2026-10-15", recover=True) == 0
     chain = FL.read_all(FS.CHAIN_P)
     assert chain[-1]["event"] == "PLAN_RECOVERY" and chain[-1]["signal_day"] == "2026-10-15"
     assert sum(1 for r in chain if r["event"] == "PLAN") == 1, "不重复PLAN"
-    st2 = json.load(open(FS.STATE_P, encoding="utf-8"))
+    st2 = json.load(open(rep, encoding="utf-8"))
     rebuilt = [(b["code"], b["plan"]["plan_hash"]) for b in st2["plans"]["2026-10-15"]["buys"]]
     assert rebuilt == orig_buys, "恢复重建的冻结计划哈希逐笔一致"
+
+
+def test_rehearsal_three_day_state_continuity(tmp_path, monkeypatch):
+    """审查§6-2(分叉修复验收): 连续三交易日 plan→execute→plan→execute 实弹——
+    T+1成交必须进入次日plan初始状态, 正式state/正式账本全程零写入。"""
+    _fwd_real_env(tmp_path, monkeypatch)
+    from cycle_system.ashare_v2.data_portal import DataPortal
+    frozen = DataPortal(data_mode=C.PIT_RESEARCH).price_panel()
+    sig = frozen[frozen["date"] == pd.Timestamp("2026-10-16")].set_index("code")
+    rep = FS._state_rehearsal_p()
+
+    def _inc(day, mult_o, mult_c):
+        codes = list(sig.index)
+        return pd.DataFrame({"date": pd.Timestamp(day), "code": codes,
+                             "sector": "",                                  # 生产fetch_day同形(空串非NaN)
+                             "open": [float(sig["close"][c]) * mult_o for c in codes],
+                             "high": [float(sig["close"][c]) * max(mult_o, mult_c) for c in codes],
+                             "low": [float(sig["close"][c]) * min(mult_o, mult_c) for c in codes],
+                             "close": [float(sig["close"][c]) * mult_c for c in codes],
+                             "volume": 1e7, "amount": 2e8, "adj_factor": 1.0,
+                             "close_adj": [float(sig["close"][c]) * mult_c for c in codes]})
+
+    inc19, inc20 = _inc("2026-10-19", 1.005, 1.03), _inc("2026-10-20", 1.004, 0.97)
+    monkeypatch.setattr(FI, "load_day", lambda d: inc19 if d == "2026-10-19" else inc20)
+    for dd, df_ in (("2026-10-19", inc19), ("2026-10-20", inc20)):
+        df_.to_csv(os.path.join(FI.ING_DIR, f"{dd}.csv"), index=False)   # 增量层真实落盘(merged只读csv)
+        import hashlib as _hl
+        sha = _hl.sha256(open(os.path.join(FI.ING_DIR, f"{dd}.csv"), "rb").read()).hexdigest()
+        json.dump({"day": dd, "fetched_at": f"{dd}T15:30:00+08:00", "close_trading_after_fetch": True,
+                   "source": "akshare(测试注入)", "csv_sha256": sha, "codes_missing": [],
+                   "price_basis": "raw+hfq"},
+                  open(os.path.join(FI.ING_DIR, f"{dd}.meta.json"), "w", encoding="utf-8"))
+
+    class _DT(datetime):
+        @staticmethod
+        def now(tz=None):
+            return _DT.cur.replace(hour=15, minute=30, tzinfo=FS.TZ)
+
+    _DT.cur = datetime(2026, 10, 19)                  # D1收盘后
+    monkeypatch.setattr(FS, "datetime", _DT)
+    assert FS.cmd_plan("2026-10-16") == 0             # D1: PLAN(16)
+    assert os.path.exists(rep) and not os.path.exists(FS.STATE_P), "D1: state须落rehearsal, 正式零写入"
+
+    _DT.cur = datetime(2026, 10, 20)                  # D2(重建D1计划的成交)
+    assert FS.cmd_execute("2026-10-19") == 0          # EXECUTE(16→19)
+    st = json.load(open(rep, encoding="utf-8"))
+    assert st["cash"] < C.NAV0 and st["ledger_trading_day"] == "2026-10-19", "D2: fills已进rehearsal state"
+    assert sum(p["total"] for p in st["pos"].values()) > 0, "D2: 持仓非空(raw open成交入账)"
+
+    assert FS.cmd_plan("2026-10-19") == 0             # D2: PLAN(19) 从成交后的rehearsal state出发
+    rec19 = [r for r in FL.read_all(FS.CHAIN_P) if r["event"] == "PLAN" and r["signal_day"] == "2026-10-19"][-1]
+    assert rec19["ledger_target"].startswith("REHEARSAL")
+    st2 = json.load(open(rep, encoding="utf-8"))
+    assert set(st2["plans"]) >= {"2026-10-16", "2026-10-19"}, "次日plan必须看到前日成交后的持仓/现金"
+
+    _DT.cur = datetime(2026, 10, 21)                  # D3: 执行D2计划(可含卖出前日持仓)
+    assert FS.cmd_execute("2026-10-20") == 0
+    ex20 = FL.read_all(FS.CHAIN_P)[-1]
+    assert ex20["event"] == "EXECUTE" and ex20["signal_day"] == "2026-10-19"
+    st3 = json.load(open(rep, encoding="utf-8"))
+    assert st3["ledger_trading_day"] == "2026-10-20", "演练账本日序连续推进 19→20"
+    assert not os.path.exists(FS.STATE_P), "全程: 正式state零写入"
+    assert not os.path.exists(os.path.join(FS.FWD_DIR, "ledger", "ledger_dual_cycle_v2_forward.jsonl")), \
+        "全程: 正式账本零写入"
+    head = json.load(open(FS.HEAD_P, encoding="utf-8"))
+    assert head["ok"] and head["seq"] == 4 and FS.cmd_verify() == 0
 
 
 def test_recovery_execute_blocked_when_ledger_advanced(tmp_path, monkeypatch):
@@ -311,7 +378,7 @@ def test_recovery_execute_blocked_when_ledger_advanced(tmp_path, monkeypatch):
     from cycle_system.ashare_v2.data_portal import DataPortal
     frozen = DataPortal(data_mode=C.PIT_RESEARCH).price_panel()
     sig = frozen[frozen["date"] == pd.Timestamp("2026-10-16")].set_index("code")
-    co = PortfolioCoordinator.load_state(FS.STATE_P, nav0=C.NAV0,
+    co = PortfolioCoordinator.load_state(FS._state_rehearsal_p(), nav0=C.NAV0,
                                          ledger_root=os.path.join(FS.FWD_DIR, "ledger"),
                                          ledger_name="dual_cycle_v2_fwd_rehearsal")
     fills, _ = co.execute_day("2026-10-16",
@@ -330,21 +397,23 @@ def test_recovery_plan_crash_state_missing_real_panel(tmp_path, monkeypatch):
     全部冻结plan哈希逐笔一致, 链不重复PLAN。"""
     _fwd_real_env(tmp_path, monkeypatch)
     assert FS.cmd_plan("2026-10-16") == 0
-    st = json.load(open(FS.STATE_P, encoding="utf-8"))
+    rep = FS._state_rehearsal_p()                      # rehearsal域统一(plan save到rehearsal)
+    st = json.load(open(rep, encoding="utf-8"))
     orig_buys = [(b["code"], b["plan"]["plan_hash"], b["plan"]["cash_budget"])
                  for b in st["plans"]["2026-10-16"]["buys"]]
     assert len(orig_buys) >= 4, "实弹前提: 真面板有买入计划"
     del st["plans"]["2026-10-16"]
-    json.dump(st, open(FS.STATE_P, "w", encoding="utf-8"))
+    json.dump(st, open(rep, "w", encoding="utf-8"))
     assert FS.cmd_plan("2026-10-16") == 7
     assert FS.cmd_plan("2026-10-16", recover=True) == 0
     chain = FL.read_all(FS.CHAIN_P)
     assert chain[-1]["event"] == "PLAN_RECOVERY"
     assert sum(1 for r in chain if r["event"] == "PLAN") == 1
-    st2 = json.load(open(FS.STATE_P, encoding="utf-8"))
+    st2 = json.load(open(rep, encoding="utf-8"))
     rebuilt = [(b["code"], b["plan"]["plan_hash"], b["plan"]["cash_budget"])
                for b in st2["plans"]["2026-10-16"]["buys"]]
     assert rebuilt == orig_buys, "恢复重建的冻结计划(含预算)逐笔哈希一致"
+    assert not os.path.exists(FS.STATE_P), "rehearsal模式: 正式state全程零写入"
 
 
 def test_ingest_fetch_pipeline_synthetic(tmp_path, monkeypatch):
