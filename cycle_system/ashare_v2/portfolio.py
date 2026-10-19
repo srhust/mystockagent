@@ -71,6 +71,8 @@ class PortfolioCoordinator:
         lots = [int(o // step) * step for o in outs]
         rem = filled - sum(lots)
         lots[max(range(len(outs)), key=lambda i: outs[i])] += rem
+        if len(lots) > 1 and 0 in lots:                # 缺陷修复: 拆分零股归首引擎不再静默
+            self.annotations.append(f"双引擎拆分零股归并主引擎: {code} filled={filled} lots={lots}(整手不可分, 归因偏置显式)")
         return lots
 
     # ── 计划(信号日T) ──
@@ -109,6 +111,8 @@ class PortfolioCoordinator:
             total = sum(vv.shares for vv in self.virtuals if vv.code == v.code)
             want = v.shares if cls == ExitClass.EXIT.value else ex.round_lot(v.code, int(v.shares * frac))
             if want <= 0:
+                if cls == ExitClass.REDUCE.value:      # 缺陷修复: <200股头寸REDUCE整手取零此前静默消失
+                    self.annotations.append(f"REDUCE不足一手延迟: {v.code} shares={v.shares}×{frac}(§6整手显式)")
                 continue
             if want < total and want < ex.lot_step(v.code)[0]:
                 self.annotations.append(f"REDUCE零股不可拆卖延迟: {v.code} want={want}(§6整手显式)")
@@ -145,45 +149,63 @@ class PortfolioCoordinator:
                              "score_points": max(v.risk_budget_used for v in vs),
                              "industry": ind_of.get(code, ""), "vol20": vol20.get(code, 0.0),
                              "risk_forced": any(s["code"] == code and s["risk_forced"] for s in sells)})
-        # 计划卖出的预估回款计入 allocator 可用现金(执行序先卖后买保证真实到账)
-        est_proceeds = sum(s["shares"] * (px.get(s["code"]) or self.px_last.get(s["code"]) or 0.0)
-                           * (1 - 0.0011) for s in sells)
-        plan = K.allocate(deepcopy(scored), holdings, cash=self.ledger.cash + est_proceeds,
+        # 计划卖出的预估回款计入 allocator 可用现金(执行序先卖后买保证真实到账)。
+        # 缺陷修复(审查B/BUG-3): 回款用与执行器同源的 ex.fees()(含¥5佣金floor), 不再 flat 0.11% 高估
+        est_proceeds = 0.0
+        for s in sells:
+            ref_s = px.get(s["code"]) or self.px_last.get(s["code"]) or 0.0
+            est_proceeds += max(0.0, s["shares"] * ref_s - ex.fees(s["code"], s["shares"] * ref_s, True))
+        avail_pool = self.ledger.cash + est_proceeds
+        plan = K.allocate(deepcopy(scored), holdings, cash=avail_pool,
                           nav=max(nav_est, 1e-9),
                           ctx={"px": px, "vol20": vol20, "industry": ind_of, "budget_state": budget_state})
         buys = []
         for b in plan["buys"]:
             code = b["code"]
             wts = [1.0] if len(b["engines"]) <= 1 else [1.0] * len(b["engines"])
-            budget_ = self._plan_budget(code, b["value"], b["px"], self.ledger.cash + est_proceeds)
+            budget_ = self._plan_budget(code, b["value"], b["px"], avail_pool)
             if budget_ is None:
                 self.annotations.append(f"买入预算不足一手放弃: {code}(显式)")
+                plan["rejects"].append({"code": code, "reason": "E_BUDGET_UNFEASIBLE",
+                                        "score_points": b["score_points"]})   # BUG-6修复: E层撤销必落拒单表
                 continue
             buys.append({"code": code, "cash_budget": budget_, "engines": b["engines"],
                          "score_points": b["score_points"], "industry": b["industry"],
                          "record_ids": b["record_ids"], "plan_weights": wts})
         # 3.5) 换仓执行化(独立验收第4项): allocator swap记录 → 真实卖(out)全部+买(in)等值换入。
-        #      触发/edge/成本判据全用allocator已冻结规则; 本层只做转换+一致性校验(单名/组合/行业三上限同源复验)。
+        #      触发/edge/成本判据全用allocator已冻结规则; 本层只做转换+一致性校验(三上限同源复验)。
         swap_applied = 0
+        # BUG-1修复(审查B): 组合σ复验必须含当日已排buys, 否则swap叠穿PORT_DAILY_RISK_FRAC
+        risk_now = sum(h["value"] * (h.get("vol20") or 0.0) for h in holdings) \
+            + sum(b["cash_budget"] * (vol20.get(b["code"]) or 0.0) for b in buys)
+        if any((h.get("vol20") or 0.0) <= 0 for h in holdings):
+            self.annotations.append("持仓缺vol20按σ=0计(显式标注, 组合风险或被低估): "
+                                    + ",".join(h["code"] for h in holdings if (h.get("vol20") or 0) <= 0))
+        swap_pool = 0.0                            # BUG-2修复: 换仓卖款逐笔加入可用池(卖先于买语义)
         ind_after = {k: round(w * nav_est, 2) for k, w in plan["industry_weights_after"].items()}
         in_seen = {b["code"] for b in buys}
+
+        def _swap_deny(in_c, sw_c, reason, note):
+            self.annotations.append(f"{reason}: {sw_c}->{in_c}({note})")
+            plan["rejects"].append({"code": in_c, "reason": reason, "swap_out": sw_c,
+                                    "score_points": sw.get("in_score")})
         for sw in plan["swaps"]:
             out_c, in_c = sw["out"], sw["in"]
             vs = [v for v in self.virtuals if v.code == out_c]
             if not vs or in_c in in_seen or swap_applied >= C.SWAP_DAILY_LIMIT:
-                self.annotations.append(f"swap跳过(无持仓/重复in/超日上限): {out_c}->{in_c}(显式)")
+                _swap_deny(in_c, out_c, "SWAP_SKIPPED_STATE", "无持仓/重复in/超日上限显式")
                 continue
             v_out = min(vs, key=lambda v: v.risk_budget_used)
             if any(s["pos_id"] == v_out.position_id for s in sells):
-                self.annotations.append(f"swap跳过(out已在退出队列): {out_c}(去重显式)")
+                _swap_deny(in_c, out_c, "SWAP_SKIPPED_OUT_EXITING", "去重显式")
                 continue
             ref_out = px.get(out_c) or self.px_last.get(out_c)
             in_p = px.get(in_c) or self.px_last.get(in_c)
             in_vol = sw.get("in_vol") or vol20.get(in_c)
             if not ref_out or ref_out <= 0 or not in_p or not in_vol:
-                self.annotations.append(f"swap缺价/缺波动跳过: {out_c}->{in_c}(显式)")
+                _swap_deny(in_c, out_c, "SWAP_SKIPPED_NO_PRICE", "显式")
                 continue
-            out_net = v_out.shares * ref_out * (1 - 2 * K.COST_RATE_EST)
+            out_net = v_out.shares * ref_out - ex.fees(out_c, v_out.shares * ref_out, True)
             name_cap_val = nav_est * C.NAME_RISK_FRAC_OF_NAV / max(in_vol, 1e-9)   # 单名σ上限(同源公式)
             ind_c = sw.get("in_industry") or ind_of.get(in_c, "")
             budget = out_net
@@ -191,33 +213,33 @@ class PortfolioCoordinator:
                 ind_left = max(0.0, C.INDUSTRY_CONCENTRATION_ALLOWED * nav_est - ind_after.get(ind_c, 0.0))
                 budget = min(budget, ind_left)            # B2修复: swap-in同样受行业60%硬顶
             budget = min(budget, name_cap_val)
-            base, step = (200, 1) if in_c.startswith("68") else (100, 100)
+            base, step = ex.lot_step(in_c)                # 统一走冻结执行器同源函数
             shares_in = int(budget / in_p)
             shares_in = base + ((shares_in - base) // step) * step if shares_in >= base else 0
             if shares_in <= 0:
-                self.annotations.append(f"swap-in不足一手跳过: {in_c} budget={budget:.0f}(显式)")
+                _swap_deny(in_c, out_c, "SWAP_IN_LOT_INFEASIBLE", f"budget={budget:.0f}显式")
                 continue
             in_val = shares_in * in_p
-            out_vol_v = vol20.get(out_c) or 0.0
-            risk_now = sum(h["value"] * (h.get("vol20") or 0.0) for h in holdings)
-            if (risk_now - v_out.shares * ref_out * out_vol_v + in_val * in_vol) / nav_est \
-                    > C.PORT_DAILY_RISK_FRAC + 1e-9:
-                self.annotations.append(f"swap超组合风险预算跳过: {out_c}->{in_c}(显式)")
+            out_risk = v_out.shares * ref_out * (vol20.get(out_c) or 0.0)
+            if (risk_now - out_risk + in_val * in_vol) / nav_est > C.PORT_DAILY_RISK_FRAC + 1e-9:
+                _swap_deny(in_c, out_c, "SWAP_PORT_RISK_EXCEEDED", "显式")
+                continue
+            sw_budget = self._plan_budget(in_c, in_val, in_p, avail_pool + swap_pool + out_net)
+            if sw_budget is None:                          # avail含本换仓自身卖款(BUG-2修复)
+                _swap_deny(in_c, out_c, "SWAP_REVOKED_BUDGET", "显式")
                 continue
             sells.append({"code": out_c, "shares": int(v_out.shares), "engine": v_out.engine,
                           "clause": f"换仓置换→{in_c}", "risk_forced": False,
                           "pos_id": v_out.position_id, "score": v_out.risk_budget_used, "kind": "SWAP"})
-            sw_budget = self._plan_budget(in_c, in_val, in_p, self.ledger.cash + est_proceeds)
-            if sw_budget is None:
-                self.annotations.append(f"swap-in预算不足一手撤销: {in_c}(显式)")
-                sells.pop()
-                continue
             buys.append({"code": in_c, "cash_budget": sw_budget,
                          "engines": sw.get("in_engines", [Engine.LONG_CYCLE.value]),
-                         "score_points": sw["in_score"], "industry": ind_c, "record_ids": [],
+                         "score_points": sw["in_score"], "industry": ind_c,
+                         "record_ids": [f"SWAP:{out_c}->{in_c}@{signal_day}"],
                          "plan_weights": [1.0] * len(sw.get("in_engines", ["x"]))})
             if ind_c:
                 ind_after[ind_c] = ind_after.get(ind_c, 0.0) + in_val
+            risk_now = risk_now - out_risk + in_val * in_vol
+            swap_pool += out_net
             in_seen.add(in_c)
             swap_applied += 1
         # 退出优先级排序(§5.4): 风险强退 > 引擎退出 > 换仓 > 减仓 — 成交序=此序
@@ -281,6 +303,7 @@ class PortfolioCoordinator:
         fills, rejects = [], []
         for s in rec["sells"]:
             if "plan" not in s:
+                rejects.append({"stage": "sell", "code": s["code"], "reason": "no_plan_stale"})
                 continue
             code = s["code"]
             if code in halted or code not in px_t1:
@@ -307,6 +330,9 @@ class PortfolioCoordinator:
                 if v.shares == 0:
                     self.virtuals.remove(v)
             self._sync_real_to_virtual()
+        # 缺陷修复(审查B/BUG-3): 卖→首买之间先按真实现金重估全部待买预算,
+        # 消除跳空/费差导致的 Ledger 现金透支崩溃(违规路径必须显式拒单而非AssertionError)
+        self._rebudget_pending_buys(rec, signal_day)
         for b in rec["buys"]:
             if "plan" not in b:
                 continue

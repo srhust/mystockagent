@@ -1,5 +1,5 @@
 {
- "contract_version": 1,
+ "contract_version": 2,
  "config_hash": "cc5cb7c990c2a499",
  "gates": [
   {
@@ -10,7 +10,9 @@
    "evidence": [
     "industry_cycle.IndustryMembershipProvider.sw_trust",
     "long_cycle.LongCycleEngine.strict_gate_report",
-    "test_phaseC::test_strict_gate_blocks_formal_signals"
+    "test_phaseC::test_halt_day_no_candidate_and_strict_gate",
+    "fast_v.FastVEngine.candidates(STRICT闸门)",
+    "test_independent_gate::test_fv_strict_gate_blocks"
    ],
    "status": "BLOCKING"
   },
@@ -65,11 +67,13 @@
   "sw_trust_sample": "SW_PARTIAL",
   "survivorship_note_present": true,
   "strict_candidates_n": 0,
-  "strict_blocked_confirmed": true
+  "strict_blocked_confirmed": true,
+  "fv_strict_candidates_n": 0,
+  "fv_strict_blocked_confirmed": true
  },
  "_provenance": {
   "asof": "2026-06-30",
-  "generated_at": "2026-10-19T09:42:54.000362+08:00",
+  "generated_at": "2026-10-19T11:26:27.073108+08:00",
   "mode": "STATIC_RESEARCH_PROBE(历史回放, 非前向信号)"
  },
  "four_gates_confirmed": true

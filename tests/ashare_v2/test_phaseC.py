@@ -144,9 +144,29 @@ def test_lc_weak_vs_industry_ladder():
     out = em.evaluate(pos, {"industry_state": LongCycleState.EARLY_RECOVERY.value,
                             "rel_industry_60": -0.12, "rel_weak_days": 65, "day": "d"})
     assert out and out[0][0] == ExitClass.REDUCE.value
+    # §2.5"持续显著弱于": -0.20档EXIT同样需要确认期(缺陷修复: 此前单日即全清, 与-0.10档60日要求倒挂)
     out2 = em.evaluate(pos, {"industry_state": LongCycleState.EXPANSION.value,
-                             "rel_industry_60": -0.25, "day": "d"})
+                             "rel_industry_60": -0.25, "rel_weak_days": 25, "day": "d"})
     assert out2[0][0] == ExitClass.EXIT.value
+    out3 = em.evaluate(pos, {"industry_state": LongCycleState.EXPANSION.value,
+                             "rel_industry_60": -0.25, "rel_weak_days": 3, "day": "d"})
+    assert not any(c == ExitClass.EXIT.value for c, _, _ in out3), "单日-0.25不得全清仓"
+
+
+def test_fv_rebound_fade_warning_from_engine_flag():
+    em = ExitManager()
+    pos = _vp("P3", Engine.FAST_V.value)
+    out = em.evaluate(pos, {"fast_v_state": FastVState.REBOUND_ACTIVE.value, "rebound_fade": True, "day": "d"})
+    assert out and out[0][0] == ExitClass.WARNING.value
+    out2 = em.evaluate(pos, {"fast_v_state": FastVState.REBOUND_ACTIVE.value, "day": "d"})
+    assert not any(cl == "反弹衰竭降档(观察, 未破位)" for _, cl, _ in out2) or out2 == []
+
+
+def test_unknown_engine_label_raises_not_silent():
+    em = ExitManager()
+    pos = _vp("P4", "BOGUS_ENGINE")
+    with pytest.raises(ValueError):
+        em.evaluate(pos, {})
 
 
 # ── 场景D: 底部假设被否定 → INVALIDATED + EXIT ─────────────

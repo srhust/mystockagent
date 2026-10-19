@@ -22,6 +22,8 @@ from cycle_system.ashare_v2 import config as C
 from cycle_system.ashare_v2 import capital_allocator as K
 from cycle_system.ashare_v2 import opportunity_ranker as R
 from cycle_system.ashare_v2 import signal_merge as M
+from cycle_system.ashare_v2 import data_portal as _DP  # noqa: F401  (保持导入序稳定)
+from cycle_system.ashare_v2 import exit_manager as EM
 from cycle_system.ashare_v2.data_portal import DataPortal
 from cycle_system.ashare_v2.fast_v import FastVEngine
 from cycle_system.ashare_v2.industry_cycle import (IndustryMembershipProvider, IndustrySeriesBuilder)
@@ -87,6 +89,7 @@ class Runner:
         if ind in self.lc._states:
             ctx["industry_state"] = self.lc.industry_state(ind, str(pd.Timestamp(d).date()))
         ctx["fast_v_state"] = self.fv.state_at(code, str(pd.Timestamp(d).date()))
+        ctx["rebound_fade"] = self.fv.fade_at(code, str(pd.Timestamp(d).date()))
         st = self.lc._stk_tables.get(code)
         ft = self.lc._ind_tables.get(ind)
         if st is not None and d in st.index:
@@ -99,14 +102,14 @@ class Runner:
             if pd.notna(r60) and pd.notna(i60):
                 rel = float(r60) - float(i60)
                 ctx["rel_industry_60"] = rel
-                if rel <= -0.10:
+                if rel <= EM.LC_WEAK_REDUCE:
                     cnt = 0
                     for j in range(len(ft) - 1, -1, -1):
                         dd = ft.index[j]
                         if dd > d:
                             continue
                         rs, fi = st.get("trend60").get(dd), ft["trend60"].iloc[j]
-                        if pd.notna(rs) and pd.notna(fi) and float(rs) - float(fi) <= -0.10:
+                        if pd.notna(rs) and pd.notna(fi) and float(rs) - float(fi) <= EM.LC_WEAK_REDUCE:
                             cnt += 1
                         else:
                             break
@@ -183,6 +186,10 @@ class Runner:
             px1 = {c: v for c, v in px1m.items() if v}
             fills, rejects = self.coord.execute_day(day_s, px1, px_valid)
             rec = self.coord.plans[day_s]
+            # 缺陷修复(审查A): 面板相邻两行必须是日历上的相邻交易日, 否则T+1语义错位
+            if rec["exec_day"] != str(pd.Timestamp(d1).date()):
+                raise RuntimeError(f"面板日序与交易日历失配: 信号{day_s}的exec_day={rec['exec_day']}"
+                                   f" ≠ 面板次日{d1}(合成面板必须按日历过滤, §12)")
             self.plan_log.append({"signal_day": day_s, "exec_day": rec["exec_day"],
                                   "n_scored": len(scored), "n_buys": len(net.buys),
                                   "n_sells": len(net.sells), "n_rejects_alloc": len(rec["alloc"]["rejects"]),

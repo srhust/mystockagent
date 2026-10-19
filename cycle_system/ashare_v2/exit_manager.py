@@ -42,8 +42,11 @@ class ExitManager:
                 out.append((ExitClass.EXIT.value, "趋势实质破坏(TREND_IMPAIRED, 确认期已在状态机完成)", 1.0))
             rel = ctx.get("rel_industry_60")
             if rel is not None:
-                if rel <= LC_WEAK_EXIT:
-                    out.append((ExitClass.EXIT.value, f"个股持续显著弱于行业(rel60={rel:.2f}≤{LC_WEAK_EXIT})", 1.0))
+                if rel <= LC_WEAK_EXIT and ctx.get("rel_weak_days", 0) >= C.LC_IMPAIR_CONFIRM_D:
+                    # 缺陷修复(§2.5"持续显著弱于"): -0.20档此前单日即全清, 与-0.10档需60日连续倒挂
+                    out.append((ExitClass.EXIT.value,
+                                f"个股持续显著弱于行业(rel60={rel:.2f}≤{LC_WEAK_EXIT}, "
+                                f"{ctx.get('rel_weak_days')}日≥{C.LC_IMPAIR_CONFIRM_D}确认)", 1.0))
                 elif rel <= LC_WEAK_REDUCE and ctx.get("rel_weak_days", 0) >= C.LC_WEAK_VS_INDUSTRY_D:
                     out.append((ExitClass.REDUCE.value, f"个股持续弱于行业且未修复(rel60={rel:.2f}, {ctx.get('rel_weak_days')}日)",
                                 REDUCE_FRACTION))
@@ -55,8 +58,11 @@ class ExitManager:
                 out.append((ExitClass.EXIT.value, "修复失败(REVERSAL_FAILED):再创新低或自反弹高点衰竭≥6%", 1.0))
             elif fst == FastVState.EXPIRED.value:
                 out.append((ExitClass.EXIT.value, "Fast-V研究窗自然结束(EXPIRED=引擎到期, 非LC固定天数)", 1.0))
-            elif fst == FastVState.REBOUND_ACTIVE.value and ctx.get("rebound_fade", 0) <= -0.03:
+            elif fst == FastVState.REBOUND_ACTIVE.value and bool(ctx.get("rebound_fade")):
+                # rebound_fade为引擎同源标志(REBOUND_ACTIVE且fade≤-0.03, fast_v.fade_at) — 缺陷修复: 此前全仓无赋值点
                 out.append((ExitClass.WARNING.value, "反弹衰竭降档(观察, 未破位)", 0.0))
+        else:
+            raise ValueError(f"未知引擎标签, 拒绝静默不退出: {pos.engine!r}")
         return out
 
     def source_discipline_ok(self) -> dict:

@@ -96,6 +96,9 @@ def stage_features(builder: IndustrySeriesBuilder, industry: str, day: str) -> d
         elif win is None:
             f[f"range_pos_{w}d"] = None
             f.setdefault("_insufficient_history_windows", []).append(w)
+        else:                                     # 完全走平: 键存在+原因显式(缺陷修复: 此前键缺失被误标"数据不足")
+            f[f"range_pos_{w}d"] = None
+            f.setdefault("_flat_window_windows", []).append(w)
     for w in C.LC_TREND_WINDOWS:
         if len(s) > w:
             f[f"trend_{w}d"] = _r(px / s.iloc[-1 - w] - 1)

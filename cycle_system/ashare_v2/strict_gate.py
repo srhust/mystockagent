@@ -32,7 +32,8 @@ GATES = [
      "strict_effect": "BLOCK_FORMAL_SIGNALS(行业级候选=0+报告)",
      "research_effect": "DEGRADE: PROXY_ONLY指数+SW_PARTIAL信任+折价0.35",
      "evidence": ["industry_cycle.IndustryMembershipProvider.sw_trust",
-                  "long_cycle.LongCycleEngine.strict_gate_report", "test_phaseC::test_strict_gate_blocks_formal_signals"]},
+                  "long_cycle.LongCycleEngine.strict_gate_report", "test_phaseC::test_halt_day_no_candidate_and_strict_gate",
+                  "fast_v.FastVEngine.candidates(STRICT闸门)", "test_independent_gate::test_fv_strict_gate_blocks"]},
     {"id": "G2_MARKET_WIDE_POOL", "name": "全市场历史池名录未落盘",
      "strict_effect": "DATA_BLOCKED(市场全域统计/全域选股)",
      "research_effect": "DEGRADE: 当前池九桶+月末聚合曲线+SURVIVORSHIP_BIAS_PARTIAL强制",
@@ -50,19 +51,27 @@ GATES = [
 ]
 
 
-def strict_blocked() -> bool:
-    """当前数据状态下 STRICT 是否存在任一阻断(是→无正式信号, 系统只能影子/研究)。"""
-    return True  # G1-G4 全部成立(结构性事实, 由 probe 运行时复核并落证据)
+def strict_blocked(report=None) -> bool:
+    """STRICT 是否处于阻断(是→无正式信号, 系统只能影子/研究)。
+
+    缺陷修复(审查A): 此前恒True不可验证。现按运行时报告判定: probe双引擎候选=0且契约
+    禁止正式信号才算确认; 无报告时fail-closed仍视为阻断(宁保守勿虚报)。"""
+    if report is not None:
+        return (report.get("strict_formal_signals_possible") is False
+                and report.get("probe", {}).get("strict_blocked_confirmed") is True)
+    return True
 
 
-def evaluate(portal=None, membership=None, universe_buckets=None, lc_strict_candidates=None) -> dict:
-    """运行时复核四条件状态; 参数缺省时仅返回静态契约。"""
+def evaluate(portal=None, membership=None, universe_buckets=None, lc_strict_candidates=None,
+             fv_strict_candidates=None) -> dict:
+    """运行时复核四条件状态; 参数缺省时仅返回静态契约(status=ASSERTED, 由探测证据升为BLOCKING)。"""
+    probed = lc_strict_candidates is not None or portal is not None
     rows = []
     for g in GATES:
         row = dict(g)
-        row["status"] = "BLOCKING"
+        row["status"] = "BLOCKING" if probed else "ASSERTED(静态契约, 待运行时探针)"
         rows.append(row)
-    out = {"contract_version": 1, "config_hash": C.config_hash(), "gates": rows,
+    out = {"contract_version": 2, "config_hash": C.config_hash(), "gates": rows,
            "strict_formal_signals_possible": False,
            "research_mode_note": "RESEARCH 可运行影子但每条记录必须携带对应降级标注(折价/trust/caveat), "
                                  "禁止把降级输出包装为正式信号",
@@ -90,6 +99,11 @@ def evaluate(portal=None, membership=None, universe_buckets=None, lc_strict_cand
     if lc_strict_candidates is not None:
         out["probe"]["strict_candidates_n"] = len(lc_strict_candidates)
         out["probe"]["strict_blocked_confirmed"] = len(lc_strict_candidates) == 0
+    if fv_strict_candidates is not None:               # 缺陷修复: 此前探针只数LC候选, Fast-V STRICT盲区不可见
+        out["probe"]["fv_strict_candidates_n"] = len(fv_strict_candidates)
+        out["probe"]["fv_strict_blocked_confirmed"] = len(fv_strict_candidates) == 0
+        out["probe"]["strict_blocked_confirmed"] = (out["probe"].get("strict_blocked_confirmed")
+                                                    and out["probe"]["fv_strict_blocked_confirmed"])
     return out
 
 

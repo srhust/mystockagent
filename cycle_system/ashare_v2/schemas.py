@@ -53,6 +53,7 @@ class EntryKind(str, Enum):
     EARLY_REVERSAL = "EARLY_REVERSAL"
     BREAKOUT_CONFIRM = "BREAKOUT_CONFIRM"
     TREND_CONTINUATION = "TREND_CONTINUATION"
+    PANIC_REBOUND = "PANIC_REBOUND"   # Fast-V统一入口(细化阶段在cycle_stage字段), 缺陷修复: 此前FV用组合串绕过枚举
 
 
 class ExitClass(str, Enum):
@@ -84,6 +85,9 @@ class Availability(str, Enum):
 class Engine(str, Enum):
     LONG_CYCLE = "LONG_CYCLE"
     FAST_V = "FAST_V"
+
+
+_MAX_EVIDENCE_AGE_D = 365   # 契约健全性下界(非预测参数): 证据过期须重新签发而非沿用
 
 
 @dataclass
@@ -122,22 +126,55 @@ class OpportunityRecord:
     forbidden_claims_note: str = ("评分未校准, 不构成预期收益率或胜率" )
 
     def validate(self) -> List[str]:
+        """契约硬化(独立复核修复): 枚举成员+日期格式+normalize比较+证据年龄下界, 堵字符串绕过。"""
+        import re
         errs = []
         req = dict(membership_trust=self.membership_trust, code=self.code, engine=self.engine,
                    first_signal_day=self.first_signal_day, entry_condition=self.entry_condition,
                    invalidation_condition=self.invalidation_condition,
-                   data_credibility=self.data_credibility, decision=self.decision)
+                   data_credibility=self.data_credibility, decision=self.decision,
+                   entry_kind=self.entry_kind)
         for k, v in req.items():
             if not v:
                 errs.append(f"缺必填字段: {k}")
         if not self.key_evidence:
             errs.append("key_evidence 不可为空(无可解释证据不得成机会)")
+        _DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+        if not _DATE.match(str(self.first_signal_day or "")):
+            errs.append(f"first_signal_day 非YYYY-MM-DD: {self.first_signal_day!r}")
+        if self.engine not in {e.value for e in Engine}:
+            errs.append(f"engine 非法: {self.engine}")
+        _stages = {e.value for e in LongCycleState} | {e.value for e in FastVState}
+        if self.cycle_stage not in _stages:
+            errs.append(f"cycle_stage 非法: {self.cycle_stage}")
+        if self.entry_kind and self.entry_kind not in {e.value for e in EntryKind}:
+            errs.append(f"entry_kind 非法: {self.entry_kind}")
+        if self.data_credibility not in {e.value for e in Availability}:
+            errs.append(f"data_credibility 非法: {self.data_credibility}")
+        if self.decision not in ("TRADE", "NO_TRADE"):
+            errs.append(f"decision 非法: {self.decision}")
         trust = {e.value for e in MembershipTrust}
         if self.membership_trust not in trust:
             errs.append(f"membership_trust 非法: {self.membership_trust}")
+        try:
+            import pandas as _pd
+            first_ts = _pd.Timestamp(self.first_signal_day)
+        except Exception:
+            first_ts = None
+            errs.append("first_signal_day 无法解析")
         for e in self.key_evidence:
-            if e.asof > self.first_signal_day:
-                errs.append(f"PIT违规: 证据 {e.name} 时点 {e.asof} 晚于信号日 {self.first_signal_day}")
+            if e.availability not in {v.value for v in Availability}:
+                errs.append(f"证据 {e.name} availability 非法: {e.availability}")
+            if not _DATE.match(str(e.asof or "")):
+                errs.append(f"PIT格式违规: 证据 {e.name} asof={e.asof!r} 非YYYY-MM-DD(禁字符串直比)")
+                continue
+            if first_ts is not None:
+                a = _pd.Timestamp(e.asof).normalize()
+                if a > first_ts.normalize():
+                    errs.append(f"PIT违规: 证据 {e.name} 时点 {e.asof} 晚于信号日 {self.first_signal_day}")
+                elif a < first_ts.normalize() - _pd.Timedelta(days=_MAX_EVIDENCE_AGE_D):
+                    errs.append(f"证据过旧: {e.name} asof={e.asof} 早于信号日{self.first_signal_day}"
+                                f"超{_MAX_EVIDENCE_AGE_D}日(契约健全性, 非预测参数)")
         return errs
 
 

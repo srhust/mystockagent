@@ -39,7 +39,8 @@ def score_merged(merged: dict) -> dict:
     best = max(cands, key=lambda s: s["score_points"])
     best["code"] = merged["code"]
     best["engines"] = merged["engines"]
-    best["record_ids"] = [id(r) for r in merged["records"]]
+    best["record_ids"] = [f"{r.engine}:{r.code}:{r.first_signal_day}"
+                          for r in merged["records"]]   # 缺陷修复(审查B): 确定性归因键替代CPython堆地址(§12可重放)
     if len(cands) > 1:
         best["runner_up_engine"] = cands[1]["engine"]
     return best

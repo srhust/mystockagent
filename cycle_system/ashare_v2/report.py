@@ -15,6 +15,8 @@ import os
 import subprocess
 from datetime import datetime, timedelta, timezone
 
+import pandas as pd
+
 from cycle_system.ashare_v2 import config as C
 from cycle_system.ashare_v2.data_portal import sha256_file, MANIFEST_P
 from cycle_system.ashare_v2.schemas import RunMode
@@ -51,9 +53,11 @@ def write_all(outdir: str, runner, result: dict | None, diag: dict | None = None
     lc = runner.lc
     fv = runner.fv
     trans = {}
+    ts = pd.Timestamp(day)
     for ind, dmap in lc._states.items():
-        seq = list(dmap.values())
-        trans[ind] = {"state_at_day": seq[-1], "n_transitions": sum(1 for a, b in zip(seq, seq[1:]) if a != b)}
+        seq = [v for k, v in sorted(dmap.items()) if k <= ts]   # 缺陷修复: 此前取全历史末日态(PIT误标)+未来迁移计数
+        trans[ind] = {"state_at_day": seq[-1] if seq else "UNKNOWN",
+                      "n_transitions": sum(1 for a, b in zip(seq, seq[1:]) if a != b)}
     fvd = {}
     for code in fv._states:
         st = fv.state_at(code, day)

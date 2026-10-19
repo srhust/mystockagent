@@ -100,14 +100,15 @@ def test_G_industry_cap_and_no_engine_split():
 # ── H: 组合风险预算停止贪心 + 超额冻结 ─────────────────────
 def test_H_portfolio_risk_budget_stop_and_freeze():
     s = [_scored("A", 9), _scored("B", 8), _scored("C", 7)]
-    # 单元测试专注风险预算机制: industry留空避免60%行业顶干扰; cash>nav的口径一致性由E层组合负责
-    ctx = {"px": {"A": 100, "B": 100, "C": 100}, "vol20": {"A": 0.05, "B": 0.05, "C": 0.05},
-           "industry": {}}
-    plan = K.allocate(s, [], cash=100000, nav=20000, ctx=ctx)
+    # 单元测试专注风险预算机制: 三行业分置避免行业顶干扰(空行业现已入__UNKNOWN__共享60%桶);
+    # vol=0.30使单名σ上限主导规模, 组合0.20上限在第3笔触发; cash>nav口径一致性由E层组合负责
+    ctx = {"px": {"A": 100, "B": 100, "C": 100}, "vol20": {"A": 0.30, "B": 0.30, "C": 0.30},
+           "industry": {"A": "IA", "B": "IB", "C": "IC"}}
+    plan = K.allocate(s, [], cash=200000, nav=100000, ctx=ctx)
     assert len(plan["buys"]) == 2
     stop = [r for r in plan["rejects"] if r["reason"] == "PORT_RISK_BUDGET_STOP"]
     assert len(stop) >= 1
-    plan2 = K.allocate(s, [], cash=100000, nav=20000,
+    plan2 = K.allocate(s, [], cash=200000, nav=100000,
                        ctx={**ctx, "budget_state": "EXCEEDED"})
     assert plan2["buys"] == [] and plan2["forced_liquidation_priority"] is True
     assert all(r["reason"] == "RISK_BUDGET_EXCEEDED_FROZEN" for r in plan2["rejects"])

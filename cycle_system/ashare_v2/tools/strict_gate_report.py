@@ -31,8 +31,12 @@ def main() -> int:
     lc_s = LongCycleEngine(portal, IndustrySeriesBuilder(portal), mp, data_mode=C.PIT_STRICT)
     lc_s.build()
     cand = lc_s.candidates(day)
+    from cycle_system.ashare_v2.fast_v import FastVEngine
+    fv_s = FastVEngine(portal, data_mode=C.PIT_STRICT)
+    fv_s.build()
+    fv_cand = fv_s.candidates(day)                     # 缺陷修复: FV纳入STRICT探针(此前盲区)
     rep = SG.evaluate(portal=portal, membership=mp, universe_buckets=buckets,
-                      lc_strict_candidates=cand)
+                      lc_strict_candidates=cand, fv_strict_candidates=fv_cand)
     rep["_provenance"] = {"asof": day, "generated_at": datetime.now(TZ).isoformat(),
                           "mode": "STATIC_RESEARCH_PROBE(历史回放, 非前向信号)"}
     ok = (rep["probe"].get("strict_blocked_confirmed") is True

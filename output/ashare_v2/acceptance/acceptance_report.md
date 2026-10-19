@@ -1,11 +1,11 @@
 # Ashare Dual-Cycle V2 阶段G统一验收
 
-- 版本: a886974e3dd8612e802af97d4caa4ab74d3918ed (ashare-v2)  配置哈希: cc5cb7c990c2a499
+- 版本: 44e57df06e1792d1d1a8cc84bd593c9d638fb9f1 (ashare-v2)  配置哈希: cc5cb7c990c2a499
 
 | 验收项 | 结果 |
 |---|---|
-| V2工程测试 tests/ashare_v2 | 66 passed, 0 failed |
-| 全量回归 tests/ | 114 passed, 0 failed |
+| V2工程测试 tests/ashare_v2 | 87 passed, 0 failed |
+| 全量回归 tests/ | 135 passed, 0 failed |
 | 基线完整性 C1-C7 | PASS ({"C1_csv_manifest": "PASS", "C6_tamper_selftest": "PASS", "C2_frozen_artifacts": "PASS", "C3_us_frozen": "PASS", "C4_worktree_frozen": "PASS", "C5_swing_m1_untouched": "PASS", "C7_frozen_code_hashes": "PASS_ANNOTATED"}) |
 | F2复现P0 | F2_REPRO_RESOLVED |
 | 冻结文件在V2分支被改动 | 无 |

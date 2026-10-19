@@ -17,7 +17,7 @@ import numpy as np
 import pandas as pd
 
 from cycle_system.ashare_v2 import config as C
-from cycle_system.ashare_v2.schemas import (Availability, DataMode, Engine, Evidence,
+from cycle_system.ashare_v2.schemas import (Availability, DataMode, Engine, EntryKind, Evidence,
                                             FastVState, MembershipTrust, OpportunityRecord)
 
 
@@ -48,6 +48,7 @@ class FastVEngine:
         self.data_mode = data_mode
         self._feat = {}
         self._states: dict = {}      # code → {day: state}
+        self._fade: dict = {}        # code → {day: bool}(修复衰竭信号, 与状态机同源判据)
         self._first_sig = {}
         self._built = False
 
@@ -75,6 +76,7 @@ class FastVEngine:
         entry_i = None
         rebound_high = np.nan
         states = {}
+        fade_flags = {}                        # day → bool: REBOUND_ACTIVE且自反弹高点衰竭≤-0.03(与状态机同源判据)
         for i in range(n):
             p = px[i]
             if not np.isfinite(p):
@@ -92,18 +94,20 @@ class FastVEngine:
                     no_new_low_cnt = 0
             else:
                 age = i - shock_i
-                if p < run_low:
+                prev_run_low = run_low                 # 缺陷修复(规范§3.2/§3.5): 先判定再更新,
+                new_low = p <= prev_run_low            # "再创新低"此前恒False=死分支(§3.3失败回退不可达)
+                rebound = p / prev_run_low - 1 if prev_run_low and np.isfinite(prev_run_low) else 0.0
+                if new_low:
                     run_low = p
                     no_new_low_cnt = 0
                 else:
                     no_new_low_cnt += 1
-                rebound = p / run_low - 1 if run_low and np.isfinite(run_low) else 0.0
                 if st == FastVState.SHOCK_DETECTED.value and age >= 3:
                     st = FastVState.BOTTOM_SEARCH.value
                 elif st in (FastVState.BOTTOM_SEARCH.value,) and no_new_low_cnt >= C.FV_STABILIZE_D:
                     st = FastVState.REVERSAL_CANDIDATE.value
                 elif st == FastVState.REVERSAL_CANDIDATE.value:
-                    if p < run_low:                     # 再创新低 → 回到搜索
+                    if new_low:                            # 再创新低 → 回到搜索(§3.3失败回退, 原死分支已修复)
                         st = FastVState.BOTTOM_SEARCH.value
                     elif rebound >= C.FV_REBOUND_CONFIRM and p > f["ma5"][i] and np.isfinite(f["ma5"][i]):
                         st = FastVState.ENTRY_CONFIRMED.value
@@ -114,17 +118,18 @@ class FastVEngine:
                 elif st in (FastVState.ENTRY_CONFIRMED.value, FastVState.REBOUND_ACTIVE.value):
                     rebound_high = max(rebound_high, p)
                     fade = p / rebound_high - 1 if np.isfinite(rebound_high) and rebound_high > 0 else 0.0
-                    if p < run_low or fade <= -0.06:
-                        st = FastVState.REVERSAL_FAILED.value
-                    elif p < run_low * 1.0001 and age > 3:
+                    if new_low or fade <= -0.06:
                         st = FastVState.REVERSAL_FAILED.value
                     elif fade <= -0.03 and p < f["ma10"][i] and np.isfinite(f["ma10"][i]):
                         st = FastVState.REBOUND_ACTIVE.value   # 修复衰竭但未破位: 降档
                     elif (st == FastVState.ENTRY_CONFIRMED.value and i - (entry_i or i) >= 5
                           and np.isfinite(f["ma20"][i]) and p > f["ma20"][i]):
                         st = FastVState.REBOUND_ACTIVE.value
-                    if st == FastVState.ENTRY_CONFIRMED.value and i - (entry_i or i) > C.FV_EXPIRE_D:
-                        st = FastVState.EXPIRED.value
+                    fade_flag = (st == FastVState.REBOUND_ACTIVE.value and fade <= -0.03)
+                    fade_flags[f["date_idx"][i]] = fade_flag
+                    if (st in (FastVState.ENTRY_CONFIRMED.value, FastVState.REBOUND_ACTIVE.value)
+                            and i - (entry_i or i) > C.FV_EXPIRE_D):
+                        st = FastVState.EXPIRED.value      # 缺陷修复(§3.1"数日至数周"): REBOUND_ACTIVE此前为吸收态, 永不过期
                 elif st in (FastVState.REVERSAL_FAILED.value, FastVState.EXPIRED.value):
                     if age > C.FV_EXPIRE_D + 10:
                         st, shock_i, run_low = FastVState.NO_SETUP.value, None, np.nan
@@ -134,6 +139,7 @@ class FastVEngine:
                     st = FastVState.EXPIRED.value
             states[f["date_idx"][i]] = st
         self._states[code] = states
+        self._fade[code] = fade_flags
 
     def state_at(self, code: str, day: str) -> str:
         if not self._built:
@@ -143,10 +149,23 @@ class FastVEngine:
         prior = [k for k in dmap if k <= key]
         return dmap[max(prior)] if prior else FastVState.NO_SETUP.value
 
+    def fade_at(self, code: str, day: str) -> bool:
+        """REBOUND_ACTIVE中修复衰竭(≤-0.03)当日标志 — exit_manager.rebound_fade条款的赋值源。"""
+        if not self._built:
+            self.build()
+        return bool(self._fade.get(code, {}).get(pd.Timestamp(day), False))
+
     def candidates(self, day: str) -> list:
         """当日 Fast-V 候选——可独立于长期趋势(本方法不查询 Long-Cycle)。"""
         if not self._built:
             self.build()
+        if self.data_mode == DataMode.STRICT.value:
+            self.strict_gate_report = getattr(self, "strict_gate_report", [])
+            self.strict_gate_report.append(
+                {"day": day, "gate": "STRICT_FAST_V",
+                 "reason": "严格模式下个股级机会同样依赖未验证成员/快照信任(SW_PARTIAL/UNKNOWN)与"
+                           "ST/停牌近似, 不产出正式信号(缺陷补全: FV此前无闸门)"})
+            return []
         out = []
         d = pd.Timestamp(day)
         for code, dmap in self._states.items():
@@ -176,7 +195,7 @@ class FastVEngine:
                 features_at_signal={"drop5": None if not np.isfinite(f["drop5"][i]) else round(float(f["drop5"][i]), 4),
                                     "drop10": None if not np.isfinite(f["drop10"][i]) else round(float(f["drop10"][i]), 4),
                                     "drop20": round(float(f["drop20"][i]), 4), "accel": None if not np.isfinite(f["accel"][i]) else round(float(f["accel"][i]), 4)},
-                entry_kind="REVERSAL_CANDIDATE/ENTRY_CONFIRMED",
+                entry_kind=EntryKind.PANIC_REBOUND.value,
                 entry_condition="恐慌冲击后企稳(低点不再下移≥3日)+反弹确认(收盘较运行低点≥3%且上穿MA5), 当日收盘可判",
                 invalidation_condition="再创新低/自反弹高点衰竭6%修复失败/波动环境改变触发风险失效",
                 research_horizon_m=None,

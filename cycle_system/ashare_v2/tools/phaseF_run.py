@@ -21,11 +21,11 @@ from cycle_system.ashare_v2.data_portal import DataPortal                  # noq
 from cycle_system.ashare_v2.runner import Runner                           # noqa: E402
 from cycle_system.ashare_v2.schemas import RunMode                         # noqa: E402
 
-rng = np.random.default_rng(42)
-
-
 def synth_panel():
-    """§9.2 A-H 内置合成面板(日历过滤交易日位点, 无假日断档)。"""
+    """§9.2 A-H 内置合成面板(日历过滤交易日位点, 无假日断档)。
+
+    rng在函数内播种(缺陷修复: 此前模块级rng使同进程第二次调用得到不同面板, 破坏§12可复现)。"""
+    rng = np.random.default_rng(42)
     from cycle_system import ashare_calendar as cal
     all_bd = pd.bdate_range("2022-06-01", "2026-06-30")
     dates = [d for d in all_bd if cal.is_trading_day(d)]

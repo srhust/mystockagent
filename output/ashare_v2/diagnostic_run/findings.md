@@ -1,7 +1,7 @@
 # Ashare Dual-Cycle V2 findings — mode=DIAGNOSTIC
 
 - 窗口: None  模拟天数: 0
-- 代码版本: d027ecc74084738ed8afdeb16f2523d3fd5358da  配置哈希: cc5cb7c990c2a499
+- 代码版本: 44e57df06e1792d1d1a8cc84bd593c9d638fb9f1  配置哈希: cc5cb7c990c2a499
 - 数据锚: manifest 90dd925b61c4…(250/250)
 
 ## 四态分离
@@ -20,7 +20,7 @@
 
 ## 单日诊断
 - 行业状态分布: ['BOTTOM_WATCH', 'DOWNTREND', 'EARLY_RECOVERY', 'EXPANSION']
-- 候选数: 31  假想分配: 3笔(现金守恒True), 拒绝理由样例: ['INSUFFICIENT_CASH_FOR_ONE_LOT']
+- 候选数: 27  假想分配: 2笔(现金守恒True), 拒绝理由样例: ['INSUFFICIENT_CASH_FOR_ONE_LOT', 'NAME_RISK_LOT_FLOOR']
 - Strict闸门(同数据): DATA_BLOCKED
 
 ## 失败项清单

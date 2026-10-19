@@ -18,10 +18,14 @@
 """
 from __future__ import annotations
 
+from cycle_system.ashare_v2 import _path  # noqa: F401,E402  旧模块路径引导(供冻结执行器同源整手函数)
+import ashare_executor as ex              # noqa: E402  只读复用lot_step(缺陷修复: 消除三处重复)
+
 from cycle_system.ashare_v2 import config as C
 
 COST_RATE_EST = 0.0011            # 双边费用粗估(佣金+印花+过户量级; 精确口径在E层执行器)
 NAV_VALUE_PER_SCORE_POINT = 0.01  # 每1评分点允许的NAV占比(保守工程上限, 未校准, 非收益率)
+UNKNOWN_INDUSTRY = "__UNKNOWN__"  # 行业缺失候选集中入此桶共享60%硬顶(缺陷修复: 此前inf绕过硬顶)
 
 
 def allocate(scored: list, holdings: list, cash: float, nav: float, ctx: dict) -> dict:
@@ -35,7 +39,8 @@ def allocate(scored: list, holdings: list, cash: float, nav: float, ctx: dict) -
     held_by_code = {h["code"]: h for h in holdings}
     ind_value = {}
     for h in holdings:
-        ind_value[h.get("industry", "")] = ind_value.get(h.get("industry", ""), 0.0) + h["value"]
+        _i = h.get("industry", "") or UNKNOWN_INDUSTRY
+        ind_value[_i] = ind_value.get(_i, 0.0) + h["value"]
     buys, rejects, swaps = [], [], []
     risk_used = sum(h["value"] * h.get("vol20", 0.0) for h in holdings)
     risk_cap = nav * C.PORT_DAILY_RISK_FRAC
@@ -61,15 +66,22 @@ def allocate(scored: list, holdings: list, cash: float, nav: float, ctx: dict) -
         stress = (ctx.get("risk_stress", {}) or {}).get(code, 1.0)
         risk_shares /= stress
         cash_shares = spendable / p
-        ind = ind_of.get(code, s.get("industry", ""))
-        ind_allowed_val = max(0.0, C.INDUSTRY_CONCENTRATION_ALLOWED * nav - ind_value.get(ind, 0.0)) if ind else float("inf")
+        ind = ind_of.get(code, s.get("industry", "")) or UNKNOWN_INDUSTRY
+        ind_allowed_val = max(0.0, C.INDUSTRY_CONCENTRATION_ALLOWED * nav - ind_value.get(ind, 0.0))
         shares = int(min(risk_shares, cash_shares, ind_allowed_val / p))   # 行业60%硬顶=截断至余量(非跳过)
-        base, step = (200, 1) if code.startswith("68") else (100, 100)     # 申报规则与冻结执行器同源
+        base, step = ex.lot_step(code)                                       # 统一调用冻结执行器同源函数
         if shares < base:
-            if ind and (ind_value.get(ind, 0.0) / nav) >= C.INDUSTRY_CONCENTRATION_ALLOWED - 1e-9:
+            if (ind_value.get(ind, 0.0) / nav) >= C.INDUSTRY_CONCENTRATION_ALLOWED - 1e-9:
                 rejects.append({"code": code, "reason": "INDUSTRY_CONCENTRATION_LIMIT", "industry": ind,
                                 "industry_w_now": round(ind_value.get(ind, 0.0) / nav, 4),
                                 "allowed": C.INDUSTRY_CONCENTRATION_ALLOWED, "score_points": s["score_points"]})
+                continue
+            if risk_shares < base:
+                # 缺陷修复(审查B): 单名σ上限致不足一手 ≠ 现金不足, 拒因如实且不得触发换仓
+                # (§5.4换仓语义=资金不足/预算停止; σ受限换入新股同样σ受限, 换仓无意义)
+                rejects.append({"code": code, "reason": "NAME_RISK_LOT_FLOOR", "score_points": s["score_points"],
+                                "risk_shares_max": round(risk_shares, 2), "one_lot_min": base,
+                                "vol20": v, "why": "σ预算下一手名义超过单名风险上限(非资金问题)"})
                 continue
             r = {"code": code, "reason": "INSUFFICIENT_CASH_FOR_ONE_LOT", "score_points": s["score_points"],
                  "one_lot_cost": round(base * p, 2), "spendable_left": round(spendable, 2)}
@@ -78,12 +90,6 @@ def allocate(scored: list, holdings: list, cash: float, nav: float, ctx: dict) -
                 rejects.append(r)
             continue
         shares = base + ((shares - base) // step) * step                   # 整手向下取整(避免执行器批量拒单)
-        if shares <= 0:
-            r = {"code": code, "reason": "INSUFFICIENT_CASH", "score_points": s["score_points"]}
-            swap = _try_swap(r, s, holdings, held_by_code, swaps, p, v, nav)
-            if not swap:
-                rejects.append(r)
-            continue
         val = shares * p
         add_risk = val * v
         if add_risk / nav > C.NAME_RISK_FRAC_OF_NAV + 1e-9:      # 截断后仍超单名风险(不应发生, 显式防御)
@@ -120,7 +126,11 @@ def allocate(scored: list, holdings: list, cash: float, nav: float, ctx: dict) -
 def _try_swap(reject_r, s, holdings, held_by_code, swaps, p, v, nav):
     if len(swaps) >= C.SWAP_DAILY_LIMIT or not holdings:
         return False
-    weakest = min((h for h in holdings if not h.get("risk_forced")), key=lambda h: h["score_points"])
+    free_h = [h for h in holdings if not h.get("risk_forced")]
+    if not free_h:
+        reject_r["swap_denied"] = {"why": "全部持仓处于风险强退队列, 不可用作换仓来源(空min守卫)"}
+        return False
+    weakest = min(free_h, key=lambda h: h["score_points"])
     edge = s["score_points"] - weakest["score_points"]
     cand_val = min(nav * C.NAME_RISK_FRAC_OF_NAV / max(p * v, 1e-9) * p, nav * 0.25)
     est_cost = (weakest["value"] + cand_val) * COST_RATE_EST

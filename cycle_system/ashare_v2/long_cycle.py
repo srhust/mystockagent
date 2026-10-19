@@ -81,7 +81,13 @@ class LongCycleEngine:
         self._hist: dict = {}            # industry → 状态序列(pd.Series)
         self._first_elig: dict = {}      # (code, entry_kind) → 首现日
         self._built = False
+        self._built_upto = None              # 截断build上界(缺陷修复: 越界查询禁止静默陈旧返回)
         self.strict_gate_report: list = []
+
+    def _guard_upto(self, day: str) -> None:
+        if self._built_upto is not None and pd.Timestamp(day) > self._built_upto:
+            raise RuntimeError(f"截断build(≤{self._built_upto.date()})后查询{day}: 禁止静默返回陈旧态, "
+                               "请重新build或查询更早日期(前缀因果守卫)")
 
     # ── 特征/状态构建(单程时序) ──
     def build(self, until_day: str | None = None) -> None:
@@ -116,6 +122,8 @@ class LongCycleEngine:
             sub = sub.set_index("date").sort_index()
             self._stk_tables[code] = stock_feature_table(sub["close_adj"], sub["amount"])
         self._built = True
+        self._built_upto = (pd.Timestamp(until_day) if until_day is not None
+                            else pd.Timestamp(max(dates)))
 
     def _step(self, ind, day, f, prev, mem):
         """状态迁移: 只用当日及以前特征行 f(全部因果)。mem: imp=MA250下方连续日,
@@ -124,6 +132,8 @@ class LongCycleEngine:
         def ok(k):
             v = f.get(k)
             return v is not None and not (isinstance(v, float) and np.isnan(v))
+        def okv(k, default):
+            return f[k] if ok(k) else default   # 缺陷修复: `x or d`哨兵对0.0/NaN失效(平坦底部trend60==0被误判)
         if prev is None or not ok("rp250") or not ok("trend250"):
             return LongCycleState.UNKNOWN.value
         below, slope_dn = bool(f["below_long"]), bool(f["slope250_down"])
@@ -139,11 +149,11 @@ class LongCycleEngine:
                 return LongCycleState.BOTTOM_WATCH.value
             return prev
         if prev == LongCycleState.DOWNTREND.value:
-            if f["rp250"] < 0.25 and (f["dd500"] or 0) < -0.25:
+            if f["rp250"] < 0.25 and okv("dd500", 0) < -0.25:
                 return LongCycleState.BOTTOM_WATCH.value
             return prev
         if prev == LongCycleState.BOTTOM_WATCH.value:
-            if bool(f["no_new_low_60"]) and bool(f["base_rising"]) and f["rp250"] < 0.45 and (f["trend60"] or -9) > -0.05:
+            if bool(f["no_new_low_60"]) and bool(f["base_rising"]) and f["rp250"] < 0.45 and okv("trend60", -9) > -0.05:
                 mem["ref"] = float(f["min60"])
                 return LongCycleState.BOTTOM_FORMING.value
             if f["rp250"] > 0.55 and f["trend250"] > 0:
@@ -155,15 +165,15 @@ class LongCycleEngine:
                 return LongCycleState.INVALIDATED.value          # 底部假设被否定
             if impaired:
                 return LongCycleState.TREND_IMPAIRED.value
-            if f["px"] > f["ma60"] and (f["trend60"] or -9) > 0:
+            if f["px"] > f["ma60"] and okv("trend60", -9) > 0:
                 return LongCycleState.EARLY_RECOVERY.value
             return prev
         if prev == LongCycleState.EARLY_RECOVERY.value:
             if impaired:
                 return LongCycleState.TREND_IMPAIRED.value
-            if f["px"] > f["ma250"] and f["trend250"] > 0 and (f["mom12"] or -9) > 0:
+            if f["px"] > f["ma250"] and f["trend250"] > 0 and okv("mom12", -9) > 0:
                 return LongCycleState.EXPANSION.value
-            if (f["trend60"] or 0) < -0.08 and f["rp250"] < 0.35 and mem["ref"]:
+            if okv("trend60", 0) < -0.08 and f["rp250"] < 0.35 and mem["ref"]:
                 if f["px"] < mem["ref"] * 0.95:
                     mem["ref"] = None
                     return LongCycleState.INVALIDATED.value
@@ -172,11 +182,11 @@ class LongCycleEngine:
         if prev == LongCycleState.EXPANSION.value:
             if impaired:
                 return LongCycleState.TREND_IMPAIRED.value
-            if (f["trend60"] or 0) < 0 and f["px"] < f["ma120"]:
+            if okv("trend60", 0) < 0 and f["px"] < f["ma120"]:
                 return LongCycleState.EARLY_RECOVERY.value         # 降档非清仓
             return prev
         if prev == LongCycleState.TREND_IMPAIRED.value:
-            if mem["above_long"] and f["px"] > f["ma120"] and (f["trend60"] or -9) > 0:
+            if mem["above_long"] and f["px"] > f["ma120"] and okv("trend60", -9) > 0:
                 return LongCycleState.EARLY_RECOVERY.value
             if f["trend250"] < -0.15 and f["rp250"] < 0.25:
                 return LongCycleState.DOWNTREND.value
@@ -187,6 +197,7 @@ class LongCycleEngine:
     def industry_state(self, industry: str, day: str) -> str:
         if not self._built:
             self.build(day)
+        self._guard_upto(day)
         d = self._states.get(industry or "", {})
         key = pd.Timestamp(day)
         prior = [k for k in d if k <= key]
@@ -209,15 +220,21 @@ class LongCycleEngine:
         """当日 Long-Cycle 机会(三类入口)。Strict 模式受行业信任闸门拒绝(显式报告)。"""
         if not self._built:
             self.build(day)
+        self._guard_upto(day)
         d = pd.Timestamp(day)
-        rel = self.membership.sector_of("", day)  # 行业层整体信任(SW=UNKNOWN/无记录)
-        trust = rel["sw_trust"]
+        sample = list(self._stk_tables.keys())[:25]
+        tally: dict = {}
+        for c in sample:
+            t_ = self.membership.sector_of(c, day).get("sw_trust", "UNKNOWN")
+            tally[t_] = tally.get(t_, 0) + 1
+        trust = max(tally, key=tally.get) if tally else "UNKNOWN"   # 缺陷修复: sector_of("")恒UNKNOWN使理由串误述证据
         if self.data_mode == DataMode.STRICT.value:
-            self.strict_gate_report.append({
-                "day": day, "gate": "industry_membership",
-                "status": Availability.DATA_BLOCKED.value,
-                "reason": f"申万历史成员={trust}(SW_PIT_VERIFIED不可得), 快照成分=CURRENT_SNAPSHOT_ONLY"
-                          " → Strict模式拒绝正式Long-Cycle信号(§7.2/§7.4)"})
+            gate = {"day": day, "gate": "industry_membership",
+                    "status": Availability.DATA_BLOCKED.value,
+                    "reason": f"申万历史成员={trust}(样本{len(sample)}码聚合, SW_PIT_VERIFIED不可得), "
+                              "快照成分=CURRENT_SNAPSHOT_ONLY → Strict模式拒绝正式Long-Cycle信号(§7.2/§7.4)"}
+            if not any(r["day"] == day and r["gate"] == gate["gate"] for r in self.strict_gate_report):
+                self.strict_gate_report.append(gate)     # 缺陷修复: 同日重复调用不再无界append
             return []
         panel = self.portal.price_panel()
         sector_of = panel.drop_duplicates("code").set_index("code")["sector"].to_dict()
@@ -262,7 +279,8 @@ class LongCycleEngine:
             if bool(row["no_new_low_60"]):
                 return EntryKind.EARLY_REVERSAL.value
         if (istate == LongCycleState.EXPANSION.value and not np.isnan(row["rp120"])
-                and 0.25 <= float(row["rp120"]) <= 0.75 and px > row["ma120"] and float(row["trend250"] or -9) > 0):
+                and 0.25 <= float(row["rp120"]) <= 0.75 and px > row["ma120"]
+                and (float(row["trend250"]) > 0 if pd.notna(row["trend250"]) else False)):
             return EntryKind.TREND_CONTINUATION.value
         return None
 
@@ -278,7 +296,9 @@ class LongCycleEngine:
                   EntryKind.TREND_CONTINUATION.value: "扩张期正常回撤后趋势延续(px>MA120且250趋势为正)"}[entry]
         rec = OpportunityRecord(
             industry=ind, industry_taxonomy_version="SECTOR_SNAPSHOT_CURRENT_ONLY",
-            membership_trust=MembershipTrust.CURRENT_SNAPSHOT_ONLY.value,
+            membership_trust=(MembershipTrust.SW_PARTIAL.value
+                              if mem.get("sw_trust") == MembershipTrust.SW_PARTIAL.value
+                              else MembershipTrust.CURRENT_SNAPSHOT_ONLY.value),  # 缺陷修复: 个股级SW分层落到记录(mem此前算而不用)
             code=code, engine=Engine.LONG_CYCLE.value, cycle_stage=istate,
             key_evidence=self._state_evidence(ind, day) + [
                 Evidence("stk_rp120", None if np.isnan(row["rp120"]) else round(float(row["rp120"]), 4), day,
