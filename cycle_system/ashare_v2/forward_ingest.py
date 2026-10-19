@@ -42,10 +42,20 @@ def _sha256(path: str) -> str:
     return h.hexdigest()
 
 
-def fetch_day(day: str, codes: list | None = None, per_call_sleep: float = 0.4) -> dict:
-    """抓取day日bar(akshare同源, 复用冻结管道fetch_one只读): raw+hfq两口径。"""
+def fetch_day(day: str, codes: list | None = None, per_call_sleep: float = 0.4,
+              force: bool = False) -> dict:
+    """抓取day日bar(akshare同源, 复用冻结管道fetch_one只读): raw+hfq两口径。
+
+    幂等: 当日csv+meta已存在且哈希自洽→直接返回既有meta(保留最早fetched_at证据,
+    不重抓500接口); 数据晚落盘(akshare当日bar收盘后生成)由调用方重试。--force重抓。"""
     import ashare_stock_pipeline as pipe          # 冻结文件: 只读调用, 不改写其CSV
     os.makedirs(ING_DIR, exist_ok=True)
+    if not force:
+        try:
+            load_day(day)
+            return json.load(open(os.path.join(ING_DIR, f"{day}.meta.json"), encoding="utf-8"))
+        except Exception:                          # noqa: BLE001  缺文件/失配都走重抓(失配由重抓覆盖并留痕meta)
+            pass
     day8 = day.replace("-", "")
     codes = codes or pipe.configured_stocks()
     rows, missing = [], []
@@ -132,12 +142,13 @@ def main() -> int:
     f = sub.add_parser("fetch")
     f.add_argument("--day", required=True)
     f.add_argument("--codes", default="")
+    f.add_argument("--force", action="store_true", help="重抓覆盖(默认幂等复用当日已抓取)")
     a = sub.add_parser("audit")
     a.add_argument("--day", required=True)
     x = ap.parse_args()
     if x.cmd == "fetch":
         codes = x.codes.split(",") if x.codes else None
-        print(json.dumps(fetch_day(x.day, codes), ensure_ascii=False))
+        print(json.dumps(fetch_day(x.day, codes, force=getattr(x, "force", False)), ensure_ascii=False))
     else:
         m = json.load(open(os.path.join(ING_DIR, f"{x.day}.meta.json"), encoding="utf-8"))
         df = load_day(x.day)

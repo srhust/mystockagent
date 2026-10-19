@@ -178,7 +178,11 @@ def cmd_plan(day: str, formal: bool = False) -> int:
     panel, frozen_max, inc_days = _merged_portal(day)
     import pandas as _pd
     if _pd.Timestamp(day) > _pd.Timestamp(frozen_max):
-        meta = FI.require_plan_ready(day)             # FORWARD/增量日: 收盘后抓取证明(P0-2)
+        try:
+            meta = FI.require_plan_ready(day)             # FORWARD/增量日: 收盘后抓取证明(P0-2)
+        except (FileNotFoundError, RuntimeError) as e:
+            print(json.dumps({"error": str(e), "code": "INCREMENT_NOT_READY"}, ensure_ascii=False))
+            return 6
     else:
         meta = {"fetched_at": "frozen-layer", "source": "R31 frozen manifest(verify_hashes通过)",
                 "csv_sha256": "frozen", "codes_missing": [], "note": "REPLAY演练日在冻结层内, 无需增量"}
@@ -256,7 +260,11 @@ def cmd_execute(day: str, formal: bool = False) -> int:
         return 2
     if _run_kind(signal_day) == "FORWARD":
         _module_audit()                                # 执行记账同样验预测模块哈希
-    inc = FI.load_day(day)                             # raw OHLC(增量层, 哈希已验)
+    try:
+        inc = FI.load_day(day)                             # raw OHLC(增量层, 哈希已验)
+    except (FileNotFoundError, ValueError) as e:
+        print(json.dumps({"error": str(e), "code": "INCREMENT_NOT_READY"}, ensure_ascii=False))
+        return 6
     df_inc = inc.set_index("code")
     px1 = {c: float(v) for c, v in df_inc["open"].to_dict().items() if v == v and v > 0}
     frozen = DataPortal(data_mode=C.PIT_RESEARCH).price_panel()

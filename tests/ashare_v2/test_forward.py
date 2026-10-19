@@ -202,6 +202,16 @@ def test_p01_execute_rejects_intraday(tmp_path, monkeypatch):
     assert FS.cmd_execute("2026-10-16") == 5, "盘中(10:00)重建拒绝"
 
 
+def test_missing_increment_graceful_rc6(tmp_path, monkeypatch):
+    """P0-2负例: 增量层缺日 → plan/execute均给出结构化拒绝(rc=6), 不裸抛。"""
+    codes = ["600040"]
+    panel = _synth_panel(codes, end="2026-10-15")
+    _fwd_env(tmp_path, monkeypatch, panel)
+    monkeypatch.setattr(FI, "require_plan_ready",
+                        lambda day: (_ for _ in ()).throw(FileNotFoundError(f"增量层无{day}数据/审计meta")))
+    assert FS.cmd_plan("2026-10-19") == 6, "增量缺失plan结构化拒绝"
+
+
 def test_audit_baseline_merges_addendum(tmp_path, monkeypatch):
     """R0原件永不改写; addendum按版本序合并为审计基线(工具版本单独记录)。"""
     monkeypatch.setattr(FS, "FWD_DIR", str(tmp_path))
