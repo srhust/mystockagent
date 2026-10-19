@@ -47,7 +47,14 @@ HEAD_P = os.path.join(FWD_DIR, "chain_head.json")
 STATE_P = os.path.join(FWD_DIR, "coord_state.json")
 FREEZE_P = os.path.join(FWD_DIR, "FREEZE.json")
 ADMIT_P = os.path.join(FWD_DIR, "FORMAL_ADMIT.json")
+LEDGER_NAME = "dual_cycle_v2_forward"
+LEDGER_NAME_REHEARSAL = "dual_cycle_v2_fwd_rehearsal"      # 准入前成交演练专用: 正式账本零写入
 TZ = timezone(timedelta(hours=8))
+
+
+def _state_rehearsal_p() -> str:
+    """运行期解析(随FWD_DIR): 禁止模块级冻结路径——否则tmp环境会污染真实目录。"""
+    return os.path.join(FWD_DIR, "coord_state_rehearsal.json")
 
 # 预测模块(冻结判据所在): 失配=拒绝FORWARD。辅助工具单列(变更须记录但不阻断, 分开审计)。
 PREDICTION_MODULES = (
@@ -163,8 +170,8 @@ class MergedPortal:
         return self._df
 
 
-def _ledger_last_date() -> str | None:
-    p = os.path.join(FWD_DIR, "ledger", "ledger_dual_cycle_v2_forward.jsonl")
+def _ledger_last_date(ledger_name: str) -> str | None:
+    p = os.path.join(FWD_DIR, "ledger", f"ledger_{ledger_name}.jsonl")
     if not os.path.exists(p):
         return None
     last = None
@@ -270,18 +277,31 @@ def cmd_plan(day: str, formal: bool = False, recover: bool = False) -> int:
 
 
 def cmd_execute(day: str, formal: bool = False) -> int:
-    """T+1延迟重建成交(raw open)。默认DIAGNOSTIC标注; 正式FORWARD绩效账本需准入文件。"""
+    """T+1延迟重建成交(raw open)。
+
+    裁定合规: 正式FORWARD绩效账本(ledger_dual_cycle_v2_forward)在准入(FORMAL_ADMIT.json+
+    --formal)之前**零写入**——默认全部成交进 rehearsal 账本与rehearsal state(从正式state
+    快照初始化), 正式状态/账本保持"从未自动成交"的原始性; 链记录(execution audit)始终写。"""
     import pandas as pd
-    if not os.path.exists(STATE_P):
+    gate = "FORMAL" if (formal and os.path.exists(ADMIT_P)) else "DIAGNOSTIC_REHEARSAL"
+    STATE_REHEARSAL_P = _state_rehearsal_p()
+    if gate == "FORMAL":
+        state_src = state_dst = STATE_P
+        ledger_name = LEDGER_NAME
+    else:
+        state_src = STATE_REHEARSAL_P if os.path.exists(STATE_REHEARSAL_P) else STATE_P
+        state_dst = STATE_REHEARSAL_P
+        ledger_name = LEDGER_NAME_REHEARSAL
+    if not os.path.exists(state_src):
         print(json.dumps({"error": "先执行 plan(信号日)才能 execute"}, ensure_ascii=False))
         return 2
     if _chain_has("EXECUTE", "exec_day", day):
         print(json.dumps({"error": f"{day} 已有EXECUTE记录(幂等拒绝)", "code": "IDEMPOTENT_EXECUTE"},
                          ensure_ascii=False))
         return 3
-    led_last = _ledger_last_date()
+    led_last = _ledger_last_date(ledger_name)
     if led_last and led_last >= day:
-        print(json.dumps({"error": f"账本已推进至{led_last}≥{day}但链上无该日EXECUTE记录"
+        print(json.dumps({"error": f"账本({ledger_name})已推进至{led_last}≥{day}但链上无该日EXECUTE记录"
                                    "(半执行崩溃窗口): 禁止自动重放(会双记账), 须人工对账后裁定",
                           "code": "LEDGER_ADVANCED_NO_RECORD"}, ensure_ascii=False))
         return 7
@@ -290,9 +310,9 @@ def cmd_execute(day: str, formal: bool = False) -> int:
         print(json.dumps({"error": f"重建须在{day}收盘后(现{now.isoformat()[:16]}): 盘中拒绝",
                           "code": "NOT_AFTER_CLOSE"}, ensure_ascii=False))
         return 5
-    coord = PortfolioCoordinator.load_state(STATE_P, nav0=C.NAV0,
-                                           ledger_root=os.path.join(FWD_DIR, "ledger"),
-                                           ledger_name="dual_cycle_v2_forward")
+    coord = PortfolioCoordinator.load_state(state_src, nav0=C.NAV0,
+                                            ledger_root=os.path.join(FWD_DIR, "ledger"),
+                                            ledger_name=ledger_name)
     signal_day = next((d for d, r_ in coord.plans.items() if r_["exec_day"] == day), None)
     if signal_day is None:
         print(json.dumps({"error": f"无信号日的计划以{day}为执行日"}, ensure_ascii=False))
@@ -329,7 +349,9 @@ def cmd_execute(day: str, formal: bool = False) -> int:
     rec = {"event": "EXECUTE", "signal_day": signal_day, "exec_day": day, **_prov(),
            "execution_mode": "DELAYED_REBUILD_RAW_OPEN",
            "price_basis": "raw open(执行/涨跌停/费用域), 非close_adj — P0-1修复",
-           "formal_gate": "FORMAL" if (formal and os.path.exists(ADMIT_P)) else "DIAGNOSTIC_REHEARSAL",
+           "formal_gate": gate,
+           "ledger_target": (f"FORMAL:{ledger_name}" if gate == "FORMAL"
+                             else f"REHEARSAL:{ledger_name}(正式账本与正式state零写入)"),
            "data_fetched_at": json.load(open(os.path.join(FI.ING_DIR, f"{day}.meta.json"),
                                              encoding="utf-8"))["fetched_at"],
            "fills": [{k: f.get(k) for k in ("code", "action", "shares", "price", "notional",
@@ -339,9 +361,10 @@ def cmd_execute(day: str, formal: bool = False) -> int:
            "nav": coord.nav(px1), "cash": round(coord.ledger.cash, 4),
            "positions": {c: p["total"] for c, p in coord.ledger.pos.items()}}
     FL.append_record(CHAIN_P, rec, freeze=_freeze())
-    coord.save_state(STATE_P)
+    coord.save_state(state_dst)
     head = _seal_head()
     print(json.dumps({"execute": day, "mode": rec["execution_mode"], "gate": rec["formal_gate"],
+                      "ledger_target": rec["ledger_target"],
                       "fills": len(fills), "rejects": len(rejects),
                       "adjustments": len(rec["plan_adjustments"]),
                       "nav": rec["nav"], "chain_seq": head["seq"]}, ensure_ascii=False))

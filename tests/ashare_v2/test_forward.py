@@ -234,6 +234,9 @@ def test_p01_real_panel_execute_fills_raw_open(tmp_path, monkeypatch):
     assert FS.cmd_execute("2026-10-19") == 0
     ex = FL.read_all(FS.CHAIN_P)[-1]
     assert ex["execution_mode"] == "DELAYED_REBUILD_RAW_OPEN"
+    assert ex["ledger_target"].startswith("REHEARSAL"), "准入前成交必须进演练账本"
+    assert not os.path.exists(os.path.join(FS.FWD_DIR, "ledger", "ledger_dual_cycle_v2_forward.jsonl")), \
+        "正式FORWARD绩效账本在准入前必须零写入"
     assert len(ex["fills"]) >= 3, f"实弹成交须非空: {len(ex['fills'])}"
     open_map = inc.set_index("code")["open"].to_dict()
     for f in ex["fills"]:
@@ -281,7 +284,7 @@ def test_recovery_plan_crash_state_missing(tmp_path, monkeypatch):
 
 
 def test_recovery_execute_blocked_when_ledger_advanced(tmp_path, monkeypatch):
-    """失败恢复核心防线(真实R31面板实弹): 真fills已入账本但链无EXECUTE → rc7拒绝双记账。"""
+    """失败恢复核心防线(真实R31面板实弹): 真fills已入演练账本但链无EXECUTE → rc7拒绝双记账。"""
     _fwd_real_env(tmp_path, monkeypatch)
     assert FS.cmd_plan("2026-10-16") == 0
     plan_rec = FL.read_all(FS.CHAIN_P)[-1]
@@ -291,12 +294,12 @@ def test_recovery_execute_blocked_when_ledger_advanced(tmp_path, monkeypatch):
     sig = frozen[frozen["date"] == pd.Timestamp("2026-10-16")].set_index("code")
     co = PortfolioCoordinator.load_state(FS.STATE_P, nav0=C.NAV0,
                                          ledger_root=os.path.join(FS.FWD_DIR, "ledger"),
-                                         ledger_name="dual_cycle_v2_forward")
+                                         ledger_name="dual_cycle_v2_fwd_rehearsal")
     fills, _ = co.execute_day("2026-10-16",
                               px_t1={c: float(v) * 1.005 for c, v in sig["close"].items()},
                               prev_close={c: float(v) for c, v in sig["close"].items()})
-    co.save_state(FS.STATE_P)
-    assert len(fills) >= 3, f"实弹前提: 真实fills入账(账本jsonl已落盘), got {len(fills)}"
+    co.save_state(FS._state_rehearsal_p())
+    assert len(fills) >= 3, f"实弹前提: 真实fills入账(演练账本jsonl已落盘), got {len(fills)}"
     json.dump({"fetched_at": "2026-10-19T15:30:00+08:00"},
               open(os.path.join(FI.ING_DIR, "2026-10-19.meta.json"), "w", encoding="utf-8"))
     monkeypatch.setattr(FI, "load_day", lambda d: pd.DataFrame({"code": [], "open": []}))

@@ -42,7 +42,11 @@ git diff --stat 8857398..HEAD -- fast_v.py long_cycle.py exit_manager.py opportu
 | schedule-842e6487 | `40 15 * * 1-5` | T日: `fetch <day>`(收盘后增量抓取, 禁 pipeline) → `plan <day>`; 要求确认 run_kind/formal_gate/chain_seq/head_hash; 拒绝码处置规则写入 prompt | cron 表达式+zone 回读 OK; scheduledAt=2026-10-19 15:40+08 |
 | schedule-e1be29c8 | `10 16 * * 1-5` (原09:40作废) | T+1: `fetch <day>` → `execute <day>` raw-open 延迟重建; 非15:00后拒绝在代码内(与时刻表双保险) | 回读 OK; 16:10>15:00 满足收盘后约束 |
 | 依赖 | python(anaconda)+pandas+akshare | 工作目录=仓库根(工具自带 _path 引导, 任意 cwd 可跑) | akshare 实测: fetch_one 600010 raw+hfq 双口径返回至 2026-10-16 ✓; 增量全池抓取 2026-10-19 实测运行中(见 §6) |
-| 退出码 | plan 0/2/3/4/6; execute 0/2/3/5/6; verify 0/1; seal 0/1 | 全部结构化 JSON stdout, 无裸 traceback | 负例测试 5 条覆盖 |
+| 退出码 | plan 0/2/3/4/6/7; execute 0/2/3/5/6/7; verify 0/1; seal 0/1 | 全部结构化 JSON stdout, 无裸 traceback | 负例测试覆盖(含rc7双防线) |
+
+## 4.1 正式绩效账本零写入 (验收13补强)
+
+DIAGNOSTIC 阶段的 execute 成交**不进正式账本文件**: state 快照初始化到 `coord_state_rehearsal.json`, fills 落 `ledger_dual_cycle_v2_fwd_rehearsal.jsonl`; 正式 `coord_state.json` 与 `ledger_dual_cycle_v2_forward.jsonl` 在准入(FORMAL_ADMIT.json + `--formal`)前保持"从未自动成交"的原始态。链记录(审计档案)始终写并标 `ledger_target`。实弹测试断言: rehearsal 成交 fills≥3 且**正式账本 jsonl 不存在**。修复过程自曝一处缺陷: rehearsal 路径曾写成模块级常量导致 tmp 测试污染真实目录——已改运行期解析并清理, 测试后真实目录核验无残留。
 
 ## 6. 完整 T/T+1 验证记录 (实盘)
 
