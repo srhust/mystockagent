@@ -10,7 +10,7 @@
 | 26 笔结构负期望 → 样本内负均值不外推 | AUDIT_FINAL §7.3+更正 #4 |
 | IP 确认封禁 → SUSPECTED_RATE_LIMIT_OR_CONNECTION_REJECTION | 更正 #5；**精确化后继=更正 #12**（东财 push2his 接口级、非 IP 级、sina/baostock 可达，直连 RemoteDisconnected 取证） |
 | RAW 账本 CORPORATE_ACTION_UNVERIFIED | `raw_bt/*/ledger_selfcheck.json` note 字段+R0 报告 F2；**注**：ca_bt 新账本已入账域改标（见 D） |
-| 旧污染 jsonl/旧 CSV 证据分离 | `independent/F4_no_cross_run_contamination.json` |
+| 旧污染 jsonl/旧 CSV 证据分离 | `independent/F3_ledger_isolation.json` + `independent/ledger_forensics_note.md` |
 
 ## B — R1 风险恢复状态机（P0）
 预注册 `independent/R1_PREREG.md`（R1.0-PREREG 六规则，读数前冻结）；合成测试 6/6；重放 30 迁移/状态日 ACTIVE 1090/COOLDOWN 177/PROBE 252/LOCKOUT 26；确定性逐数（9396.05/1545/18850750.5）；high_water_global min -0.6059 全程未重置（恢复不依赖旧峰值上涨✓）；LOCKOUT→COOLDOWN→PROBE→ACTIVE 强制序✓；R0 对照仅行为叙事（221/1545 LC 供给日交叉证）。产物 `independent/r1_risk_recovery.json`（重建后 parse 校验，更正 #8）。**零参数调优**✓（2020-2026 只验迁移）。
@@ -25,7 +25,7 @@
 run_kind 三值（FORWARD 仅 plan 于 T+1 开盘边界前生成；10-19 补录=LATE；更正 #7）：17 测试；链上首条=seq1 REPLAY(10-16)。**今日 15:52 哨兵**=10-20 盘后 plan 直播（EM 通则首条真 FORWARD；拒则零行闸门如实登记=阻断即设计正确，更正 #12 后新增决策⑤材料 `DESIGN_FORWARD_SOURCE_TRILEMMA.md`，默认 A+C）。更正账本 12 条全 append-only sha256 锚定✓。fetch_day 错误分布/上限/退避/熔断：`fetch_guard.py`（pacing_s 强化，更正 #6 M2 教训）+今日 `sina_channel_probe_2026-10-19.json`（248ok/2format/0network 实测分布）。
 
 ## F — 统一验收
-四份独立报告 F1-F4 在 `independent/`；R0 未动=F1（4 目录 hash 对比）；R1 可重放=F2 逐数；无跨运行污染=F4；FORWARD/LATE 分离=E-1+今日直播实录（LIVE_2026-10-20.log）；**全套测试 179 passed（ashare_v2 域 131）**；红线审计 R 项全 ok。
+四份独立报告 F1-F4 在 `independent/`；R0 未动=F1（4 目录 hash 对比）；R1 可重放=F2 逐数；账本隔离/无跨运行污染=F3；FORWARD/LATE 严格分离=F4+**今日直播实录**（LIVE_2026-10-20.log 待哨兵回填）；**全套测试 179 passed（ashare_v2 域 131）**；红线审计 R 项全 ok。
 
 ## 数据扩展（并行）
 POC M1+M2+深化三件套完成；`M3_REVIEW_PACKAGE.md` 待审（全量未启动✓）。
