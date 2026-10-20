@@ -141,6 +141,15 @@ def coverage(y: int) -> dict:
     got = sum(1 for c in codes if man["files"].get(c, {}).get("rows", 0) > 0)
     by = json.load(open(os.path.join(ROOT, "QC", "universe_by_year.json"), encoding="utf-8"))["years"][str(y)]
     rows_all = [man["files"][c]["rows"] for c in codes if man["files"].get(c, {}).get("rows", 0) > 0]
+    # 指标9跨年累积口径(2000年代年交易日仅~235-240, 单年250阈值失真; LC真需求=历史>=500日)
+    cum = {}
+    for y2 in range(1998, y + 1):
+        p2 = os.path.join(ROOT, "daily_sina", str(y2), "manifest.json")
+        if os.path.exists(p2):
+            m2 = json.load(open(p2, encoding="utf-8"))
+            for c, v in m2.get("files", {}).items():
+                cum[c] = cum.get(c, 0) + v.get("rows", 0)
+    lc_rate = round(sum(1 for c in codes if cum.get(c, 0) >= 500) / max(1, got), 4)
     cov = round(got / max(1, by["alive_any_time_in_year"]), 4)
     rep = {"year": y, "channel": "sina", "adjust_basis": COLS_NOTE,
            "指标1_历史存续数": by["alive_any_time_in_year"], "指标2_实获价格数": got,
@@ -151,7 +160,7 @@ def coverage(y: int) -> dict:
            "指标6_公司行动覆盖": "CA事件子批另跑(baostock dividend通道)",
            "指标7_行业PIT覆盖": "第二源p_stock2110实测中(见PIT_INDUSTRY_REPORT)",
            "指标8_FastV可计算率(>=60行)": round(sum(1 for r in rows_all if r >= 60) / max(1, got), 4),
-           "指标9_LongCycle可算率(当年>=250行)": round(sum(1 for r in rows_all if r >= 250) / max(1, got), 4),
+           "指标9_LongCycle可算率(该券跨年累积行数>=500)": lc_rate,
            "指标10_可信度": "PASS" if cov >= 0.85 else "MAJOR_GAP_SUSPEND"}
     tmp = os.path.join(ROOT, "QC", f"coverage_sina_{y}.json.tmp")
     json.dump(rep, open(tmp, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
