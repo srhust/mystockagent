@@ -1,0 +1,44 @@
+{
+ "tool": "live_crosscheck",
+ "day": "2026-10-20",
+ "frame": "独立对账证据(FORWARD入账路径=16元组sina不动, 红线)",
+ "rows": [
+  {
+   "code": "000002",
+   "bs": null,
+   "note": "TRADE_DATE_NOT_IN_BAOSTOCK(更新延迟非错误)"
+  },
+  {
+   "code": "000012",
+   "bs": null,
+   "note": "TRADE_DATE_NOT_IN_BAOSTOCK(更新延迟非错误)"
+  },
+  {
+   "code": "000050",
+   "bs": null,
+   "note": "TRADE_DATE_NOT_IN_BAOSTOCK(更新延迟非错误)"
+  },
+  {
+   "code": "000059",
+   "bs": null,
+   "note": "TRADE_DATE_NOT_IN_BAOSTOCK(更新延迟非错误)"
+  },
+  {
+   "code": "000060",
+   "bs": null,
+   "note": "TRADE_DATE_NOT_IN_BAOSTOCK(更新延迟非错误)"
+  }
+ ],
+ "verdict": "CROSSCHECK_DONE",
+ "guard": {
+  "ok": 5,
+  "fail": 0,
+  "retry_sleeps": 0,
+  "blocked": 0,
+  "breaker": "CLOSED",
+  "error_distribution": {},
+  "first_seen": {},
+  "rolling_calls": 5
+ },
+ "ts": "2026-10-20T16:02:42+08:00"
+}

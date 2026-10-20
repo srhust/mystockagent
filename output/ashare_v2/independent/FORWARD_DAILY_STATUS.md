@@ -22,13 +22,13 @@
 - C 层事实：sina probe 248/251 ok；baostock 对账 5/5 全等（crosscheck_2026-10-19.json）。
 - **FORWARD 累计：0**
 
-### 2026-10-20（周二，今日）
-- 15:52 哨兵单次有界主链抓取（裁定 C "只尝试一次"）→ [待回填]
-  - fetch 结果=____ / plan 生成时刻=____ / 链 seq2 run_kind=____
-- 16:20 LATE 彩排哨兵（10-19 fetch→plan 预期 LATE_RECONSTRUCTION 或如实跳过）→ [待回填]
-- C 层事实：sina probe 10-20 → [哨兵自动] / baostock 对账 → [若僵尸会话未清则顺延登记]
-- **今日结论判定（预注册）**：FORWARD seq2 成立 = 行数>0 ∧ plan∈[15:52,16:30] ∧ 链标 FORWARD ∧ wall<10-21 09:25；否则 FORWARD=0 当日 + 阻断实录。
-- **FORWARD 累计：____**（读数前不填）
+### 2026-10-20（周二，今日）——**结果实录**
+- 15:52:51 主链 fetch 2026-10-20：**rc=1 零成交行**（251 券执行全过、EM 接口拒供）→ `RuntimeError 前向数据不完整(禁止生成计划)` 闸门阻断 plan ✓ **不伪造**。
+- C 层 15:54 sina probe 10-20：**248 no_data / 0 network**（探针健康，sina 当日数据 15:54 未上架=数据事实非通道错误；16:40 后复测）。
+- C 层 16:02 baostock crosscheck：5/5 **TRADE_DATE_NOT_IN_BAOSTOCK**（官方日更延迟，非错误标注）；**通道自愈确认**（前僵尸态已清，会话健康）。
+- 16:20:40 LATE 彩排 fetch 10-19：同闸门**如实阻断**（无 plan 无 seq——LATE 实体化条件未满足，宁缺毋伪）。
+- **今日结论（按预注册判定）**：FORWARD seq2 **未成立**（rows=0）→ **当日 FORWARD=0 + 正式阻断实录**；链仍单条 seq1 REPLAY；16:20 后无新增 plan/seq 污染 ✓。
+- **FORWARD 累计：0**（诚实计数，EM 接口级封锁持续中的正确状态）
 
 ### 2026-10-21（周三，计划）
 - 若 10-20 FORWARD 成立：`execute 2026-10-21`（10-20 计划的真前向执行=T+1 raw open）+ 盘后 fetch/plan 当日 → FORWARD 逐日累积自本日启动。
