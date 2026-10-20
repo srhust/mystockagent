@@ -11,6 +11,7 @@
 | DC-4 | 通道对退市券能力（批1） | sina 结构无源 vs baostock 有能力但通道阻断 | 死券 823 清单待批；并集门定义入 coverage_union | OPEN（03:30 重试） |
 | DC-5 | p2110 登记深度不齐（B 线） | 同标准下 600008 首条 2000 vs 600000 首条 2008 | 区间头前一律 UNKNOWN，禁向前延伸（全量后修正：深度好于抽检预估，见 PIT_INDUSTRY §3） | CLOSED |
 | DC-6 | p2110 跨标准时序（B 线） | 申万旧(1063 券) vs 证监会2001(992 券)同券变更日期集合重合度 **median=0.0**（n=932，2004 前） | **定性=独立异源事件流（非单标准镜像）**——行业可信度分层依据成立：多标准同期重合=HIGH/单标准=降级/MULTI_DISAGREE 进本账；不择一覆盖 | CLOSED（分层规则入 PIT_INDUSTRY §2 消费侧） |
+| DC-7 | sina 双 endpoint 日更不齐（10-20） | 19:32 probe（hq 行情源）248 ok vs crosscheck（daily-hfq 源）5/5 SINA_MISSING_TODAY | 同机构两源更新时点独立，登记不覆盖；对账以 baostock 单日实取（000002 close 3.45）为第三方 = 当日数据真实性获证 | CLOSED |
 
 ## 2. 系统性交叉核验计划（未读数，预注册）
 1. **批4 = sina raw ↔ R31 冻结面板 ↔ baostock** 三层：同券同日 close 对比，容差 0.5%；超容差进本账新行；R31 值永不改写（差异方向由 baostock 第三方仲裁，如 DC-1 范式）。
