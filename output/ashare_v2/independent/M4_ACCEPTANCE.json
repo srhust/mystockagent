@@ -12,14 +12,15 @@
      0.8246,
      0.8361
     ],
-    "manifest_sha256_recorded": true
+    "manifest_sha256_recorded": true,
+    "dead_union_so_far": 8
    },
    "baostock_deadcode": {
-    "status": "BLOCKED_RETRY",
+    "status": "WINDOWED_RETRY",
     "codes": 823,
     "plan": "QC/deadcode_batch_plan_2000_2003.json",
     "retry": "03:30/12:00",
-    "evidence": "login 10054 @17:05"
+    "evidence": "login 10054 @17:05; 18:14实弹8券全成(600001-3@239bar/年入库)后全挂; 18:26定性翻案=服务端压缩流截断损坏(非限速非僵尸): decompress -5/-3+非法字节; 03:30低峰重试; 容忍8+稀释配置已上"
    },
    "union_qc": "PENDING(deadcode)",
    "gate_def": "union>=0.85 per A3"
@@ -44,7 +45,8 @@
   "R0_R1_untouched": "R1-R5 audit ok @16:03",
   "FORMAL_ADMIT": "absent",
   "no_param_opt": true,
-  "no_return_claims": true
+  "no_return_claims": true,
+  "self_report": "更正#15(误杀C层sleeper, 重挂无损失)+#16候选教训(定性需异常栈证据)入册"
  },
  "deliverables": {
   "1": "M4_BATCH_COVERAGE_REPORT.md",
@@ -55,5 +57,21 @@
   "6": "FORWARD_DAILY_STATUS.md",
   "7": "M4_ACCEPTANCE.json(本文件live draft)"
  },
- "updated": "2026-10-20T17:15+08:00"
+ "updated": "2026-10-20T18:40+08:00",
+ "line_B_p2110": {
+  "batch1_union_1279codes": {
+   "ok": 1026,
+   "empty": 203,
+   "fail": 0
+  },
+  "metric7_pit_coverage": {
+   "Y2000": 0.8079,
+   "Y2001": 0.8177,
+   "Y2002": 0.823,
+   "Y2003": 0.8369
+  },
+  "standards": 11,
+  "cross_standard_independence": "DC-6 median重合0.0(n932)=真异源, 分层规则HIGH/DOWNGRADE/DISAGREE成立",
+  "correction": "15样本UNKNOWN-MAJORITY预估被全量推翻(当日修正入报告)"
+ }
 }
