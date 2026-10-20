@@ -58,3 +58,15 @@
 
 ## 测试基线
 **100 passed**（tests/ashare_v2 全量，20:35 复核，含三日实弹 + `test_e1_forward_time_boundary`）。redline_audit R6=TRUE 同步复核（prediction_mismatch=0，FL/16 元组零触碰——E-1 全部在 tools 域）。
+
+
+---
+## 2026-10-20 傍晚刷新（第五阶段开工日 17:05）
+- **裁定五已启**：goal-75b8212c；PHASE5_RULING 原文落档+M3_APPROVAL hash 绑定。
+- **A1 完成**：区间存续 29 年全表（2000=1062），basic 官方 9014 券 1197 退市 outDate 100%，6/6 bar 互证。
+- **A2 双批器**：baostock 版八项（僵尸会话教训内嵌）+ sina 版八项（并集门/跨年 LC 口径）。
+- **批1 sina 完成**：3924 在市券（cov 0.81-0.84 单边）；**结构发现=sina 无退市券历史**（fail 全死券跨口径复现）；死券 823 清单待 baostock（通道 login 拒 10054 阻断中, 03:30/12:00 重试排定）。
+- **B 线突破**：cninfo p_stock2110=逐券行业归属全历史（600008 回溯 2000-04 申万旧），退市券 5/5 无记录=gap 待另源；clf_hist_sw 名不副实已识破。
+- **C 线直播日**：FORWARD 双闸门阻断如实（10-20 零行/10-19 LATE 同拒），R1-R5 全绿，链单 seq 无污染；提醒系统三处对齐裁定 C（单次有界/条件化 execute/sina 日更滞后 40min+→19:30 窗）。
+- **交付物**：#2 UNIVERSE、#4 CA_GAPS、#6 FORWARD_DAILY_STATUS、#1 M4_BATCH_COVERAGE 初版在库。
+- 下一步：03:30 死券重试→union QC→批2 决策；19:30 C 层复测；明日 15:52 同构。
