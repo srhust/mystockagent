@@ -3,21 +3,98 @@
  "day": "2026-10-20",
  "pool": 250,
  "error_distribution": {
-  "ok": 0,
+  "ok": 248,
   "network": 0,
-  "no_data": 248,
+  "no_data": 0,
   "missing_code": 0,
   "format": 2
  },
  "guard": {
-  "ok": 248,
+  "ok": 496,
   "fail": 2,
   "blocked": 0,
   "breaker": "CLOSED",
   "retry_sleeps": 0
  },
- "rows_ok_sample": [],
+ "rows_ok_sample": [
+  {
+   "code": "000002",
+   "status": "ok",
+   "open": 3.51,
+   "close": 3.45,
+   "volume": 241078230.0,
+   "hfq_close": 583.55,
+   "factor": 169.14492753623188
+  },
+  {
+   "code": "000012",
+   "status": "ok",
+   "open": 3.52,
+   "close": 3.51,
+   "volume": 10655779.0,
+   "hfq_close": 128.87,
+   "factor": 36.71509971509972
+  },
+  {
+   "code": "000050",
+   "status": "ok",
+   "open": 5.83,
+   "close": 5.82,
+   "volume": 18052184.0,
+   "hfq_close": 49.32,
+   "factor": 8.474226804123711
+  },
+  {
+   "code": "000059",
+   "status": "ok",
+   "open": 5.18,
+   "close": 5.13,
+   "volume": 22336703.0,
+   "hfq_close": 9.42,
+   "factor": 1.8362573099415205
+  },
+  {
+   "code": "000060",
+   "status": "ok",
+   "open": 5.35,
+   "close": 5.35,
+   "volume": 42688183.0,
+   "hfq_close": 224.58,
+   "factor": 41.97757009345795
+  }
+ ],
  "note_for_reviewer": "决策点⑤材料: 若批准sina为FORWARD源, 本表=该日全池可得性/错误分布; baostock对账差>0.5%行数另见live_crosscheck; 16元组fetch_day未动",
- "ts": "2026-10-20T16:33:29+08:00",
- "sina_vs_baostock_sample": []
+ "ts": "2026-10-20T19:47:03+08:00",
+ "sina_vs_baostock_sample": [
+  {
+   "code": "000002",
+   "sina": 3.45,
+   "baostock": 3.45,
+   "diff_pct": 0.0
+  },
+  {
+   "code": "000012",
+   "sina": 3.51,
+   "baostock": 3.51,
+   "diff_pct": 0.0
+  },
+  {
+   "code": "000050",
+   "sina": 5.82,
+   "baostock": 5.82,
+   "diff_pct": 0.0
+  },
+  {
+   "code": "000059",
+   "sina": 5.13,
+   "baostock": 5.13,
+   "diff_pct": 0.0
+  },
+  {
+   "code": "000060",
+   "sina": 5.35,
+   "baostock": 5.35,
+   "diff_pct": 0.0
+  }
+ ]
 }

@@ -47,6 +47,7 @@ def main() -> int:
         print(json.dumps(out, ensure_ascii=False))
         return 1
     for pure in a.codes.split(","):
+        pure = str(pure).strip().zfill(6)   # 防御: 某些shell/JSON链路会把"000002"变数字2
         code = ("sh." if pure.startswith("6") else "sz.") + pure
         try:
             def _q(c=code):

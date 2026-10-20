@@ -5,28 +5,43 @@
  "rows": [
   {
    "code": "000002",
-   "bs": null,
-   "note": "TRADE_DATE_NOT_IN_BAOSTOCK(更新延迟非错误)"
+   "bs_open": 3.51,
+   "bs_close": 3.45,
+   "tradestatus": "1",
+   "sina_close": null,
+   "flag": "SINA_MISSING_TODAY"
   },
   {
    "code": "000012",
-   "bs": null,
-   "note": "TRADE_DATE_NOT_IN_BAOSTOCK(更新延迟非错误)"
+   "bs_open": 3.52,
+   "bs_close": 3.51,
+   "tradestatus": "1",
+   "sina_close": null,
+   "flag": "SINA_MISSING_TODAY"
   },
   {
    "code": "000050",
-   "bs": null,
-   "note": "TRADE_DATE_NOT_IN_BAOSTOCK(更新延迟非错误)"
+   "bs_open": 5.83,
+   "bs_close": 5.82,
+   "tradestatus": "1",
+   "sina_close": null,
+   "flag": "SINA_MISSING_TODAY"
   },
   {
    "code": "000059",
-   "bs": null,
-   "note": "TRADE_DATE_NOT_IN_BAOSTOCK(更新延迟非错误)"
+   "bs_open": 5.18,
+   "bs_close": 5.13,
+   "tradestatus": "1",
+   "sina_close": null,
+   "flag": "SINA_MISSING_TODAY"
   },
   {
    "code": "000060",
-   "bs": null,
-   "note": "TRADE_DATE_NOT_IN_BAOSTOCK(更新延迟非错误)"
+   "bs_open": 5.35,
+   "bs_close": 5.35,
+   "tradestatus": "1",
+   "sina_close": null,
+   "flag": "SINA_MISSING_TODAY"
   }
  ],
  "verdict": "CROSSCHECK_DONE",
@@ -40,5 +55,5 @@
   "first_seen": {},
   "rolling_calls": 5
  },
- "ts": "2026-10-20T16:02:42+08:00"
+ "ts": "2026-10-20T19:52:15+08:00"
 }
