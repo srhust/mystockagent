@@ -67,11 +67,11 @@ def pull_one(ak, code: str, y: int, guard: FetchGuard):
     def _q():
         t = threading.Thread(target=_w, daemon=True)
         t.start()
-        t.join(25)
+        t.join(60)        # 校准: 25s口径批1实测18%假fail(慢查询后台最终成功), 60s贴合sina尾延迟
         if "exc" in box:
             raise box["exc"]                                          # 交guard重试/熔断
         if "df" not in box:
-            raise ConnectionError("SINA_HANG_25S")
+            raise ConnectionError("SINA_HANG_60S")
         df = box["df"]
         return df
     return guard.call(_q)
