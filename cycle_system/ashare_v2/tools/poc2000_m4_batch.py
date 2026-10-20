@@ -141,6 +141,10 @@ def write_year(bs, y: int, guard: FetchGuard) -> dict:
         man["files"][code] = {"rows": len(res), "sha256": sha256(dest),
                               "range_first": first, "range_last": last}
         stats["ok"] += 1
+        if (stats["ok"] + stats["skip"]) % 100 == 0:               # A2.6强化: 每100券续传落盘
+            mtmp0 = man_p + ".tmp"
+            json.dump(man, open(mtmp0, "w", encoding="utf-8"), ensure_ascii=False, indent=0)
+            os.replace(mtmp0, man_p)
     man["generated"] = datetime.now().isoformat(timespec="seconds")
     man["stats"] = stats
     man["elapsed_s"] = round(time.time() - t0, 1)
@@ -207,7 +211,7 @@ def main() -> int:
     if lg.error_code != "0":
         print("baostock登录失败:", lg.error_msg)
         return 7
-    guard = FetchGuard(cap_calls=1500, window_s=3600, max_retries=3, breaker_threshold=10,
+    guard = FetchGuard(cap_calls=1900, window_s=3600, max_retries=3, breaker_threshold=10,
                        breaker_reset_s=900, pacing_s=0.35)
     bad = []
     for y in years:
