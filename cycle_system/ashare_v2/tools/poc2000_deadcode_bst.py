@@ -97,13 +97,14 @@ def main() -> int:
             if err == "HANG":
                 hang_streak += 1
                 fail += 1
-                if hang_streak >= 3:
-                    print(f"CHANNEL_BLOCKED 连续3HANG @y{y} {code}; 已存 {ok}/{len(codes)} 续传友好退出")
+                if hang_streak >= 8:   # 18:20实弹修正: baostock=冷启动节流形态(前段连挂后段可成, 8/8成功实证), 容忍从3放宽到8并配合sleep稀释
+                    print(f"CHANNEL_BLOCKED 连续8HANG @y{y} {code}; 已存 续传友好退出")
                     mtmp = man_p + ".tmp"
                     json.dump(man, open(mtmp, "w", encoding="utf-8"), ensure_ascii=False, indent=0)
                     os.replace(mtmp, man_p)
                     bs.logout()
                     return 7
+                time.sleep(10)         # 挂后稀释: 给服务端窗口恢复时间
                 continue
             if err:
                 fail += 1
@@ -129,6 +130,7 @@ def main() -> int:
             man["files"][code] = {"rows": len(rows), "sha256": sha256(dest),
                                   "range_first": first, "range_last": last}
             ok += 1
+            time.sleep(1.0)            # 成功段pacing(节流形态防御)
             if (ok + skip) % 50 == 0:
                 mtmp = man_p + ".tmp"
                 json.dump(man, open(mtmp, "w", encoding="utf-8"), ensure_ascii=False, indent=0)
