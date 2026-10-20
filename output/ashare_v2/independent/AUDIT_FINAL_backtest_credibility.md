@@ -149,10 +149,36 @@ S1 2020-10-30 NAV 破峰值 80%（-20.42%）→ S2 EXCEEDED 边界振荡（11-02
 | 2855166 | B×C 交叉验证：**LC 供给日 R0=0 vs R1=221/1545**（行为级操作化证实）；全项目 30 JSON parse 审计 ALL_OK+更正 #8（手写 JSON 缺陷自报） |
 | 327da65 | live_crosscheck 对账工具入役（首跑复现 SINA_STALE 1.639%）；明日序列 2b；更正 #9 |
 | 7d1f0c9 | DESIGN_EXIT_LAYER_MISMATCH 设计稿（裁定 C-3 单独成篇不入 R1）；注：该 commit 信息声称含附录 C 但实际未入库（edit 竞态失败），由本 commit 补齐并登记更正 #10 |
+| bf3f337 | 附录 C 本体入库+更正 #10 登记 |
+| 118435d | **D 事件库全池收口**：ca_full_ingest 156 涉事券 100% COVERED（591 事件，UNVERIFIED 0）；更正 #11（无记录年语义+差别化税率双值） |
+| e409199 | ca_impact_bound：入账影响边界测量（DIVIDEND 562~623 元>5% 自触发集成；BONUS 命中 0） |
+| 4439495 | ca_apply 入账纯函数（CAI.0-PREREG 六规则）+7 单测（多 lot FIFO/市值守恒） |
+| acc8c35 | ledger_selfcheck CAI.5 扩展+四 run 零回归证明（--raw 口径教训） |
+| 0b4985c | **R1_CAI 重放接线**（--ca opt-in，81d NO_HOLDER 行为零漂移+无 ca 重跑 provenance-only 双证） |
+| 4b10d64 | **R1_CAI 集成重放完成**：multi C1-C4 全 n=0 TRUE/17 笔 1821.93 元/**路径敏感性发现**（9.1%→47% 复利分叉，narrative_ban） |
+| 8e4b0c5 | AUDIT_FINAL 附录 D（本发现+更正 #9 后继确认：sina 滞后 API 自修正） |
+| 430e1d2 | **FORWARD 通道取证反转**：EM 真源直连 RemoteDisconnected+接口分化定位；更正 #12（封锁精确化到东财接口级） |
+| 9dbb647 | 决策⑤材料：sina 全池 248ok/sina↔baostock 5/5 全等+三方案文档+15:52 哨兵 |
+| 2eb06b0 | D 可用性 Baostock 补登记（RIGHTS 配股 GAP 诚实入册）+退市边界首探 |
+| 608e90c | M3 评审包索引定稿+16:20 LATE 哨兵 |
+| 811709e | POC 深化三件套：A2 全扫 6/6 PASS/A1 二窗 0.000%/BONUS 旁证 v2 复合公式 21/22 |
+| 4724b83 | M3 包刷新（A1/A2/A3 状态升级，议题 1 关闭） |
+| d54fcf4 | PHASE4 验收索引+快照 10-20 晨刷新 |
+| c9fa2bb | 全套 179 passed 无回归+600188 残例三假说取证入档 |
+| 51dc45b | 测试口径澄清（179 全目录/131 域内）+注入攻击两条识别记录（未执行） |
+| be9a235 | 快照轮次50补记（r0_comparison 实测正确+误诊自拦截教训） |
+| 5dc1711 | E_LIVE 直播实录上午段+**判读框架读数前写死** |
+| 998aeb7 | CA 计数交叉校验闭环（先报 MISMATCH→anchor 边界语义→恒等式全闭合） |
+| 5f4a05e | CAI 预注册附录（BOUNDARY-1/2，POST-HOC 显式声明不改原文） |
+| e34b144 | CAI.BOUNDARY-2 防御行代码化（BONUS_UNAPPLIED_ALERT 账本内告警）+81d 零回归 |
+| dacc7c1 | M4 分批器预备（双保险拒绝实测 rc=9+占位异常；全量禁令代码化） |
+| 5d1256f | 交付索引 F4 引用错误修正+更正 #13 |
+| 73a2172 | 引用批验系统化（refcheck_docs.py）+2 真破缺修正+更正 #14 |
 
-关键量化状态：全套测试 **124 passed**；红线审计 R 项全 ok（16 元组 mismatch 空）；FORMAL_ADMIT 关闭；
-R0 产物零触碰；R1 重放确定性逐数吻合；待外部时钟：明日 15:50/16:10 直播
-（10-20 盘后 plan=首条真 FORWARD，序列 2b baostock 对账必做）+ M3 扩量评审（材料=QC/poc_report.json）。
+关键量化状态（2026-10-20 10:45 刷新）：全套测试 **179 passed（ashare_v2 域 131）**；红线审计 R1-R5 全 ok
+（16 元组 mismatch 空，今日 10:45 实测复跑）；更正账本 **14 条**；FORMAL_ADMIT 关闭；R0 产物零触碰；
+R1 重放确定性逐数吻合；待外部时钟：**今日 15:52 哨兵直播**（10-20 盘后 plan=首条真 FORWARD 尝试，
+EM 拒则闸门阻断如实入档）+ 16:20 LATE 彩排哨兵 + 审查者裁决（M3 扩量/决策⑤换源 A-B-C/行业二源）。
 
 ---
 
