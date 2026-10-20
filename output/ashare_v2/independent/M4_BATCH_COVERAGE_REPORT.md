@@ -37,3 +37,13 @@
 2. **sina 请求量级**：批2-3=37,615 券次，批4≈33,000 券次；@55/min 理想 11.4h+10h，限流折损 ×1.8 ≈ **20.5h+18h** → 排程=夜间窗 00:00-08:00 分 4-5 夜（不与哨兵/C 层/死券批争用；续传幂等使任意夜中断零损失）。
 3. **baostock 死券批**：批2-3 仅 97 券次（0.1h）+批1 823 券次（0.5h）——baostock 通道恢复后死券总工作 **<1h**；瓶颈全在通道封锁时长，与数据量无关。
 4. 批0（1998-99）≈1900 券次×2 年 sina ≈ 1.2h，随任一夜窗顺带。
+
+## 五检工程前提：新数据→研究层 schema 契约审计（17:45，零请求）
+R31 面板契约（data_portal 输入= date,open,high,low,close,volume,amount,adj_factor 8 列）↔ 批1 sina 列：
+| 面板列 | sina 批1 | 判定 |
+|---|---|---|
+| date/open/high/low/close/volume/amount | 全在 | **DIRECT 7/7** ✓ |
+| adj_factor | 无 | DERIVED_PENDING——桥接路径已预注册（DATA_CONFLICT §2-2 sina_raw×panel_factor ↔ baostock 后复权对账） |
+| （增益） | outstanding_share, turnover | 面板契约之外，股本突变候选集（指标6）由此承载 |
+
+结论：**完整性检查的工程前提成立**（新数据可在不修改冻结面板的前提下直接构建研究层输入）；状态机活性/账本守恒/执行约束三检=接线后跑，**接线时点在批4 union QC+审查者放行之后**（M4 未完不触预测域，红线 D 顺序已锁）。
