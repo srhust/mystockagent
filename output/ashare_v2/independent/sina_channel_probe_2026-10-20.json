@@ -18,6 +18,6 @@
  },
  "rows_ok_sample": [],
  "note_for_reviewer": "决策点⑤材料: 若批准sina为FORWARD源, 本表=该日全池可得性/错误分布; baostock对账差>0.5%行数另见live_crosscheck; 16元组fetch_day未动",
- "ts": "2026-10-20T16:00:56+08:00",
+ "ts": "2026-10-20T16:33:29+08:00",
  "sina_vs_baostock_sample": []
 }
