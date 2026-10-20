@@ -25,7 +25,7 @@
 run_kind 三值（FORWARD 仅 plan 于 T+1 开盘边界前生成；10-19 补录=LATE；更正 #7）：17 测试；链上首条=seq1 REPLAY(10-16)。**今日 15:52 哨兵**=10-20 盘后 plan 直播（EM 通则首条真 FORWARD；拒则零行闸门如实登记=阻断即设计正确，更正 #12 后新增决策⑤材料 `DESIGN_FORWARD_SOURCE_TRILEMMA.md`，默认 A+C）。更正账本 12 条全 append-only sha256 锚定✓。fetch_day 错误分布/上限/退避/熔断：`fetch_guard.py`（pacing_s 强化，更正 #6 M2 教训）+今日 `sina_channel_probe_2026-10-19.json`（248ok/2format/0network 实测分布）。
 
 ## F — 统一验收
-四份独立报告 F1-F4 在 `independent/`；R0 未动=F1（4 目录 hash 对比）；R1 可重放=F2 逐数；无跨运行污染=F4；FORWARD/LATE 分离=E-1+今日直播实录（LIVE_2026-10-20.log）；**全套测试 131 passed**；红线审计 R 项全 ok。
+四份独立报告 F1-F4 在 `independent/`；R0 未动=F1（4 目录 hash 对比）；R1 可重放=F2 逐数；无跨运行污染=F4；FORWARD/LATE 分离=E-1+今日直播实录（LIVE_2026-10-20.log）；**全套测试 179 passed（ashare_v2 域 131）**；红线审计 R 项全 ok。
 
 ## 数据扩展（并行）
 POC M1+M2+深化三件套完成；`M3_REVIEW_PACKAGE.md` 待审（全量未启动✓）。
