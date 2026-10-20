@@ -1,0 +1,17 @@
+{
+ "crosscheck_v2": {
+  "counts": {
+   "source_DIVIDEND": 553,
+   "source_BONUS": 21,
+   "total": 574,
+   "csv_rows": 552,
+   "audit_NO_HOLDER": 535,
+   "booked_rows": 17
+  },
+  "delta_1_explained": "600348 ex_date=2020-06-01=窗口首日=**anchor日非exec日**(replay对exec_day半开(start,end], 首日nav为起算锚与R0/R1语义一致)→不入审计属边界语义非bug",
+  "impact": "首日anchor无持仓无成交, 该事件即使入账也仅NO_HOLDER 0元行, 账本零影响",
+  "identity": "574 = 553 DIV + 21 BONUS; 553 = 552 审计行 + 1 anchor日; 552 = 535 NO_HOLDER + 17 入账; BONUS 21 由QC/BONUS_factor_consistency旁证覆盖",
+  "verdict": "ALL_CONSISTENT_WITH_BOUNDARY_SEMANTICS"
+ },
+ "discipline_note": "先报MISMATCH再取证再闭合——交叉校验不粉饰"
+}
