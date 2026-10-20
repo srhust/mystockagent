@@ -1,0 +1,34 @@
+{
+ "_title": "包D裁定可用性审计—Baostock通道补充登记(10-20, 东财/巨潮通道仍待实测)",
+ "DIVIDEND_BONUS": {
+  "interface": "baostock.query_dividend_data(report年报)",
+  "status": "EXISTS_IN_PRODUCTION_USE",
+  "evidence": "ca_full_ingest 156券591事件COVERED; ca_apply税档双值交叉校验; 送转=dividStocksPs送+dividReserveToStockPs转合并",
+  "limits": [
+   "无独立拆股事件(并入转增比例)",
+   "配股不在分红接口—见RIGHTS",
+   "税后双值=差别化规则, 消费层按持有期选档(CAI.3)"
+  ]
+ },
+ "RIGHTS": {
+  "interface": "未发现baostock独立配股接口",
+  "status": "GAP_UNVERIFIED",
+  "consequence": "涉配股持仓的除权日raw跌幅含配股价差—事件缺失期维持CORPORATE_ACTION_UNVERIFIED标注(涉配股窗口需人工公告核对, M4前限制声明)",
+  "candidates": [
+   "东财stock_history_dividend_detail(含配股列,待通道)",
+   "巨潮公告文本重建(慢路径)"
+  ]
+ },
+ "DELIST": {
+  "interface": "baostock.query_all_stock历史主表diff",
+  "status": "EXISTS_BOUNDARY_PARTIAL",
+  "evidence": "QC/delist_boundary_probe.json: 600002@2006-04-24/600065@2007-12-13确定终止; 600001/03/05/68 last_bar=窗尾2008-12-31→真实退市日UNKNOWN(不外推, A2 no-lookahead纪律: 未判定者标注待扩窗)",
+  "method_flaw_disclosed": "首探窗仅到2008—窗尾值不可当退市日, 已按纪律改标UNKNOWN而非猜测"
+ },
+ "SUSPEND_ST": {
+  "interface": "daily tradestatus/isST字段",
+  "status": "EXISTS_M2_VERIFIED",
+  "evidence": "M2 12券×6年切片全含, halt/st天数逐行"
+ },
+ "FORWARD_IMPACT": "16元组fetch_day源=东财(封锁中); baostock为对账/研究源非入账源(红线)"
+}
