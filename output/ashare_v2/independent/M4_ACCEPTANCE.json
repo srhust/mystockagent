@@ -1,0 +1,59 @@
+{
+ "phase5_baseline": "6967845",
+ "approval": "M3_APPROVAL_2026-10-20.json(裁定sha绑定)",
+ "batches": {
+  "batch1_2000_2003": {
+   "sina_in_market": {
+    "status": "DONE",
+    "files": 3924,
+    "cov_single_channel": [
+     0.8117,
+     0.8186,
+     0.8246,
+     0.8361
+    ],
+    "manifest_sha256_recorded": true
+   },
+   "baostock_deadcode": {
+    "status": "BLOCKED_RETRY",
+    "codes": 823,
+    "plan": "QC/deadcode_batch_plan_2000_2003.json",
+    "retry": "03:30/12:00",
+    "evidence": "login 10054 @17:05"
+   },
+   "union_qc": "PENDING(deadcode)",
+   "gate_def": "union>=0.85 per A3"
+  },
+  "batch2_2004_2010": {
+   "status": "HELD(A3门)"
+  },
+  "batch3_2011_2019": {
+   "status": "HELD"
+  },
+  "batch4_2020_2026": {
+   "status": "HELD",
+   "note": "R31三层交叉预注册于DATA_CONFLICT#2"
+  },
+  "batch0_warmup_1998_1999": {
+   "status": "QUEUED",
+   "why": "LC跨年500依赖(批1量化证据)"
+  }
+ },
+ "tests_snapshot": "179 passed(接裁定时基线, M4未完不触预测规则)",
+ "redline": {
+  "R0_R1_untouched": "R1-R5 audit ok @16:03",
+  "FORMAL_ADMIT": "absent",
+  "no_param_opt": true,
+  "no_return_claims": true
+ },
+ "deliverables": {
+  "1": "M4_BATCH_COVERAGE_REPORT.md",
+  "2": "HISTORICAL_UNIVERSE_REPORT.md",
+  "3": "PIT_INDUSTRY_REPORT.md",
+  "4": "CORPORATE_ACTION_GAPS.md",
+  "5": "DATA_CONFLICT_REPORT.md",
+  "6": "FORWARD_DAILY_STATUS.md",
+  "7": "M4_ACCEPTANCE.json(本文件live draft)"
+ },
+ "updated": "2026-10-20T17:15+08:00"
+}
