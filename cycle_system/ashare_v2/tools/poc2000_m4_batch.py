@@ -81,19 +81,36 @@ def cache_ok(path: str, rec: dict, y: int) -> bool:
 
 
 def pull_one(bs, code: str, y: int, guard: FetchGuard):
-    """A2.2: 三态返回 rows / EMPTY_OK / RAISE(交guard)。"""
-    def _q():
+    """A2.2+A2.7强化: 三态返回 rows / EMPTY_OK / RAISE(交guard)。
+    无会话→error 10001001可辨识=会话断, 重登后重试; 阻塞(僵尸会话)→线程超时按网络类重试。"""
+    import threading
+
+    box = {}
+
+    def _worker():
         rs = bs.query_history_k_data_plus(code, COLS, start_date=f"{y}-01-01",
                                          end_date=f"{y}-12-31", frequency="d", adjustflag="3")
-        if rs.error_code != "0":
-            msg = rs.error_msg
-            if any(k in msg for k in ("网络", "连接", "timeout", "recv")):
-                raise ConnectionError(msg)                      # 网络类→重试/熔断
-            return ("ERRDATA", msg)                              # 数据类→不重试, 计fail
         rows = []
-        while rs.next():
+        while rs.error_code == "0" and rs.next():
             rows.append(rs.get_row_data())
-        return rows                                              # []=该券年内无bar(停牌/边界)
+        box["rs"], box["rows"] = rs, rows
+
+    def _q():
+        t = threading.Thread(target=_worker, daemon=True)
+        t.start()
+        t.join(30)
+        if "rs" not in box:
+            raise ConnectionError(f"QUERY_TIMEOUT_30S(code={code})")   # 僵尸/限速→重试类
+        rs = box["rs"]
+        if rs.error_code != "0":
+            if rs.error_code == "10001001" or "login" in (rs.error_msg or "").lower():
+                bs.logout()
+                bs.login()                                             # 会话断→重登再试(算重试)
+                raise ConnectionError(f"SESSION_LOST({rs.error_code})")
+            if not (rs.error_msg or "").strip():
+                raise ConnectionError(f"EMPTY_ERRMSG({rs.error_code})")  # 空msg不当数据类静默
+            return ("ERRDATA", rs.error_msg)                             # 明确param类才终态fail
+        return box["rows"]                                               # []=年内无bar(停牌/边界)
     return guard.call(_q)
 
 
