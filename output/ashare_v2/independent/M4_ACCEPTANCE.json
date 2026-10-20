@@ -16,17 +16,26 @@
     "dead_union_so_far": 8
    },
    "baostock_deadcode": {
-    "status": "WINDOWED_RETRY",
+    "status": "DONE_ALL_WINDOWS",
     "codes": 823,
     "plan": "QC/deadcode_batch_plan_2000_2003.json",
     "retry": "03:30/12:00",
-    "evidence": "login 10054 @17:05; 18:14实弹8券全成(600001-3@239bar/年入库)后全挂; 18:26定性翻案=服务端压缩流截断损坏(非限速非僵尸): decompress -5/-3+非法字节; 03:30低峰重试; 容忍8+稀释配置已上"
+    "evidence": "login 10054 @17:05; 18:14实弹8券全成(600001-3@239bar/年入库)后全挂; 18:26定性翻案=服务端压缩流截断损坏(非限速非僵尸): decompress -5/-3+非法字节; 03:30低峰重试; 容忍8+稀释配置已上",
+    "codes_done": "823/823 (198+205+209+206)"
    },
-   "union_qc": "PENDING(deadcode)",
-   "gate_def": "union>=0.85 per A3"
+   "union_qc": {
+    "2000": 0.9981,
+    "2001": 0.9982,
+    "2002": 0.9975,
+    "2003": 0.9984,
+    "gate": "PASS_2026-10-20T20:40",
+    "short": "2券/年=empty边界事实"
+   },
+   "gate_def": "union>=0.85 per A3",
+   "qc_verdict": "PASS"
   },
   "batch2_2004_2010": {
-   "status": "HELD(A3门)"
+   "status": "UNLOCKED(sina侧21:00夜窗启动; 死券54券次待窗)"
   },
   "batch3_2011_2019": {
    "status": "HELD"
