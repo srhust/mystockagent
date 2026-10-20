@@ -1,7 +1,7 @@
 # Ashare Dual-Cycle V2 findings — mode=SHADOW
 
 - 窗口: ('2026-03-02', '2026-06-30')  模拟天数: 81
-- 代码版本: acc8c359fb0667774e57aa5eb9fb1a79053aa9c0  配置哈希: cc5cb7c990c2a499
+- 代码版本: 5f4a05eff583bd11dc3a0f38dd0bccadd5ff5254  配置哈希: cc5cb7c990c2a499
 - 数据锚: manifest 90dd925b61c4…(250/250)
 
 ## 四态分离

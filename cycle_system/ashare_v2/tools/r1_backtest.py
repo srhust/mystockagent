@@ -123,6 +123,15 @@ class R1Runner(RawRunner):
                 _d1s = rec["exec_day"]
                 for e_ in self.ca_events.get(_d1s, []):
                     if e_["type"] != "DIVIDEND":
+                        # CAI.BOUNDARY-2 防御行: 送转未启用配置下若出现持仓命中, 强制告警入审计
+                        _bh = sum(int(v.shares) for v in self.coord.virtuals
+                                  if v.code == e_["code"] and v.shares > 0)
+                        if _bh > 0:
+                            self.ca_rows.append({
+                                "day": _d1s, "code": e_["code"], "type": "BONUS_UNAPPLIED_ALERT",
+                                "shares_basis": _bh, "amount": 0.0, "tax_chosen": "N/A",
+                                "days_held": "", "source_event":
+                                    f"held={_bh}>0而送转入账未启用(CAI.BOUNDARY-2): 该窗禁称完整账本"})
                         continue          # BONUS重放内调整=hits 0(预注册); 一致性由事件加载旁证核
                     _lots = [{"shares": int(v.shares), "entry_day": v.opened_day}
                              for v in self.coord.virtuals
