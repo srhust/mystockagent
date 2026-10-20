@@ -1,0 +1,14 @@
+{
+ "mode": "R1_CAI_ON",
+ "events_in_window": 574,
+ "days_with_events": 351,
+ "non_dividend_events": 21,
+ "note": "入账=DIVIDEND应计制(ex_date当日盘后, CAI.1); BONUS重放内股数调整未启用(持仓命中0, CAI.4旁证核在coverage侧); 税档按lot持有期(CAI.3)",
+ "dividend_amount_total": 1821.93,
+ "n_audit_rows": 552,
+ "tier_dist": {
+  "NO_HOLDER": 535,
+  "TAX20_LT30": 9,
+  "TAX10_30_365": 8
+ }
+}

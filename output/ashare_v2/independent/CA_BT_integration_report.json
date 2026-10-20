@@ -1,0 +1,51 @@
+{
+ "_title": "Ashare V2 包D R1_CAI 集成重放证据(ca_bt)",
+ "_class": "ACCOUNTING_INTEGRATION_VERIFIED / PATH_DIVERGENCE_DISCLOSED / PERFORMANCE_CLAIM_FORBIDDEN",
+ "_baseline": "ashare-v2@0b4985c; R0(4目录)与R1(r1_bt)产物零触碰; CAI.0-PREREG六条规则读数前已冻结(4439495)",
+ "integration": {
+  "mode": "R1_CAI_ON",
+  "events_in_window": 574,
+  "days_with_events": 351,
+  "non_dividend_events": 21,
+  "note": "入账=DIVIDEND应计制(ex_date当日盘后, CAI.1); BONUS重放内股数调整未启用(持仓命中0, CAI.4旁证核在coverage侧); 税档按lot持有期(CAI.3)",
+  "dividend_amount_total": 1821.93,
+  "n_audit_rows": 552,
+  "tier_dist": {
+   "NO_HOLDER": 535,
+   "TAX20_LT30": 9,
+   "TAX10_30_365": 8
+  }
+ },
+ "ledger_selfcheck": "ca_bt multi(--raw): C1(期初-Σ成交+Σ派息审计) C2(NAV构成含派息) C3 C4(股数守恒) 全n=0 all_ok TRUE —— 1821.93元入账与账本现金流水逐日自洽, virtuals=同run物理持仓",
+ "readings_pathwise": {
+  "final_nav_ca": 17713.3,
+  "final_nav_r1_reference": 9396.05,
+  "dividends_booked": 1821.93,
+  "nav_final_delta": 8317.2,
+  "dd_global_min_ca": -0.4388,
+  "dd_global_min_r1": -0.6059,
+  "transitions_ca": 31,
+  "transitions_r1": 30,
+  "state_days_ca": {
+   "ACTIVE": 996,
+   "LOCKOUT": 45,
+   "COOLDOWN": 206,
+   "PROBE_REENTRY": 298
+  }
+ },
+ "critical_finding_path_sensitivity": {
+  "observation": "1821.93元(期初20000的9.1%)早期入账差 → 终值差+8317(期末的47%)",
+  "mechanism": "现金预算微移→成交路径分叉→2020-2021上行段复利放大; 逐日NAV差>0.1%的天数=1430/1545(几乎全程分叉)",
+  "implication": "本重放域对路径极端敏感: 任何非单源差异的实验在此域不可归因; R1对照设计的严格单源纪律(RAW域同流)由此获得独立证据支持; 此前7.1pp/26笔归因困难与此同根因",
+  "narrative_ban": "R1_CAI vs R1差异含两个来源(会计完整性+成交路径分叉), 严禁解释为分红使收益+88%, 严禁任何性能/优劣表述, 数值仅作PATHWISE披露"
+ },
+ "state_machine_note": "派息入账改变NAV→状态机输入改变, CA路径31迁移/LOCKOUT 45天为R1_CAI自身行为记录; 与R1的30迁移对照不构成功效结论(双源差异)",
+ "artifacts": [
+  "ca_bt/ca_r1_2020-06-01_2026-10-16/(17文件含ca_events.csv 552行/ca_audit.json)",
+  "ca_bt/ca_r1_2026-03-02_2026-06-30/(38事件全NO_HOLDER行为零漂移)"
+ ],
+ "next": [
+  "正向时间线: 今日15:50后10-20 plan=首条真FORWARD(外部时钟)",
+  "M3扩量评审(审查者)"
+ ]
+}

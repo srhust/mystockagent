@@ -1,0 +1,351 @@
+{
+ "version": "R1_CAI.0-PREREG(R1状态机+企业行动入账, 独立版本非R1行为延续)",
+ "tag": "ca_r1_2020-06-01_2026-10-16",
+ "disclaimer": "STATE-MACHINE-BEHAVIOR-VERIFICATION ONLY: 状态迁移活性/防跳变/守恒验证; 非收益改善宣称; REPLAY+RESEARCH+企业行动未入账(CORPORATE_ACTION_UNVERIFIED)",
+ "state_day_counts": {
+  "ACTIVE": 996,
+  "LOCKOUT": 45,
+  "COOLDOWN": 206,
+  "PROBE_REENTRY": 298
+ },
+ "transition_timeline": [
+  {
+   "day": "2020-09-11",
+   "from_state": "ACTIVE",
+   "to_state": "LOCKOUT",
+   "rule": "dd_period<=-0.2",
+   "dd_period": -0.2109460038394777,
+   "dd_global": -0.2109460038394777,
+   "breadth5": 0.3296,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2020-09-15",
+   "from_state": "LOCKOUT",
+   "to_state": "COOLDOWN",
+   "rule": "liquidated -> cooldown 20d (NAV-independent)",
+   "dd_period": -0.1984453213804216,
+   "dd_global": -0.1984453213804216,
+   "breadth5": 0.2672,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2020-10-21",
+   "from_state": "COOLDOWN",
+   "to_state": "PROBE_REENTRY",
+   "rule": "cooldown done & breadth5>=0.45",
+   "dd_period": -0.1984453213804216,
+   "dd_global": -0.1984453213804216,
+   "breadth5": 0.476,
+   "reanchor_peak_nav": 16296.32
+  },
+  {
+   "day": "2020-12-16",
+   "from_state": "PROBE_REENTRY",
+   "to_state": "ACTIVE",
+   "rule": "probe 40d complete & intact",
+   "dd_period": -0.007299694092399278,
+   "dd_global": -0.10903359370888344,
+   "breadth5": 0.4016,
+   "reanchor_peak_nav": 18114.14
+  },
+  {
+   "day": "2021-02-04",
+   "from_state": "ACTIVE",
+   "to_state": "LOCKOUT",
+   "rule": "dd_period<=-0.2",
+   "dd_period": -0.21380413375359963,
+   "dd_global": -0.2727283458815625,
+   "breadth5": 0.36479999999999996,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2021-02-10",
+   "from_state": "LOCKOUT",
+   "to_state": "COOLDOWN",
+   "rule": "liquidated -> cooldown 20d (NAV-independent)",
+   "dd_period": -0.20148379975243413,
+   "dd_global": -0.2613314026095266,
+   "breadth5": 0.36239999999999994,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2021-03-17",
+   "from_state": "COOLDOWN",
+   "to_state": "PROBE_REENTRY",
+   "rule": "cooldown done & breadth5>=0.45",
+   "dd_period": -0.20148379975243413,
+   "dd_global": -0.2613314026095266,
+   "breadth5": 0.6144000000000001,
+   "reanchor_peak_nav": 15017.79
+  },
+  {
+   "day": "2021-05-18",
+   "from_state": "PROBE_REENTRY",
+   "to_state": "ACTIVE",
+   "rule": "probe 40d complete & intact",
+   "dd_period": -0.022695807862762152,
+   "dd_global": -0.26113269020687235,
+   "breadth5": 0.5224,
+   "reanchor_peak_nav": 15021.83
+  },
+  {
+   "day": "2021-11-01",
+   "from_state": "ACTIVE",
+   "to_state": "LOCKOUT",
+   "rule": "dd_period<=-0.2",
+   "dd_period": -0.2057068328642323,
+   "dd_global": -0.2057068328642323,
+   "breadth5": 0.292,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2021-11-25",
+   "from_state": "LOCKOUT",
+   "to_state": "COOLDOWN",
+   "rule": "liquidated -> cooldown 20d (NAV-independent)",
+   "dd_period": -0.2246583851518913,
+   "dd_global": -0.2246583851518913,
+   "breadth5": 0.4248,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2021-12-23",
+   "from_state": "COOLDOWN",
+   "to_state": "PROBE_REENTRY",
+   "rule": "cooldown done & breadth5>=0.45",
+   "dd_period": -0.2246583851518913,
+   "dd_global": -0.2246583851518913,
+   "breadth5": 0.5904,
+   "reanchor_peak_nav": 16401.53
+  },
+  {
+   "day": "2022-02-25",
+   "from_state": "PROBE_REENTRY",
+   "to_state": "ACTIVE",
+   "rule": "probe 40d complete & intact",
+   "dd_period": -0.01778161154367086,
+   "dd_global": -0.14090424762479237,
+   "breadth5": 0.4344,
+   "reanchor_peak_nav": 18173.26
+  },
+  {
+   "day": "2022-12-01",
+   "from_state": "ACTIVE",
+   "to_state": "LOCKOUT",
+   "rule": "dd_period<=-0.2",
+   "dd_period": -0.20186519191192898,
+   "dd_global": -0.20186519191192898,
+   "breadth5": 0.8368,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2022-12-12",
+   "from_state": "LOCKOUT",
+   "to_state": "COOLDOWN",
+   "rule": "liquidated -> cooldown 20d (NAV-independent)",
+   "dd_period": -0.232707361493929,
+   "dd_global": -0.232707361493929,
+   "breadth5": 0.7263999999999999,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2023-01-18",
+   "from_state": "COOLDOWN",
+   "to_state": "PROBE_REENTRY",
+   "rule": "cooldown done & breadth5>=0.45",
+   "dd_period": -0.232707361493929,
+   "dd_global": -0.232707361493929,
+   "breadth5": 0.5,
+   "reanchor_peak_nav": 20744.8
+  },
+  {
+   "day": "2023-03-22",
+   "from_state": "PROBE_REENTRY",
+   "to_state": "ACTIVE",
+   "rule": "probe 40d complete & intact",
+   "dd_period": -0.1116694524493117,
+   "dd_global": -0.2604855091439825,
+   "breadth5": 0.296,
+   "reanchor_peak_nav": 19993.78
+  },
+  {
+   "day": "2024-01-22",
+   "from_state": "ACTIVE",
+   "to_state": "LOCKOUT",
+   "rule": "dd_period<=-0.2",
+   "dd_period": -0.20417475050071332,
+   "dd_global": -0.29617411515455483,
+   "breadth5": 0.3048,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2024-01-26",
+   "from_state": "LOCKOUT",
+   "to_state": "COOLDOWN",
+   "rule": "liquidated -> cooldown 20d (NAV-independent)",
+   "dd_period": -0.19552680807782563,
+   "dd_global": -0.28852589623751135,
+   "breadth5": 0.2672,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2024-03-04",
+   "from_state": "COOLDOWN",
+   "to_state": "PROBE_REENTRY",
+   "rule": "cooldown done & breadth5>=0.45",
+   "dd_period": -0.19552680807782563,
+   "dd_global": -0.28852589623751135,
+   "breadth5": 0.7807999999999999,
+   "reanchor_peak_nav": 19235.67
+  },
+  {
+   "day": "2024-05-06",
+   "from_state": "PROBE_REENTRY",
+   "to_state": "ACTIVE",
+   "rule": "probe 40d complete & intact",
+   "dd_period": -0.06526660752749114,
+   "dd_global": -0.2707997674243131,
+   "breadth5": 0.648,
+   "reanchor_peak_nav": 19714.92
+  },
+  {
+   "day": "2024-07-24",
+   "from_state": "ACTIVE",
+   "to_state": "LOCKOUT",
+   "rule": "dd_period<=-0.2",
+   "dd_period": -0.21703664027041447,
+   "dd_global": -0.429062935986945,
+   "breadth5": 0.38,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2024-08-01",
+   "from_state": "LOCKOUT",
+   "to_state": "COOLDOWN",
+   "rule": "liquidated -> cooldown 20d (NAV-independent)",
+   "dd_period": -0.19439845558592161,
+   "dd_global": -0.4125551664499215,
+   "breadth5": 0.33680000000000004,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2024-09-26",
+   "from_state": "COOLDOWN",
+   "to_state": "PROBE_REENTRY",
+   "rule": "cooldown done & breadth5>=0.45",
+   "dd_period": -0.19439845558592161,
+   "dd_global": -0.4125551664499215,
+   "breadth5": 0.5568,
+   "reanchor_peak_nav": 15882.37
+  },
+  {
+   "day": "2024-11-28",
+   "from_state": "PROBE_REENTRY",
+   "to_state": "ACTIVE",
+   "rule": "probe 40d complete & intact",
+   "dd_period": -0.10028820853619336,
+   "dd_global": -0.41101575803843415,
+   "breadth5": 0.36879999999999996,
+   "reanchor_peak_nav": 15923.99
+  },
+  {
+   "day": "2026-03-23",
+   "from_state": "ACTIVE",
+   "to_state": "LOCKOUT",
+   "rule": "dd_period<=-0.2",
+   "dd_period": -0.22512854940371096,
+   "dd_global": -0.22685820132591816,
+   "breadth5": 0.31920000000000004,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2026-03-26",
+   "from_state": "LOCKOUT",
+   "to_state": "COOLDOWN",
+   "rule": "liquidated -> cooldown 20d (NAV-independent)",
+   "dd_period": -0.19144380506976377,
+   "dd_global": -0.1932486473770878,
+   "breadth5": 0.2064,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2026-04-24",
+   "from_state": "COOLDOWN",
+   "to_state": "PROBE_REENTRY",
+   "rule": "cooldown done & breadth5>=0.45",
+   "dd_period": -0.19144380506976377,
+   "dd_global": -0.1932486473770878,
+   "breadth5": 0.6072,
+   "reanchor_peak_nav": 21811.62
+  },
+  {
+   "day": "2026-05-25",
+   "from_state": "PROBE_REENTRY",
+   "to_state": "LOCKOUT",
+   "rule": "probe FAIL dd_probe=-0.107",
+   "dd_period": -0.15138956797757652,
+   "dd_global": -0.27973218288260704,
+   "breadth5": 0.3104,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2026-05-26",
+   "from_state": "LOCKOUT",
+   "to_state": "COOLDOWN",
+   "rule": "liquidated -> cooldown 20d (NAV-independent)",
+   "dd_period": -0.15623935065467043,
+   "dd_global": -0.2838484914389363,
+   "breadth5": 0.3064,
+   "reanchor_peak_nav": null
+  },
+  {
+   "day": "2026-07-24",
+   "from_state": "COOLDOWN",
+   "to_state": "PROBE_REENTRY",
+   "rule": "cooldown done & breadth5>=0.45",
+   "dd_period": -0.15623935065467043,
+   "dd_global": -0.2838484914389363,
+   "breadth5": 0.45600000000000007,
+   "reanchor_peak_nav": 19362.13
+  },
+  {
+   "day": "2026-09-18",
+   "from_state": "PROBE_REENTRY",
+   "to_state": "ACTIVE",
+   "rule": "probe 40d complete & intact",
+   "dd_period": -0.11499355120977472,
+   "dd_global": -0.2817487265297547,
+   "breadth5": 0.3656,
+   "reanchor_peak_nav": 19418.9
+  }
+ ],
+ "n_transitions": 31,
+ "activity_check": {
+  "ever_recovered_after_first_lock": true,
+  "reached_active_again": true,
+  "days_in_terminal_flatline": 45
+ },
+ "final_nav_r1": 17713.3,
+ "r0_comparison_behavior_only": {
+  "r0_final_nav": 15840.76,
+  "r0_frozen_from": "2020-09-14",
+  "r0_days_locked": 1453
+ },
+ "fills": 827,
+ "mode": "SHADOW",
+ "ca_integration": {
+  "mode": "R1_CAI_ON",
+  "events_in_window": 574,
+  "days_with_events": 351,
+  "non_dividend_events": 21,
+  "note": "入账=DIVIDEND应计制(ex_date当日盘后, CAI.1); BONUS重放内股数调整未启用(持仓命中0, CAI.4旁证核在coverage侧); 税档按lot持有期(CAI.3)",
+  "dividend_amount_total": 1821.93,
+  "n_audit_rows": 552,
+  "tier_dist": {
+   "NO_HOLDER": 535,
+   "TAX20_LT30": 9,
+   "TAX10_30_365": 8
+  }
+ }
+}
