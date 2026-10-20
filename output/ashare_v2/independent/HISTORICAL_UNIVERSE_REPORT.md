@@ -42,3 +42,5 @@
 
 ## 5. 数据可信度
 `M4_TRUST_UNIVERSE = OFFICIAL_SOURCE_INTERVAL_BASED`（官方证券基本资料接口 + 双方法边界互证 + 原子落盘 + sha256 锚定）。行业 PIT 覆盖状态另见 PIT_INDUSTRY_REPORT（交付物 #3）。
+
+**17:36 全量升级**：批1 sina 落盘后 3854 券×年复验，IPO 当年 `range_first ≥ ipoDate` **313/313 一致 0 违反**（6/6 抽检→全量级证据）；退市边界 `last ≤ outDate` 互证结构性待 baostock 死券批（sina 无死券 bar）。
