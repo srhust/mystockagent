@@ -9,11 +9,11 @@
 | 7.10pp → PATHWISE_ACCOUNTING_DECOMPOSITION | `independent/AUDIT_FINAL_backtest_credibility.md` §7.2+更正 #3；**附录 D 路径敏感性给出该定性的机理证据**（9.1%期初差→47%终值差，双源不可归因） |
 | 26 笔结构负期望 → 样本内负均值不外推 | AUDIT_FINAL §7.3+更正 #4 |
 | IP 确认封禁 → SUSPECTED_RATE_LIMIT_OR_CONNECTION_REJECTION | 更正 #5；**精确化后继=更正 #12**（东财 push2his 接口级、非 IP 级、sina/baostock 可达，直连 RemoteDisconnected 取证） |
-| RAW 账本 CORPORATE_ACTION_UNVERIFIED | `raw_bt/*/ledger_selfcheck.json` note 字段+R0 报告 F2；**注**：ca_bt 新账本已入账域改标（见 D） |
+| RAW 账本 CORPORATE_ACTION_UNVERIFIED | `independent/raw_bt_metrics.json` `_disclaimer`（RAW 读数主入口标注）+ 更正 #4 锚定其原 hash；**注**：ca_bt 新账本已入账域改标（见 D） |
 | 旧污染 jsonl/旧 CSV 证据分离 | `independent/F3_ledger_isolation.json` + `independent/ledger_forensics_note.md` |
 
 ## B — R1 风险恢复状态机（P0）
-预注册 `independent/R1_PREREG.md`（R1.0-PREREG 六规则，读数前冻结）；合成测试 6/6；重放 30 迁移/状态日 ACTIVE 1090/COOLDOWN 177/PROBE 252/LOCKOUT 26；确定性逐数（9396.05/1545/18850750.5）；high_water_global min -0.6059 全程未重置（恢复不依赖旧峰值上涨✓）；LOCKOUT→COOLDOWN→PROBE→ACTIVE 强制序✓；R0 对照仅行为叙事（221/1545 LC 供给日交叉证）。产物 `independent/r1_risk_recovery.json`（重建后 parse 校验，更正 #8）。**零参数调优**✓（2020-2026 只验迁移）。
+预注册=**`tools/r1_state_machine.py` docstring PREREGISTERED 段**（R1.0-PREREG 六规则，冻结 @2c5ba44，读数前落码；原索引误写独立 md 文件名，更正 #14）；合成测试 6/6；重放 30 迁移/状态日 ACTIVE 1090/COOLDOWN 177/PROBE 252/LOCKOUT 26；确定性逐数（9396.05/1545/18850750.5）；high_water_global min -0.6059 全程未重置（恢复不依赖旧峰值上涨✓）；LOCKOUT→COOLDOWN→PROBE→ACTIVE 强制序✓；R0 对照仅行为叙事（221/1545 LC 供给日交叉证）。产物 `independent/r1_risk_recovery.json`（重建后 parse 校验，更正 #8）。**零参数调优**✓（2020-2026 只验迁移）。
 
 ## C — LC 独立审计
 `independent/lc_audit.json`：首候选成因/特征可用起点/warm-up；数据预热不足 vs 真实机会缺席区分；三模式同信息边界候选一致性；MA250/500 未动✓；退出层级错配=设计稿不入 R1（`DESIGN_EXIT_LAYER_MISMATCH.md`，裁定 C-3）✓。
