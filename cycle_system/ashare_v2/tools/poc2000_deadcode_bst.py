@@ -128,7 +128,9 @@ def main() -> int:
         if err:
             # 09:26修复: 服务端坏流(解码/decompress/接收异常)与HANG同格计入通道容忍,
             # 否则坏流走ERR路径空烧全清单(V2实跑120/258后坏流期空转118券的教训)
-            if "EXC" in err and any(k in err for k in ("UnicodeDecode", "OSError", "Error", "Exception")):
+            if "EXC" in err and any(k in err for k in ("UnicodeDecode", "OSError", "Error", "Exception",
+                                                       "WinError", "10054", "接收数据异常", "BadStatusLine",
+                                                       "ConnectionReset", "Timeout")):
                 hang_streak += 1
                 if hang_streak >= 8:
                     for y in years:
