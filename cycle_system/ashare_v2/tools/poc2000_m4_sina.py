@@ -31,7 +31,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..",
 from cycle_system.ashare_v2 import _path                                        # noqa: F401,E402
 from cycle_system.ashare_v2 import config as C                                   # noqa: E402
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from fetch_guard import FetchGuard, classify_error                                # noqa: E402
+from fetch_guard import FetchGuard, classify_error, CircuitOpen, RateLimitExceeded  # noqa: E402
 from poc2000_m4_batch import verify_approval, master_for_year                     # noqa: E402 复用①⑧
 
 ROOT = os.path.join(C.DATA_DIR, "ashare_history_2000")
@@ -97,14 +97,33 @@ def write_year(ak, y: int, guard: FetchGuard) -> dict:
            and rec.get("range_last", f"{y}-12-31") <= f"{y}-12-31" and rec.get("rows", 0) > 0:
             stats["skip"] += 1
             continue
-        try:
-            df = pull_one(ak, code, y, guard)
-        except Exception as e:
-            stats["fail"] += 1
-            if len(stats["errors"]) < 400:
-                stats["errors"].append(f"{code}:{classify_error(e)}")
-            continue
-        if df is None or len(df) == 0:
+        # 23:10修复(A2纪律): 熔断/限流窗=渠道自护非数据失败——等待后同券再问, 禁烧券计fail
+        df, guard_waits = None, 0
+        while True:
+            try:
+                df = pull_one(ak, code, y, guard)
+                break
+            except (CircuitOpen, RateLimitExceeded) as e:
+                guard_waits += 1
+                stats["guard_waits"] = stats.get("guard_waits", 0) + 1
+                if guard_waits > 6:
+                    print(f"  guard持续OPEN @{code}: 本批渠道阻断退出(续传友好)")
+                    mtmp = man_p + ".tmp"
+                    json.dump(man, open(mtmp, "w", encoding="utf-8"), ensure_ascii=False, indent=0)
+                    os.replace(mtmp, man_p)
+                    return 7
+                wait = max(90.0, guard.brk_reset - (time.time() - getattr(guard, "opened_at", 0)))
+                print(f"  guard-OPEN@{code}: wait {wait:.0f}s (券不消耗, attempt {guard_waits})")
+                time.sleep(wait)
+                continue
+            except Exception as e:
+                stats["fail"] += 1
+                if len(stats["errors"]) < 400:
+                    stats["errors"].append(f"{code}:{classify_error(e)}")
+                break
+        if df is None:
+            continue                      # 普通异常已在except计fail
+        if len(df) == 0:
             stats["empty"] += 1
             man["files"][code] = {"rows": 0, "sha256": "",
                                   "note": "no_bar_in_year(停牌/未上市边界事实)"}
@@ -184,6 +203,9 @@ def main() -> int:
     for y in range(lo, hi + 1):
         st = write_year(ak, y, guard)
         cv = coverage(y)
+        if isinstance(st, int):   # 早退诊断行安全(09:12修复: guard退出返int年份映射)
+            print(y, "pull: EARLY_EXIT", st, flush=True)
+            continue
         print(y, "pull:", {k: st[k] for k in ("alive", "ok", "skip", "fail", "empty")},
               "| cov:", cv["获取率"], "| 可信度:", cv["指标10_可信度"], flush=True)
         if cv["指标10_可信度"] != "PASS":
