@@ -5,6 +5,9 @@
 缺陷: 该表**无日期列**!! 实测只有名字序列 → 单独不可建区间。
 => 本工具先实证记录(试点3券), 若确无日期则沪市侧改判: 唯一官方路径=SSE官网更名史页
    (未封装, 待直接端点勘探) + baostock isST(通道恢复)——本脚本输出=证据文件非区间。
+10-21 21:35 **isST旁证实弹完成**: baostock日频isST字段可用, 12券代表批全成(000625/600681/
+600613等ST史区间与史实吻合) → QC/st_sh_isst_probe.json; 派生标记=旁证级(非官方更名史),
+区间近似=[首/末isST=1交易日]。沪市ST升级路径: 全存续券isST批(与死券V2同通道分窗)可排。
 """
 import json, os, sys, threading
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..")))
