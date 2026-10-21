@@ -15,7 +15,8 @@ from cycle_system.ashare_v2 import _path                                        
 from cycle_system.ashare_v2 import config as C                                    # noqa: E402
 
 ROOT = os.path.join(C.DATA_DIR, "ashare_history_2000")
-PANEL = os.path.join(C.DATA_DIR, "ashare", "_panel_cache.parquet")
+PANEL = os.path.join(os.path.abspath(os.path.join(os.path.dirname(_path.__file__), "..", "..")),
+                     "output", "ashare", "_panel_cache.parquet")
 
 
 def to_bst(code: str) -> str:
