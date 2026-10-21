@@ -26,9 +26,16 @@
 - 15:52:51 主链 fetch 2026-10-20：**rc=1 零成交行**（251 券执行全过、EM 接口拒供）→ `RuntimeError 前向数据不完整(禁止生成计划)` 闸门阻断 plan ✓ **不伪造**。
 - C 层 15:54 sina probe 10-20：**248 no_data / 0 network**（探针健康，sina 当日数据 15:54 未上架=数据事实非通道错误；16:40 后复测）。
 - C 层 16:02 baostock crosscheck：5/5 **TRADE_DATE_NOT_IN_BAOSTOCK**（官方日更延迟，非错误标注）；**通道自愈确认**（前僵尸态已清，会话健康）。
+- **C 层 19:3x 夜测（方案⑤定案实录）**：sina probe **248/248 ok**（收盘 3.5h 后=日更窗口 19:30 实定）；baostock crosscheck **5/5 单日实取**（000002 close 3.45/tradestatus 1）+ sina-hfq endpoint 仍缺当日=**DC-7 同机构双 endpoint 时点独立定案**。当日数据真实性获 baostock 第三方旁证；FORWARD 入账不变=0（C 层=数据事实非 FORWARD 事件）。
 - 16:20:40 LATE 彩排 fetch 10-19：同闸门**如实阻断**（无 plan 无 seq——LATE 实体化条件未满足，宁缺毋伪）。
 - **今日结论（按预注册判定）**：FORWARD seq2 **未成立**（rows=0）→ **当日 FORWARD=0 + 正式阻断实录**；链仍单条 seq1 REPLAY；16:20 后无新增 plan/seq 污染 ✓。
 - **FORWARD 累计：0**（诚实计数，EM 接口级封锁持续中的正确状态）
+
+### 2026-10-21（周三，交易日）——当日计划（预注册）
+- 15:50/15:52 **单次有界** EM fetch（通用哨兵 `_sentinel_day.py` 晨间挂起；rc99 超时兜底/零重试已固化）。
+- 成功→plan+verify+rehearsal+redline（验证早于 10-22 09:25 成交边界）；零行→阻断如实当日 FORWARD=0，**严禁切源伪造**。
+- 16:10 T+1 execute：**昨无 plan=正确空转**（禁补造）。
+- 19:30 C 层 probe+crosscheck 常规备份（不入 FORWARD）。
 
 ### 2026-10-21（周三，计划）
 - 若 10-20 FORWARD 成立：`execute 2026-10-21`（10-20 计划的真前向执行=T+1 raw open）+ 盘后 fetch/plan 当日 → FORWARD 逐日累积自本日启动。
