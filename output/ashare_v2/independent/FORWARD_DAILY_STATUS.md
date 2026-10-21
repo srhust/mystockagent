@@ -57,3 +57,5 @@
 - 16:10 T+1 execute：昨（10-20）无 plan=空转正确。
 - 19:30 C 层照挂（sina/baostock 旁证当日真值，不入 FORWARD）。
 - **FORWARD 累计：0**（两日阻断如实计数）
+
+- **19:3x-19:4x C 层（哨兵位手动替补——哨兵进程 19:0x 被宿主回收实录）**：probe **248/248 ok, network=0**（10-21 数据 sina 上架✓）；`sina_vs_baostock_sample` **全 diff_pct=0.0**（000002=3.46/000012=3.52/000050=5.79…双源互证当日真值，guard 496ok/2fail/breaker CLOSED）。当日 FORWARD 仍=0（C 层=数据事实）；两交易日数据真实性均获异源旁证。**教训追加**：Start-Process 托管亦可被宿主进程树回收（19816 无栈死亡）——时点动作以 schedule 提醒为准、常驻仅辅助；明日 08:30 晨挂提醒已在（22748b01）。
