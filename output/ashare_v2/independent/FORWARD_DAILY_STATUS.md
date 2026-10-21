@@ -50,3 +50,10 @@
 
 ## 4. FORMAL_ADMIT 恒关声明
 本文档任何台账**不构成** FORMAL_ADMIT 证据；状态线维持 ENGINEERING_AUDIT_PASS / RESEARCH_REPLAY_ONLY / FORMAL_ADMIT_BLOCKED（裁定红线，M4 未完不得改预测规则）。
+
+### 2026-10-21（周三）——**结果实录：FORWARD=0（阻断连续第 2 日）**
+- 15:52:5x 通用哨兵单次有界 fetch：**零成交行** → `RuntimeError 2026-10-21 零成交行抓取…禁止生成计划` 闸门阻断 ✓ **未切源未伪造，无重试**（LIVE_2026-10-21.log 15:54 行实录）。
+- 定性：EM 拒供 10-20/10-21 **连续两交易日**（错误签名一致 network/零行）=接口级持续封锁，非当日抖动；前向链 seq1 后无新增。
+- 16:10 T+1 execute：昨（10-20）无 plan=空转正确。
+- 19:30 C 层照挂（sina/baostock 旁证当日真值，不入 FORWARD）。
+- **FORWARD 累计：0**（两日阻断如实计数）
