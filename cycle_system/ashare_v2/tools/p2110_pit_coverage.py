@@ -37,7 +37,7 @@ for p in glob.glob(os.path.join(ROOT, "industry_p2110", "*.csv")):
             earliest[code] = min(ds)
 
 res = {"csv_files": n_csv, "with_records": len(earliest), "empty": man["stats"].get("empty") if "stats" in man else sum(1 for v in man["files"].values() if v.get("rows", 0) == 0)}
-for y in [2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010]:
+for y in list(range(2000, 2020)):
     alive = [l.strip() for l in open(os.path.join(ROOT, "universe", str(y), "alive.csv"), encoding="utf-8") if l.strip()]
     cov = sum(1 for c in alive if earliest.get(c, "9999") <= f"{y}-01-01")
     res[f"Y{y}_存续"] = len(alive)
