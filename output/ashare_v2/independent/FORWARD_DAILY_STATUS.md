@@ -59,3 +59,9 @@
 - **FORWARD 累计：0**（两日阻断如实计数）
 
 - **19:3x-19:4x C 层（哨兵位手动替补——哨兵进程 19:0x 被宿主回收实录）**：probe **248/248 ok, network=0**（10-21 数据 sina 上架✓）；`sina_vs_baostock_sample` **全 diff_pct=0.0**（000002=3.46/000012=3.52/000050=5.79…双源互证当日真值，guard 496ok/2fail/breaker CLOSED）。当日 FORWARD 仍=0（C 层=数据事实）；两交易日数据真实性均获异源旁证。**教训追加**：Start-Process 托管亦可被宿主进程树回收（19816 无栈死亡）——时点动作以 schedule 提醒为准、常驻仅辅助；明日 08:30 晨挂提醒已在（22748b01）。
+
+
+## 2026-10-22（FORWARD=0，连续第 3 交易日）
+
+- 15:52:5x 哨兵（11496，08:10 晨挂）单次有界 EM 抓取 → **零成交行 → 闸门阻断，无重试**（`LIVE_2026-10-22.log` + stdout 双证："gate stands, no retry (ruling C single bounded)"）。
+- 与 10-20/21 同型：EM 快照接口对该日持续无供，**正式阻断而非切源伪造**（裁定 C）。C 层 19:30 sina probe/crosscheck 在轨（哨兵自动段）。
