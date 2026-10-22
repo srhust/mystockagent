@@ -139,5 +139,20 @@
   "standards": 11,
   "cross_standard_independence": "DC-6 median重合0.0(n932)=真异源, 分层规则HIGH/DOWNGRADE/DISAGREE成立",
   "correction": "15样本UNKNOWN-MAJORITY预估被全量推翻(当日修正入报告)"
+ },
+ "ca_subbatch_1998_2019": {
+  "status": "DONE_UNVERIFIED_ZERO_2026-10-22T15:10",
+  "files": 3873,
+  "covered_events": 2277,
+  "covered_no_events": 1596,
+  "unverified": 0,
+  "events": {
+   "total": 21526,
+   "dividend": 16257,
+   "bonus": 5269,
+   "tax_ambiguous": 10666
+  },
+  "tool": "ca_full_ingest_v2(relogin400)",
+  "gap_remains": "rights(配股)GAP_UNVERIFIED + tax-timeline-prereg + consumption-enable gated by 五检"
  }
 }
