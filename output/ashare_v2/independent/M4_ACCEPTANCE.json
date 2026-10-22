@@ -89,8 +89,13 @@
    "residual": "23-33券/年=双源empty边界(与批1/2同型)"
   },
   "batch4_2020_2026": {
-   "status": "UNLOCKED(A3三门全过; r31_crosscheck预写b077091)",
-   "note": "R31三层交叉预注册于DATA_CONFLICT#2"
+   "status": "RUNNING_sina(29584夜窗19:56起)",
+   "sina_qc_so_far": {
+    "2020": 0.9459,
+    "2021": 0.9544,
+    "2022": 0.961
+   },
+   "plan": "2023-2025续夜+2026半截年如实标; V2死券批4+R31交叉=r31_crosscheck首实跑(10-23 08:40链)"
   },
   "batch0_warmup_1998_1999": {
    "status": "CLOSED_UNION_PASS_2026-10-22T06:42",
