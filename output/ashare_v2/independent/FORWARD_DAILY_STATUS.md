@@ -65,3 +65,9 @@
 
 - 15:52:5x 哨兵（11496，08:10 晨挂）单次有界 EM 抓取 → **零成交行 → 闸门阻断，无重试**（`LIVE_2026-10-22.log` + stdout 双证："gate stands, no retry (ruling C single bounded)"）。
 - 与 10-20/21 同型：EM 快照接口对该日持续无供，**正式阻断而非切源伪造**（裁定 C）。C 层 19:30 sina probe/crosscheck 在轨（哨兵自动段）。
+
+
+**19:47 C 层（哨兵自动段全绿，进程 11496 善终 DONE 19:47:30）**：
+- probe（渠道实时）：pool 250 → **248 ok / 2 format / network=0**（10-22 bar sina 渠道在档✓）
+- crosscheck：baostock **5/5 今日真值**（000002 收 3.31 等，tradestatus 全交易）；`sina_close=None` 的语义=**现役 STOCKS 面板无 10-22 bar**（面板停更属预期——FORWARD=0 无入库，非渠道缺数；probe 已证渠道有数）。两口径分清防误读。
+- EM 侧：15:52 单次有界零成交行 → 阻断三日连（FORWARD=0；C 层双源持续证明**市场数据本身每日齐备**，缺的只是东财快照接口供给）。
