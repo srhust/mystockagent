@@ -1,0 +1,59 @@
+{
+ "tool": "live_crosscheck",
+ "day": "2026-10-23",
+ "frame": "独立对账证据(FORWARD入账路径=16元组sina不动, 红线)",
+ "rows": [
+  {
+   "code": "000002",
+   "bs_open": 3.28,
+   "bs_close": 3.37,
+   "tradestatus": "1",
+   "sina_close": null,
+   "flag": "SINA_MISSING_TODAY"
+  },
+  {
+   "code": "000012",
+   "bs_open": 3.53,
+   "bs_close": 3.54,
+   "tradestatus": "1",
+   "sina_close": null,
+   "flag": "SINA_MISSING_TODAY"
+  },
+  {
+   "code": "000050",
+   "bs_open": 5.7,
+   "bs_close": 5.98,
+   "tradestatus": "1",
+   "sina_close": null,
+   "flag": "SINA_MISSING_TODAY"
+  },
+  {
+   "code": "000059",
+   "bs_open": 4.67,
+   "bs_close": 4.67,
+   "tradestatus": "1",
+   "sina_close": null,
+   "flag": "SINA_MISSING_TODAY"
+  },
+  {
+   "code": "000060",
+   "bs_open": 5.18,
+   "bs_close": 5.35,
+   "tradestatus": "1",
+   "sina_close": null,
+   "flag": "SINA_MISSING_TODAY"
+  }
+ ],
+ "verdict": "CROSSCHECK_DONE",
+ "guard": {
+  "ok": 5,
+  "fail": 0,
+  "retry_sleeps": 0,
+  "blocked": 0,
+  "breaker": "CLOSED",
+  "error_distribution": {},
+  "first_seen": {},
+  "rolling_calls": 5
+ },
+ "ts": "2026-10-23T19:44:44+08:00"
+}
