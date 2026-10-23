@@ -162,3 +162,10 @@ sina 九连 PASS（0.9007→0.938 逐年升, 3.06 万券次 10.9h 零烧券）+ 
 
 
 **17:45 ST 三方互洽核验**：sina-fetched 2007 名册抽 20 券 × baostock isST 日频 → **20/20 isST>0**（14 券全年 242/242、17 券 >50% 日；000007 最低 170/242=年内更名边界）——SZSE 官方更名史(DIRECT)、sina 简名(抓取侧)、baostock isST(派生) **三方互洽**，ST 度量层证据链闭合。档案 QC/st_crosscheck_isst.json。
+
+
+## 08:55 批4（2020-2026）**sina 侧七年全完 + R31 冻结层交叉核验达成**（A3 批4 判据）
+
+sina QC：2020-2026 = 0.9459/0.9544/0.9610/0.9708/0.9795/0.9891/**0.9956**（fail 递减=退市潮收敛，2026 半截年如实含至 10-20）。
+
+**r31_crosscheck 首实跑（纯本地零网络）**：六年 **356,220 对 (code,date) close 对账，median_rel=0.0、p99_rel=0.0、within_tol=1.0、over_tol=0** —— sina 历史层与 R31 冻结 panel **逐日逐券位级全等**（同 raw 基设想的终验）。files_missing=1/年（2025/26=0；R31 的 249 券个别年份 sina csv 未含该券全年——登记级小事实，明细 QC/r31_crosscheck_{Y}.json）。**A3 四批判据全部达成：批0/1/2/3 union 结案 + 批4 sina+R31 双证**。剩余批4 死券层 V2 专批+union（baostock 窗今日午后）。
