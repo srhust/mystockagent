@@ -71,3 +71,8 @@
 - probe（渠道实时）：pool 250 → **248 ok / 2 format / network=0**（10-22 bar sina 渠道在档✓）
 - crosscheck：baostock **5/5 今日真值**（000002 收 3.31 等，tradestatus 全交易）；`sina_close=None` 的语义=**现役 STOCKS 面板无 10-22 bar**（面板停更属预期——FORWARD=0 无入库，非渠道缺数；probe 已证渠道有数）。两口径分清防误读。
 - EM 侧：15:52 单次有界零成交行 → 阻断三日连（FORWARD=0；C 层双源持续证明**市场数据本身每日齐备**，缺的只是东财快照接口供给）。
+
+
+## 2026-10-23（FORWARD=0，连续第 4 交易日）
+
+- 15:52:37 哨兵（33776）单次有界 EM → 零成交行阻断（gate stands, no retry；与 10-20/21/22 同型第四日）。C 层 19:30 自动段在轨。
