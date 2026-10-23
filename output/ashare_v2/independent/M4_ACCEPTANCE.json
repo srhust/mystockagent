@@ -161,5 +161,21 @@
   },
   "tool": "ca_full_ingest_v2(relogin400)",
   "gap_remains": "rights(配股)GAP_UNVERIFIED + tax-timeline-prereg + consumption-enable gated by 五检"
+ },
+ "pit_industry_27yr": {
+  "status": "COMPLETE_2026-10-23T12:55",
+  "csv": 5224,
+  "with_records": 5224,
+  "fail": 0,
+  "y2020_2026": [
+   0.8552,
+   0.8564,
+   0.9487,
+   0.9428,
+   0.9766,
+   0.9879,
+   0.9867
+  ],
+  "trough": "Y2010=0.757 IPO-wave registration lag (PIT-correct)"
  }
 }
