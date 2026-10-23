@@ -178,5 +178,17 @@
    0.9867
   ],
   "trough": "Y2010=0.757 IPO-wave registration lag (PIT-correct)"
+ },
+ "five_check_sina": {
+  "status": "PASS_2026-10-24T06:15",
+  "files": 4359,
+  "rows": 980881,
+  "ohlc_bad": 0,
+  "vol_neg": 0,
+  "date_bad": 0,
+  "empty": 0,
+  "ret_gt22_hist_facts": 553,
+  "seed": 20261024,
+  "tool": "five_check_sina.py(6%/year reproducible)"
  }
 }
