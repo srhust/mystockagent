@@ -1,0 +1,23 @@
+{
+ "probe": "sina channel day-bar availability",
+ "day": "2026-10-24",
+ "pool": 250,
+ "error_distribution": {
+  "ok": 0,
+  "network": 0,
+  "no_data": 248,
+  "missing_code": 0,
+  "format": 2
+ },
+ "guard": {
+  "ok": 248,
+  "fail": 2,
+  "blocked": 0,
+  "breaker": "CLOSED",
+  "retry_sleeps": 0
+ },
+ "rows_ok_sample": [],
+ "note_for_reviewer": "决策点⑤材料: 若批准sina为FORWARD源, 本表=该日全池可得性/错误分布; baostock对账差>0.5%行数另见live_crosscheck; 16元组fetch_day未动",
+ "ts": "2026-10-24T19:38:04+08:00",
+ "sina_vs_baostock_sample": []
+}

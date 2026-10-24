@@ -98,7 +98,7 @@
     "2024": 0.9795
    },
    "plan": "2023-2025续夜+2026半截年如实标; V2死券批4+R31交叉=r31_crosscheck首实跑(10-23 08:40链)",
-   "union_tail": "PENDING_baostock_multi_day_maintenance(11 refusals over 21h; low-freq dual-window chain from 10-24)"
+   "union_tail": "PENDING_13_refusals(10-23 09:01 to 10-24 22:32; night loop 2355 + morning loops armed, idempotent launch)"
   },
   "batch0_warmup_1998_1999": {
    "status": "CLOSED_UNION_PASS_2026-10-22T06:42",
