@@ -214,3 +214,19 @@ sina QC：2020-2026 = 0.9459/0.9544/0.9610/0.9708/0.9795/0.9891/**0.9956**（fai
 第五阶段基线以来冻结域**未改一字节**（价格/行业/CA/五检等全部新增均在数据层与工具层，引擎零触碰）。
 盘上锚产物原样：R0 multi 15840.76 / R1 multi 9396.05 / R1_CAI 81d 14746.47。
 **取证方法自觉**：不重跑 r1_backtest（其 rmtree 重写冻结目录，与"永不改写"原则冲突且失败不可逆）——read-only git 证据链更强。ACCEPTANCE.frozen_proof 域登记。
+
+
+## 10:10 A2 抓取器八项修复对账（round 26，代码行级证据+实战案例双链）
+
+| # | 裁定项 | 实现证据 | 实战验证案例 |
+|---|---|---|---|
+| 1 | master_for_year 实装 | `poc2000_m4_sina.py:35` 复用 `poc2000_m4_batch.master_for_year`（baostock query_stock_basic 官方区间） | 29 年 alive.csv 全由区间构造（A1 定稿） |
+| 2 | 错误不静默 | `:87` stats.errors 列表 + `:209` 每年打印 fail/empty | 批4 各年 fail 23-225 全披露入 pull 行，零吞报 |
+| 3 | 缓存 SHA256+范围行数一致性 | `:43-44` sha256()；`:95` skip 条件=**sha256 相等∧行数在范围**双检 | 幂等重跑 skip 2257+2201 等全部经 hash 校验非盲跳 |
+| 4 | 临时文件原子替换 | `:139` bar 文件、`:113/146/152` manifest、`:186` coverage 全 tmp+os.replace | 十一探拒窗期多次强停，零半文件（.tmp 计数历次 0） |
+| 5 | 每年独立 manifest+coverage | `:83` manifest.json/年 + `:186` coverage_sina_{Y}.json/年 | 29/29 年 manifest 存在（glob 实测 29） |
+| 6 | 断点续传不重复 | `:93-98` skip 分支（sha+rows 双检） | 批3 run3 1544 券秒过；批4 从 2257 处无缝续 |
+| 7 | 限速退避熔断，禁无限重试 | FetchGuard pacing 1.0s/burst；CircuitOpen 等待≥90s 重**试同券不消耗**；>6 waits flush+rc7 | 25k 请求规模零烧券；guard-OPEN 记录 attempt 1/2 有界 |
+| 8 | 审批文件含范围与版本 | `:198` verify_approval(年份区间) + PHASE5_M4 hash 绑定（不符 rc8 拒跑） | 全部批次起跑即验章；c892a089 绑定链在账 |
+
+八项全实现且有实战双证——A2 交付判据达成，证据链并入 ACCEPTANCE 复核材料。
