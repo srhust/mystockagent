@@ -232,5 +232,9 @@
  "A2_eight_fixes_audit": {
   "status": "ALL_8_IMPLEMENTED_WITH_FIELD_EVIDENCE_2026-10-24T10:10",
   "detail": "M4_BATCH_COVERAGE_REPORT 10:10 表（代码行号+实战案例双链）"
+ },
+ "A1_five_dims_audit": {
+  "status": "4of5_FIELD_EVIDENCED + code_change=UNKNOWN_by_design_declared_2026-10-24T10:20",
+  "code_change_evidence": "baostock单值语义盲区+双源行数自洽零反例+不猜测合并原则(HISTORICAL_UNIVERSE §3-1)"
  }
 }
