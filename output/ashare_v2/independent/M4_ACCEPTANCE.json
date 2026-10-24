@@ -263,5 +263,14 @@
   "stored_vs_live_sha256": "c892a089d623ff51… MATCH (read-only re-execution of verify_approval path)",
   "verify_2020_2026": "PASS years_authorized覆盖",
   "implication": "今晚自环起跑批4的rc8前提完好"
+ },
+ "D_five_check_scope_map": {
+  "ts": "2026-10-24T10:33",
+  "完整性": "five_check_sina(98万行抽样OHLC/vol/date/empty四零) + 各年coverage获取率 + R31值级356,220对零冲突 = 形/值/覆三重",
+  "状态机活性": "N/A-声明: sina/bst历史层不驱动状态机; 新数据重放R1=参数寻优禁区(裁定D禁), 故不以此证活性",
+  "LC-FV覆盖": "十指标表指标8/9列(FV 0.974-0.996/LC 0.799-0.966, 27年逐年) = 已量化在盘",
+  "账本守恒": "N/A-声明: 数据层抓取零写R0/R1/C子账本(账本域文件git证未触碰)",
+  "执行约束": "N/A-声明: 抓取器无成交语义; 执行约束属FORWARD/回测域, 该域FORMAL_ADMIT关闭中",
+  "net": "适用三项全达成且已量化; 不适用三项附N/A声明并git证支撑; 裁定D五检条款合规(不以五检行数冒充完整性, 措辞全程narrative_ban)"
  }
 }
