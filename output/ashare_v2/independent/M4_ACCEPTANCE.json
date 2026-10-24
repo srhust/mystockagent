@@ -218,5 +218,15 @@
    "6_FORWARD_DAILY_STATUS": "滚动(周一只跑工作日)",
    "7_M4_ACCEPTANCE": "本文件=定稿态(union 尾巴落位后翻 CLOSED)"
   }
+ },
+ "frozen_proof": {
+  "method": "git diff baseline 6967845..HEAD --stat on r0_engine/r1_engine/state_engine/config (read-only; 重跑rmtree风险不对等故不重放)",
+  "result": "EMPTY_DIFF=零字节改动",
+  "anchors_on_disk": {
+   "R0_multi": 15840.76,
+   "R1_multi": 9396.05,
+   "R1_CAI_81d": 14746.47
+  },
+  "ts": "2026-10-24T10:00"
  }
 }
