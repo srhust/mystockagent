@@ -236,5 +236,16 @@
  "A1_five_dims_audit": {
   "status": "4of5_FIELD_EVIDENCED + code_change=UNKNOWN_by_design_declared_2026-10-24T10:20",
   "code_change_evidence": "baostock单值语义盲区+双源行数自洽零反例+不猜测合并原则(HISTORICAL_UNIVERSE §3-1)"
+ },
+ "B_five_paths_audit": {
+  "ts": "2026-10-24T10:22",
+  "B1_sw_members": "CURRENT_ONLY禁回填(实测识破hist假象)",
+  "B1b_early_versions": "版本时间线可用(1999/2014-02/2021-12-13+p2110内2021-07-30逐券切换样本实证)",
+  "B2_cninfo_p2110": "主第二源 COMPLETE: 5224券fail0×27年曲线×11标准并存(PIT_INDUSTRY §4)",
+  "B3_main_business_ann": "候选未立项(逐券公告抽取=立项级工程, 裁定为调查项, 如实OPEN)",
+  "B4_index_members": "半闭合(价格史有/成员PIT无=B1同缺陷)",
+  "core_judgement": "主第二源达成即B条款实质满足; 时间有效区间+证据等级+UNKNOWN维持三纪律27年零违反(无回填实证)",
+  "no_price_block": "价格抓取全程未因行业缺停(裁定原文合规)",
+  "code_year_semantics": "p2110按当期代码记录(如001872段2012后), 2000年无今日代码套用(§4曲线以当期存续券×当期记录)"
  }
 }
