@@ -247,5 +247,15 @@
   "core_judgement": "主第二源达成即B条款实质满足; 时间有效区间+证据等级+UNKNOWN维持三纪律27年零违反(无回填实证)",
   "no_price_block": "价格抓取全程未因行业缺停(裁定原文合规)",
   "code_year_semantics": "p2110按当期代码记录(如001872段2012后), 2000年无今日代码套用(§4曲线以当期存续券×当期记录)"
+ },
+ "C_forward_six_rules_audit": {
+  "ts": "2026-10-24T10:28",
+  "c1_single_bounded_1552": "四交易日四哨兵全 15:52±单跑(LIVE_10-21..23.log 时间戳+traceback 有界证; 10-20 手工环同语义)",
+  "c2_success_then_plan_gate": "条件未触发=EM 零供四连, 从未成功→无 PLAN 可验, 无伪造(如实空转)",
+  "c3_fail_formal_block_no_switch": "FORWARD=0 ×4 全走正式阻断, 源切换次数=0, sina/bst 从不当作 FORWARD 源入库(fetch_day 16元组域未动)",
+  "c4_1019_forever_late": "10-19 维持 LATE 定性零改写(第四阶段账+本阶段无一条 10-19 FORWARD 记录)",
+  "c5_no_highfreq_probe": "EM 探测=1次/交易日×4日=4 总; 零轮询; 严禁条款零违例(修正账无 C 类违例)",
+  "c6_conflict_register_only": "DC-1..7 + R31 missing_files 注 = 全登记零覆盖; 面板原值 sha 链未动",
+  "verdict": "C 六细则全部达成或以'条件未触发'形态合规; 前向连续性=等待 EM 供给侧恢复, 引擎侧随时可跑通(plan/execute 链就绪)"
  }
 }
