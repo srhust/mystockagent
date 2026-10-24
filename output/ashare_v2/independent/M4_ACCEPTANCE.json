@@ -190,5 +190,33 @@
   "ret_gt22_hist_facts": 553,
   "seed": 20261024,
   "tool": "five_check_sina.py(6%/year reproducible)"
+ },
+ "FINAL_SUMMARY": {
+  "as_of": "2026-10-24T09:15",
+  "state": "PENDING_UNION_TAIL_ONLY",
+  "price_layer": "1998-2026 sina 全 29 年 PASS(批0-4 sina 侧)+五检零违例(980,881 行抽样)+R31 冻结层 356,220 对零冲突",
+  "deadcode_bst_layer": "1998-2019 四批全完(union 0.9735-0.9996); 2020-2026 待窗(12 连拒, 低频自环 11648 在途)",
+  "universe_layer": "A1 官方池 1998-2026 全表(禁未来信息排除合规, HISTORICAL_UNIVERSE §2)",
+  "industry_pit": "p2110 五路第二源 27 年全曲线 5224 券 fail0(PIT_INDUSTRY §4), UNKNOWN 纪律无回填",
+  "corporate_actions": "1998-2019 3873 券 UNVERIFIED=0 事件 21,526 + 税制预注册定稿; 2020-2026 官方池段待窗接力(与死券同通道不并行)",
+  "forward": "FORWARD=0 x4 交易日 EM 零供如实阻断; C 层旁证 probe 248/250+crosscheck 5/5 每日双绿",
+  "frozen_redlines": "R0/R1 未触(锚 15840.76/9396.05), FORMAL_ADMIT 关闭, 无收益叙事, 冲突仅登记",
+  "pending": [
+   "批4 死券 union(自环窗口)",
+   "十指标 union 列补全",
+   "CA 2020-2026 段",
+   "沪市 ST 全池 isST 对账批",
+   "601607 类异常券续登",
+   "配股第二源(未立项)"
+  ],
+  "deliverables": {
+   "1_M4_BATCH_COVERAGE": "定稿(批0-3 结案+批4 sina 全完+五检+27 年表), 待 union 尾注终版",
+   "2_HISTORICAL_UNIVERSE": "定稿",
+   "3_PIT_INDUSTRY": "定稿",
+   "4_CORPORATE_ACTION_GAPS": "定稿(含税制预注册附件)",
+   "5_DATA_CONFLICT": "定稿(DC1-7+状态推进)",
+   "6_FORWARD_DAILY_STATUS": "滚动(周一只跑工作日)",
+   "7_M4_ACCEPTANCE": "本文件=定稿态(union 尾巴落位后翻 CLOSED)"
+  }
  }
 }
