@@ -257,5 +257,11 @@
   "c5_no_highfreq_probe": "EM 探测=1次/交易日×4日=4 总; 零轮询; 严禁条款零违例(修正账无 C 类违例)",
   "c6_conflict_register_only": "DC-1..7 + R31 missing_files 注 = 全登记零覆盖; 面板原值 sha 链未动",
   "verdict": "C 六细则全部达成或以'条件未触发'形态合规; 前向连续性=等待 EM 供给侧恢复, 引擎侧随时可跑通(plan/execute 链就绪)"
+ },
+ "approval_chain_recheck": {
+  "ts": "2026-10-24T10:30",
+  "stored_vs_live_sha256": "c892a089d623ff51… MATCH (read-only re-execution of verify_approval path)",
+  "verify_2020_2026": "PASS years_authorized覆盖",
+  "implication": "今晚自环起跑批4的rc8前提完好"
  }
 }
