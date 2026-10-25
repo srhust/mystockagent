@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""_morning_loop_b4 — 明日晨双探: 06:00主探→拒→08:30补探. 每天一实例自续."""
+"""_morning_loop_b4 v2 — 正确跨天定时: 睡到明天 06:00/08:30."""
 import datetime
 import subprocess
 import time
@@ -16,13 +16,19 @@ def probe_launch(tag):
     return r.returncode
 
 
-while datetime.datetime.now().strftime("%H:%M") < "06:00":
-    time.sleep(120)
+def wait_until(hhmm):
+    target = datetime.datetime.now() + datetime.timedelta(days=1)
+    due = target.replace(hour=int(hhmm[:2]), minute=int(hhmm[3:]),
+                         second=0, microsecond=0)
+    while datetime.datetime.now() < due:
+        time.sleep(min(600, max(10, (due - datetime.datetime.now()).total_seconds())))
+
+
+wait_until("06:00")
 rc = probe_launch("MORN0600")
 if rc == 0:
     print("LAUNCHED morning")
     raise SystemExit(0)
-while datetime.datetime.now().strftime("%H:%M") < "08:30":
-    time.sleep(120)
+wait_until("08:30")
 rc2 = probe_launch("MORN0830")
 print("FINAL rc=", rc2)
