@@ -9,9 +9,15 @@ import threading
 
 sys.path.insert(0, r"E:\mystockagent")
 
-# 勿双开: 检查现存 deadcode 进程
-tasklist = subprocess.run(["tasklist", "/FI", "IMAGENAME eq python.exe"],
-                          capture_output=True, text=True).stdout
+# 勿双开: 实检查——命令行含 deadcode 的 python 进程存在则 rc4
+_running = subprocess.run(
+    ["powershell", "-NoProfile", "-Command",
+     "Get-CimInstance Win32_Process -Filter \"Name='python.exe'\" | "
+     "Where-Object { $_.CommandLine -match 'deadcode' } | Select-Object -Expand ProcessId"],
+    capture_output=True, text=True).stdout.strip()
+if _running:
+    print("ALREADY_RUNNING pids:", _running.replace("\n", ","))
+    sys.exit(4)
 try:
     import baostock as bs
 except ImportError:

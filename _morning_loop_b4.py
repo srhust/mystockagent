@@ -17,9 +17,11 @@ def probe_launch(tag):
 
 
 def wait_until(hhmm):
-    target = datetime.datetime.now() + datetime.timedelta(days=1)
-    due = target.replace(hour=int(hhmm[:2]), minute=int(hhmm[3:]),
-                         second=0, microsecond=0)
+    now = datetime.datetime.now()
+    due = now.replace(hour=int(hhmm[:2]), minute=int(hhmm[3:]),
+                      second=0, microsecond=0)
+    if due <= now:                       # 今日时刻已过→明天; 未到→今日 (当日双探语义)
+        due = due + datetime.timedelta(days=1)
     while datetime.datetime.now() < due:
         time.sleep(min(600, max(10, (due - datetime.datetime.now()).total_seconds())))
 
