@@ -98,7 +98,7 @@
     "2024": 0.9795
    },
    "plan": "2023-2025续夜+2026半截年如实标; V2死券批4+R31交叉=r31_crosscheck首实跑(10-23 08:40链)",
-   "union_tail": "PENDING(truth: 10-24 evening 4 probes refused; 10-25 morning loop fired early by HH-string bug, fixed+rearmed 13676/20004)"
+   "union_tail": "PENDING(18 valid refusals since 10-23 09:01, maintenance 3.7d; 21224 tonight2355 + 24208 Tue dual-probe armed)"
   },
   "batch0_warmup_1998_1999": {
    "status": "CLOSED_UNION_PASS_2026-10-22T06:42",
@@ -281,5 +281,6 @@
   "xref_missing": 0,
   "verdict": "E条款收稿QA门通过(union尾巴落位后仅需终表刷新, 无结构变更)"
  },
- "CORRECTIONS_count": 24
+ "CORRECTIONS_count": 24,
+ "forward_C_2026-10-26": "PROBE_248of250_format2 + sina==baostock sample zero-diff; crosscheck 5/5 SINA_MISSING_TODAY=panel staleness known-semantics, registered not fixed"
 }
