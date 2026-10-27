@@ -282,5 +282,6 @@
   "verdict": "E条款收稿QA门通过(union尾巴落位后仅需终表刷新, 无结构变更)"
  },
  "CORRECTIONS_count": 24,
- "forward_C_2026-10-26": "PROBE_248of250_format2 + sina==baostock sample zero-diff; crosscheck 5/5 SINA_MISSING_TODAY=panel staleness known-semantics, registered not fixed"
+ "forward_C_2026-10-26": "PROBE_248of250_format2 + sina==baostock sample zero-diff; crosscheck 5/5 SINA_MISSING_TODAY=panel staleness known-semantics, registered not fixed",
+ "forward_em_block_streak": "6 trading days 2026-10-20..27; single bounded probe/day (sentinel-owned), no retry, no source switch, FORWARD=0 registered daily"
 }
